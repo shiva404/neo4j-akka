@@ -1,0 +1,231 @@
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
+       xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
+       xmlns="http://www.springframework.org/schema/beans"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+						   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						   http://www.springframework.org/schema/context
+						   http://www.springframework.org/schema/context/spring-context-3.0.xsd
+						   http://www.springframework.org/schema/data/neo4j
+		                   http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd
+		                   http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
+                           http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
+
+    <context:annotation-config/>
+    <ehcache:annotation-driven cache-manager="ehCacheCacheManager" />
+    
+    <context:component-scan base-package="com.campusconnect.neo4j.akka.facebook.worker" />
+    <import resource="beans-commons.xml" />
+    <neo4j:repositories base-package="com.campusconnect.neo4j.repositories"/>
+    <neo4j:config base-package="com.campusconnect.neo4j.types" graphDatabaseService="graphDatabaseService"/>
+    
+    <bean id="graphDatabaseService"
+          class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase" name="graphDatabaseService">
+        <constructor-arg index="0" value="http://127.0.0.1:7474/db/data"/>
+        <constructor-arg index="1" value="neo4j"/>
+        <constructor-arg index="2" value="password123"/>
+    </bean>
+
+    <bean class="org.springframework.data.neo4j.support.Neo4jTemplate" id="neo4jTemplate" name="neo4jTemplate">
+        <constructor-arg index="0" ref="graphDatabaseService"/>
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.da.UserDaoImpl" id="userDao">
+        <constructor-arg index="0" ref="neo4jTemplate"/>
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.da.CollegeDao" id="collegeDao">
+        <constructor-arg index="0" ref="neo4jTemplate"/>
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.da.DepartmentDao" id="departmentDao">
+        <constructor-arg index="0" ref="neo4jTemplate"/>
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.da.GroupDao" id="groupDao">
+        <constructor-arg index="0" ref="neo4jTemplate"/>
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler" id="goodreadsAsynchHandler">
+        <property name="successListener" ref="grSuccessListener"/>
+        <property name="saveBooksToDbRouter" ref="saveBookToDbRouter" />
+        <property name="getAndSaveBooksRouter" ref="getBooksRouter"/>
+        <property name="addGoodreadsBookToUserRouter" ref="addBooksToUserRouter" />
+        <property name="userRecForWishListRouter" ref="userRecForWishlist" />
+        <property name="friendsBookSearchForWishListRouter" ref="friendsBookSearchForWishListWorker" />
+        <property name="getFriendsRouter" ref="getFriendsRouter" />
+    </bean>
+
+    <bean id="goodreadsDao" class="com.campusconnect.neo4j.da.GoodreadsDao">
+        <property name="getBook" ref="getBook" />
+        <property name="search" ref="search" />
+        <property name="goodreadsAsynchHandler" ref="goodreadsAsynchHandler" />
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.da.BookDaoImpl" id="bookDao">
+        <constructor-arg index="0" ref="neo4jTemplate"/>
+        <constructor-arg index="1" ref="goodreadsDao" />
+        <constructor-arg index="2" ref="goodreadsAsynchHandler" />
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.resources.UserResource">
+        <constructor-arg index="0" ref="userDao"/>
+        <constructor-arg index="1" ref="bookDao"/>
+        <constructor-arg index="2" ref="fbDao" />
+        <constructor-arg index="3" ref="goodreadsDao" />
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.goodreads.api.GetBook" id="getBook">
+        <constructor-arg index="0" ref="goodReadsClient" />
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.goodreads.api.GetBooks" id="getBooks">
+        <constructor-arg index="0" ref="goodReadsClient" />
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.goodreads.api.Search" id="search">
+        <constructor-arg index="0" ref="goodReadsClient" />
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.goodreads.client.GoodReadsClient" id="goodReadsClient">
+        <constructor-arg index="0" value="${goodreads.client.url}" />
+        <constructor-arg index="1" value="${goodreads.client.key}" />
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.goodreads.client.GoodreadsOauthClient" id="goodreadsOauthClient" init-method="init">
+        <constructor-arg index="0" value="${goodreads.client.key}" />
+        <constructor-arg index="1" value="${goodreads.client.secret}" />
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.resources.BookResource">
+        <constructor-arg index="0" ref="bookDao"/>
+        <constructor-arg index="1" ref="userDao"/>
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.akka.facebook.client.FacebookClient" id="facebookClient">
+        <constructor-arg index="0" value="${fb.client.url}"/>
+
+
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.akka.facebook.api.GetUserProfileImage" id="getUserProfileImage">
+        <constructor-arg index="0" ref="facebookClient"/>
+    </bean>
+
+    <bean class="com.campusconnect.neo4j.da.FBDao" id="fbDao">
+        <constructor-arg index="0" ref="connectionFactory" />
+        <constructor-arg index="1" ref="getFbFriendsRouter" />
+        <constructor-arg index="2" ref="successListener" />
+        
+    </bean>
+
+    <bean class="org.springframework.social.facebook.connect.FacebookConnectionFactory" id="connectionFactory">
+        <constructor-arg value="${facebook.clientId}"/>
+        <constructor-arg value="${facebook.clientSecret}"/>
+    </bean>
+
+    <bean id="actorSystem" class="com.github.sabomichal.akkaspringfactory.ActorSystemFactoryBean">
+        <!-- actor system name -->
+        <property name="name" value="MyActorSystem"/>
+        <!-- actor system configuration -->
+        <!--<property name="config">-->
+            <!--<bean class="com.typesafe.config.ConfigFactory" factory-method="load">-->
+                <!--<constructor-arg value="akkaActor.conf"/>-->
+            <!--</bean>-->
+        <!--</property>-->
+    </bean>
+
+    <bean id="getFbFriendsRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.facebook.worker.GetFriendsWorker"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="${akka.friends.get.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="getFriendsRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.GetFriends"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg index="0" type="int" value="${akka.friends.get.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="friendsBookSearchForWishListWorker" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.FriendsBookSearchForWishListWorker"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="${akka.friends.get.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="addBooksToUserRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.AddGoodreadsBookToUserWorker"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="${akka.friends.get.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+
+    
+    <bean id="saveBookToDbRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.SaveBooksToDbWorker"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="${akka.save.book.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="userRecForWishlist" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.UserRecForWishlist"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="${akka.wishlist.friends.rec.count}"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="getBooksRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.GetBooksWorker"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg  type="int" value="${akka.get.books.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="successListener" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.facebook.worker.SuccessListener"/>
+    </bean>
+    
+    <bean id="grSuccessListener" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.SuccessListener"/>
+    </bean>
+    
+    
+    <bean id="ehCacheCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="shared" value="true"/>
+        <property name="cacheManagerName" value="neo4j" />
+    </bean>
+    <!---->
+    <!--<bean class="org.springframework.cache.ehcache.EhCacheCacheManager" id="cacheCacheManager">-->
+        <!--<constructor-arg index="0" ref="ehCacheCacheManager" />-->
+    <!--</bean>-->
+    
+</beans>

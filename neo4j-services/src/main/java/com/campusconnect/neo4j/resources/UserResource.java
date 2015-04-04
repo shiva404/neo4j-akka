@@ -4,11 +4,15 @@ import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
 import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.util.Validator;
+import static com.campusconnect.neo4j.util.ErrorCodes.*;
 import org.apache.commons.beanutils.BeanUtils;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -41,7 +45,13 @@ public class UserResource {
 
     @POST
     public Response createUser(@QueryParam("accessToken") final String accessToken, final User user) throws URISyntaxException {
-        addPropertiesForCreate(user);
+    	StringBuffer validateUserDataMessage = Validator.validateUserObject(user);
+    	
+    	if(null!=validateUserDataMessage)
+    	{
+    		throw new InvalidInputDataException(INVALId_ARGMENTS,validateUserDataMessage.toString());
+    	}
+    	addPropertiesForCreate(user);
         User createdUser = userDao.createUser(user, accessToken);
         return Response.created(new URI("/user/" + createdUser.getId())).entity(createdUser).build();
     }

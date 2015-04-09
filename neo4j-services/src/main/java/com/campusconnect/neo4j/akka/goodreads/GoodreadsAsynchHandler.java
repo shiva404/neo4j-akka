@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import com.campusconnect.neo4j.akka.goodreads.task.AddGoodreadsBookToUserTask;
 import com.campusconnect.neo4j.akka.goodreads.task.FriendsBookSearchForWishListTask;
 import com.campusconnect.neo4j.akka.goodreads.task.GetBooksTask;
+import com.campusconnect.neo4j.akka.goodreads.task.SaveBookTask;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.types.Book;
@@ -88,7 +89,7 @@ public class GoodreadsAsynchHandler {
     }
 
     public void saveBook(Book book) {
-        saveBooksToDbRouter.tell(book, successListener);
+        saveBooksToDbRouter.tell(new SaveBookTask(book), successListener);
     }
 
     public void getAndSaveBooks(String userId, String goodreadsUserId, String accessToken, String accessTokenSecret) {

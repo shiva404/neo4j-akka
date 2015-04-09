@@ -40,6 +40,25 @@ public class User implements Serializable {
     private String goodreadsId;
     private String goodreadsAccessToken;
     private String goodreadsAccessTokenSecret;
+
+    public String getWorkDesignation() {
+        return workDesignation;
+    }
+
+    public void setWorkDesignation(String workDesignation) {
+        this.workDesignation = workDesignation;
+    }
+
+    public String getWorkLocation() {
+        return workLocation;
+    }
+
+    public void setWorkLocation(String workLocation) {
+        this.workLocation = workLocation;
+    }
+
+    private String workDesignation;
+    private String workLocation;
     public User(String name, String email, String phone) {
         this.name = name;
         this.email = email;

@@ -21,7 +21,7 @@ public class AddGoodreadsBookToUserWorker extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if(message instanceof AddGoodreadsBookToUserTask) {
             AddGoodreadsBookToUserTask addGoodreadsBookToUserTask = (AddGoodreadsBookToUserTask) message;
-            Book book = bookDao.getBookByGoodreadsId(addGoodreadsBookToUserTask.getBook().getGoodreadsId().toString(), addGoodreadsBookToUserTask.getBook());
+            Book book = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(addGoodreadsBookToUserTask.getBook().getGoodreadsId().toString(), addGoodreadsBookToUserTask.getBook());
             User user = userDao.getUser(addGoodreadsBookToUserTask.getUserId());
 
             final long now = System.currentTimeMillis();

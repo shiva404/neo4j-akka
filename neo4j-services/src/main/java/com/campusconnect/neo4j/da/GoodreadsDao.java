@@ -63,7 +63,7 @@ public class GoodreadsDao {
                     book.setGoodreadsId(bestBook.getId());
                     book.setImageUrl(bestBook.getImageUrl());
                     book.setName(bestBook.getTitle());
-                    book.setPublishedYear(result.getOriginalPublicationYear());
+//                    book.setPublishedYear(result.getOriginalPublicationYear());
                     searchBooks.add(book);
                 }
             }

@@ -18,9 +18,9 @@ public interface UserDao {
 
     User updateUser(String userId, User user);
 
-    List<User> getFollowers(User user);
+    List<User> getFollowers(String userId);
 
-    List<User> getFollowing(User user);
+    List<User> getFollowing(String userId);
 
     List<OwnedBook> getOwnedBooks(String userId);
 

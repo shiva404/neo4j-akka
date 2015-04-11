@@ -78,15 +78,13 @@ public class UserTest extends TestBase {
 
     @Test
     public void getFollowers(){
-        User fixedIdUser = userDaoImpl.getUser("8318f66b-c836-4c89-888b-97dc72927e78");
-        List<User> users = userDaoImpl.getFollowers(fixedIdUser);
+        List<User> users = userDaoImpl.getFollowers("8318f66b-c836-4c89-888b-97dc72927e78");
         System.out.println(users);
     }
 
     @Test
     public void getFollowing(){
-        User fixedIdUser = userDaoImpl.getUser("8318f66b-c836-4c89-888b-97dc72927e78");
-        List<User> users = userDaoImpl.getFollowers(fixedIdUser);
+        List<User> users = userDaoImpl.getFollowers("8318f66b-c836-4c89-888b-97dc72927e78");
         System.out.println(users);
     }
 }

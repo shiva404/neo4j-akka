@@ -106,8 +106,6 @@
 
     <bean class="com.campusconnect.neo4j.akka.facebook.client.FacebookClient" id="facebookClient">
         <constructor-arg index="0" value="${fb.client.url}"/>
-
-
     </bean>
 
     <bean class="com.campusconnect.neo4j.akka.facebook.api.GetUserProfileImage" id="getUserProfileImage">
@@ -118,6 +116,10 @@
         <constructor-arg index="0" ref="connectionFactory" />
         <constructor-arg index="1" ref="getFbFriendsRouter" />
         <constructor-arg index="2" ref="successListener" />
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.goodreads.api.GetUser" id="getUser">
+        <constructor-arg index="0" ref="goodreadsOauthClient" />
         
     </bean>
 

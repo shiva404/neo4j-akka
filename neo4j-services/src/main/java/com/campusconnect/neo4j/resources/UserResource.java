@@ -34,9 +34,7 @@ public class UserResource {
     private BookDao bookDao;
     private FBDao fbDao;
     private GoodreadsDao goodreadsDao;
-
     public UserResource() {
-    
     }
 
     public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao) {

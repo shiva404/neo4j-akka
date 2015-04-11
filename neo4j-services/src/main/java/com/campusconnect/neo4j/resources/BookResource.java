@@ -49,6 +49,13 @@ public class BookResource {
         return Response.ok().entity(book).build();
     }
     
+    @GET
+    @Path("isbn/{isbn}")
+    public Response getBookByISBN(@PathParam("isbn") final String isbn) throws IOException {
+        Book book = bookDao.getBookByIsbn(isbn);
+        return Response.ok().entity(book).build();
+    }
+    
     @POST
     @Path("{bookId}/borrow")
     public Response borrowBook(@PathParam("bookId") String bookId, BorrowRequest borrowRequest){

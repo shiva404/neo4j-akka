@@ -30,11 +30,38 @@ public class Address {
     private String state;
     private String country;
     private String zipCode;
+    private String lat;
+    private String lang;
+    public Address(String lat, String lang, String addressType, long createdDate, long lastModifiedTime) {
+        this.lat = lat;
+        this.lang = lang;
+        this.addressType = addressType;
+        this.createdDate = createdDate;
+        this.lastModifiedTime = lastModifiedTime;
+    }
+
     @CreatedDate
     private long createdDate;
     
     @LastModifiedDate
     private long lastModifiedTime;
+
+    public String getLat() {
+        return lat;
+    }
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
+    }
+
 
     public long getCreatedDate() {
         return createdDate;

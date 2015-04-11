@@ -29,7 +29,7 @@ public class GetBooks {
     }
     
     public GetBooksResponse getBooksForUser(String goodreadsId, int page) throws IOException {
-        ClientResponse clientResponse = goodReadsClient.path("review/list").path(goodreadsId).addAppKeyQueryParam().queryParam("format","xml").queryParam("page", String.valueOf(page)).header(getDefaultHeaders()).get(ClientResponse.class);
+        ClientResponse clientResponse = goodReadsClient.path("review/list").path(goodreadsId).addAppKeyQueryParam().addV2Param().queryParam("format","xml").queryParam("page", String.valueOf(page)).header(getDefaultHeaders()).get(ClientResponse.class);
         if(clientResponse.getStatus() == 200){
             String theString = IOUtils.toString(clientResponse.getEntityInputStream());
             return ResponseUtils.getEntity(StringUtils.cleanEmptyTags(theString), GetBooksResponse.class);

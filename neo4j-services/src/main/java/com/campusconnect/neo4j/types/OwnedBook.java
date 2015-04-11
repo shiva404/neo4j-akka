@@ -16,7 +16,19 @@ public class OwnedBook extends Book implements Serializable {
     private int contractPeriodInDays;
 
     public OwnedBook(Book book, OwnsRelationship ownsRelationship) {
-        super(book.getId(), book.getName(), book.getIsbn());
+        setId(book.getId());
+        setName(book.getName());
+        setIsbn(book.getIsbn());
+        setImageUrl(book.getImageUrl());
+        setIsbn13(book.getIsbn13());
+        setAuthorName(book.getAuthorName());
+        setDescription(book.getDescription());
+        setGoodreadsAuthorId(book.getGoodreadsAuthorId());
+        setGoodreadsId(book.getGoodreadsId());
+        setNodeId(book.getNodeId());
+        setNumberOfPages(book.getNumberOfPages());
+        setPublishedYear(book.getPublishedYear());
+        setPublisher(book.getPublisher());
         this.createdDate = ownsRelationship.getCreatedDate();
         this.status = ownsRelationship.getStatus();
         this.lastModifiedDate = ownsRelationship.getLastModifiedDate();

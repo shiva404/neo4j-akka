@@ -82,9 +82,7 @@ public class UserDaoImpl implements UserDao {
     public List<OwnedBook> getOwnedBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS]->(books:Book) return books, relation", params);
-
         return getOwnedBooksFromResultMap(mapResult);
     }
 
@@ -92,9 +90,7 @@ public class UserDaoImpl implements UserDao {
     public List<OwnedBook> getAvailableBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS {status: \"available\"}]->(books:Book) return books, relation", params);
-
         return getOwnedBooksFromResultMap(mapResult);
     }
 

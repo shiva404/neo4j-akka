@@ -44,7 +44,7 @@ public class GoodReadsClient {
         cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 //        cc.getClasses().add(JacksonJsonProvider.class);
         com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create(cc);
-//        client.addFilter(new LoggingFilter());
+        client.addFilter(new LoggingFilter());
         resource = client.resource(url);
     }
 
@@ -62,10 +62,14 @@ public class GoodReadsClient {
 
         public GoodreadsWebResource addAppKeyQueryParam(){
             wrapped = wrapped.queryParam("key", appKey);
-            wrapped = wrapped.queryParam("v", "2");
             return this;
         }
         
+        public GoodreadsWebResource addV2Param() {
+            wrapped = wrapped.queryParam("v", "2");
+            return this;
+        }
+
         public WebResource.Builder header(Map<String, String> headers) {
             WebResource.Builder out = wrapped.getRequestBuilder();
             if(headers != null) {

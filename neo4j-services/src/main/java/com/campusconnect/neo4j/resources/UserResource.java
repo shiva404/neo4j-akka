@@ -7,7 +7,9 @@ import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
 import com.campusconnect.neo4j.types.*;
 import com.campusconnect.neo4j.util.Validator;
+
 import static com.campusconnect.neo4j.util.ErrorCodes.*;
+
 import org.apache.commons.beanutils.BeanUtils;
 
 import javax.ws.rs.*;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by sn1 on 1/22/15.
@@ -212,12 +215,22 @@ public class UserResource {
     }
 
     @POST
-    @Path("{{userId}/follow/{followUserId}")
+    @Path("{userId}/follow/{followUserId}")
     public Response follow(@PathParam("userId") final String userId, @PathParam("followUserId") final String followUserId)
     {
     	
 		return null;
     	
+    }
+    
+    @PUT
+    @Path("{userId}/favourites")
+    public Response setFavourites(@PathParam("userId") final String userId,final Favourites favourites)
+    {
+    	 User user = userDao.getUser(userId);
+    	 user.setFavorites(favourites.getFavourites());
+    	 userDao.updateUser(userId, user);
+         return Response.ok().build();
     }
     private void addPropertiesForCreate(User user) {
         final long createdDate = System.currentTimeMillis();

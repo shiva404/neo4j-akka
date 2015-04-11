@@ -40,8 +40,18 @@ public class User implements Serializable {
     private String goodreadsId;
     private String goodreadsAccessToken;
     private String goodreadsAccessTokenSecret;
+    
+    private Set<String> favorites;
 
-    public String getWorkDesignation() {
+    public Set<String> getFavorites() {
+		return favorites;
+	}
+
+	public void setFavorites(Set<String> favourites) {
+		this.favorites = favourites;
+	}
+
+	public String getWorkDesignation() {
         return workDesignation;
     }
 

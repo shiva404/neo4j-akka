@@ -1,9 +1,14 @@
 package com.campusconnect.neo4j.tests.functional;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.campusconnect.neo4j.tests.TestBase;
 import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
 import com.campusconnect.neo4j.types.*;
 import com.sun.jersey.api.client.ClientResponse;
+
 import org.testng.annotations.Test;
 
 /**
@@ -19,6 +24,38 @@ public class UserResourceTest extends TestBase {
     
     private Book availableBook;
     private Book lentBook;
+    
+    private User updatedUser;
+    
+    @Test
+    public void testFavouritesAdditionToUser()
+    {
+    	
+    	 Favourites favourites = new Favourites();
+    	 Set<String> favTopics = new HashSet<String>();
+    	     	     	 
+    	 favTopics.add("Suspense");
+    	 favTopics.add("Trhiller");
+    	 favTopics.add("Fiction");
+    	 favTopics.add("Non Fiction");
+    	 
+    	 favourites.setFavourites(favTopics);
+    	
+    	 ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithAddress()).post(ClientResponse.class);
+     	assert clientResponse.getStatus() == 201;
+     	createdUser = clientResponse.getEntity(User.class);
+     	String userId = createdUser.getId();
+    	 
+     	ClientResponse clientResponse1 = resource.path("users").path(userId).path("favourites").type("application/json").entity(favourites).put(ClientResponse.class);
+     	assert clientResponse1.getStatus() == 200;
+     	
+     	 ClientResponse getClientResponse = resource.path("users").path(userId).accept("application/json").get(ClientResponse.class);
+         assert getClientResponse.getStatus() == 200;
+     	
+     	updatedUser = getClientResponse.getEntity(User.class);
+     	Set<String> favouritesSetOnUser = updatedUser.getFavorites();
+     	assert favouritesSetOnUser.size()==4;
+    }
     
     
     @Test

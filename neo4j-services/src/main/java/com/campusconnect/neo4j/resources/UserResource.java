@@ -192,7 +192,33 @@ public class UserResource {
         }
         return Response.ok().build();
     }
+    
+    @GET
+    @Path("{userId}/followers")
+    public Response getFollowers(@PathParam("userId") final String userId)
+    {
+    	final List<User> followers = userDao.getFollowers(userId);
+    	UsersPage usersPage = new UsersPage(0,followers.size(),followers);
+    	return Response.ok().entity(usersPage).build();
+    }
+    
+    @GET
+    @Path("{userId}/following")
+    public Response getFollowing(@PathParam("userId") final String userId)
+    {
+    	final List<User> following = userDao.getFollowing(userId);
+    	UsersPage usersPage = new UsersPage(0, following.size(), following);
+    	return Response.ok().entity(usersPage).build();
+    }
 
+    @POST
+    @Path("{{userId}/follow/{followUserId}")
+    public Response follow(@PathParam("userId") final String userId, @PathParam("followUserId") final String followUserId)
+    {
+    	
+		return null;
+    	
+    }
     private void addPropertiesForCreate(User user) {
         final long createdDate = System.currentTimeMillis();
         user.setCreatedDate(createdDate);

@@ -67,14 +67,14 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     @Cacheable(cacheName = "userFollowers", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public List<User> getFollowers(User user) {
-        return userRepository.getFollowers(user.getId());
+    public List<User> getFollowers(String userId) {
+        return userRepository.getFollowers(userId);
     }
 
     @Override
     @Cacheable(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public List<User> getFollowing(User user) {
-        return userRepository.getFollowing(user.getId());
+    public List<User> getFollowing(String userId) {
+        return userRepository.getFollowing(userId);
     }
 
     @Override

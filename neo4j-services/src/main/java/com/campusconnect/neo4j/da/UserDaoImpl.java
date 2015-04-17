@@ -22,8 +22,10 @@ public class UserDaoImpl implements UserDao {
     UserRepository userRepository;
     @Autowired
     GoodreadsAsynchHandler goodreadsAsynchHandler;
+    
     @Autowired
     private FBDao fbDao;
+    
     private Neo4jTemplate neo4jTemplate;
 
     public UserDaoImpl(Neo4jTemplate neo4jTemplate) {
@@ -41,7 +43,7 @@ public class UserDaoImpl implements UserDao {
         }
         return neo4jTemplate.save(user);
     }
-
+    
     @Override
     @Cacheable(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public User getUser(String userId) {
@@ -123,7 +125,16 @@ public class UserDaoImpl implements UserDao {
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:BORROWED]->(books:Book) return books, relation", params);
         return getBorrowedBooksFromResultMap(mapResult);
     }
-
+    
+    @Override
+    public void addAddressToUser(Address address, User user){
+        if(address.getId() == null)
+            address = neo4jTemplate.save(address);
+        AddressRelation addressRelation = new AddressRelation(user, address);
+        neo4jTemplate.save(addressRelation);
+    } 
+    
+    
     @Override
     @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<WishListBook> getWishListBooks(String userId) {

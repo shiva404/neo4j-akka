@@ -2,6 +2,7 @@ package com.campusconnect.neo4j.resources;
 
 import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
+import com.campusconnect.neo4j.da.iface.AddressDao;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.exceptions.DataDuplicateException;
@@ -35,14 +36,16 @@ public class UserResource {
     private BookDao bookDao;
     private FBDao fbDao;
     private GoodreadsDao goodreadsDao;
+    private AddressDao addressDao;
     public UserResource() {
     }
 
-    public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao) {
+    public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao, AddressDao addressDao) {
         this.userDao = userDao;
         this.bookDao = bookDao;
         this.fbDao = fbDao;
         this.goodreadsDao = goodreadsDao;
+        this.addressDao = addressDao;
     }
 
     @POST
@@ -64,8 +67,7 @@ public class UserResource {
         User createdUser = userDao.createUser(user, accessToken);
         return Response.created(new URI("/user/" + createdUser.getId())).entity(createdUser).build();
     }
-    
-    
+
     @PUT
     @Path("{userId}/fields")
     public Response updateUserFields(@PathParam("userId") final String userId, Fields fields) throws Exception {
@@ -119,11 +121,36 @@ public class UserResource {
         User updatedUser = userDao.updateUser(userId, user);
         return Response.ok().entity(updatedUser).build();
     }
+    
+    @GET
+    @Path("{userId}/addresses/{addressId}")
+    public Response getAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId) {
+        Address updatedAddress = addressDao.getAddress(addressId);
+        return Response.ok().entity(updatedAddress).build();
+    }
 
-    @PUT
+    @GET
     @Path("{userId}/addresses")
-    public Response addAddress(@PathParam("userId") final String userId, final Address address){
-        return null;
+    public Response getAddress(@PathParam("userId") final String userId, final Address address){
+        List<Address> addresses = addressDao.getAddresses(userId);
+        AddressesPage addressesPage = new AddressesPage(addresses.size(), 0, addresses);
+        return Response.ok().entity(addressesPage).build();
+    }
+    
+    @POST
+    @Path("{userId}/addresses")
+    public Response addAddress(@PathParam("userId") String userId, Address address) {
+        Address createdAddress = addressDao.createAddress(address);
+        User user = userDao.getUser(userId);
+        userDao.addAddressToUser(createdAddress, user);
+        return Response.ok().entity(createdAddress).build();
+    }
+    
+    @PUT
+    @Path("{userId}/addresses/{addressId}")
+    public Response updateAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId, Address address) {
+       Address updatedAddress = addressDao.updateAddress(address);
+       return Response.ok().entity(updatedAddress).build();
     }
     
     @POST
@@ -275,7 +302,7 @@ public class UserResource {
 
     private Address addAddress(User user, Address address){
 //        Address createdAddress = addressDao.createAddress(address);
-//        addressDao.linkAddressToUser(user, address, getRequiredHeadersForAddressLink(address.getAddressType()));
+//        addressDao.linkAddressToUser(user, address, getRequiredHeadersForAddressLink(address.getType()));
 //        return createdAddress;
         return null;
     }

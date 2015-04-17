@@ -43,9 +43,9 @@ public class DataBrewer {
     
     public static Address getFakeAddress(String addressType) {
         Address address = new Address();
-        address.setAddressLine1(faker.address().streetAddressNumber());
-        address.setAddressLine2(faker.address().secondaryAddress());
-        address.setAddressType(addressType);
+        address.setLine1(faker.address().streetAddressNumber());
+        address.setLine2(faker.address().secondaryAddress());
+        address.setType(addressType);
         address.setLandmark("landMark");
         address.setCity(faker.address().cityPrefix() + " " + faker.address().citySuffix());
         address.setState(faker.address().stateAbbr());

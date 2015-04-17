@@ -80,7 +80,10 @@
         <constructor-arg index="1" ref="bookDao"/>
         <constructor-arg index="2" ref="fbDao" />
         <constructor-arg index="3" ref="goodreadsDao" />
+        <constructor-arg index="4" ref="addressDao" />
     </bean>
+    
+
     
     <bean class="com.campusconnect.neo4j.akka.goodreads.api.GetBook" id="getBook">
         <constructor-arg index="0" ref="goodReadsClient" />
@@ -163,6 +166,8 @@
             </bean>
         </property>
     </bean>
+    
+    <bean id="addressDao" class="com.campusconnect.neo4j.da.AddressDaoImpl" />
     
     <bean id="friendsBookSearchForWishListWorker" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
         <property name="actorSystem" ref="actorSystem"/>

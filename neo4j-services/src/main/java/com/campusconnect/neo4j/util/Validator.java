@@ -14,6 +14,8 @@ public class Validator {
 		StringBuffer returnMessage = null;
 		
 		
+		
+		
 		if(null==user)
 		{
 			returnMessage = getStringBuffer();

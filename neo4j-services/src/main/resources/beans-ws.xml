@@ -43,6 +43,11 @@
     <bean class="com.campusconnect.neo4j.da.DepartmentDao" id="departmentDao">
         <constructor-arg index="0" ref="neo4jTemplate"/>
     </bean>
+    
+    <bean class="com.campusconnect.neo4j.resources.GroupResource" id="groupResource">
+        <constructor-arg index="0" ref="groupDao"/>
+        <constructor-arg index="1" ref="userDao"/>
+    </bean>
 
     <bean class="com.campusconnect.neo4j.da.GroupDao" id="groupDao">
         <constructor-arg index="0" ref="neo4jTemplate"/>

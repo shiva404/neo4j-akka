@@ -1,6 +1,5 @@
 package com.campusconnect.neo4j.types;
 
-
 import org.springframework.data.neo4j.annotation.EndNode;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
@@ -11,59 +10,61 @@ import org.springframework.data.neo4j.annotation.StartNode;
  */
 @RelationshipEntity(type = "OWNS")
 public class OwnsRelationship extends BookRelation {
- 
-    public String getGoodreadsStatus() {
-        return goodreadsStatus;
-    }
 
-    public void setGoodreadsStatus(String goodreadsStatus) {
-        this.goodreadsStatus = goodreadsStatus;
-    }
+	private String borrowerId;
 
-    private String goodreadsStatus;
-    
-    private String borrowerId;
-    
-    private String dueDate;
-    private int contractPeriodInDays;
+	private int contractPeriodInDays;
 
-    public String getBorrowerId() {
-        return borrowerId;
-    }
+	private String dueDate;
 
-    public String getDueDate() {
-        return dueDate;
-    }
+	private String goodreadsStatus;
 
-    public int getContractPeriodInDays() {
-        return contractPeriodInDays;
-    }
+	public OwnsRelationship() {
+		super();
+	}
 
-    public void setBorrowerId(String borrowerId) {
+	public OwnsRelationship(User user, Book book, long createdDate,
+			String status, long lastModifiedDate) {
+		super(user, book, status, createdDate, lastModifiedDate);
+	}
 
-        this.borrowerId = borrowerId;
-    }
+	public OwnsRelationship(User user, Book book, long createdDate,
+			String status, long lastModifiedDate, String goodreadsStatus) {
+		super(user, book, status, createdDate, lastModifiedDate);
+		this.goodreadsStatus = goodreadsStatus;
+	}
 
-    public void setDueDate(String dueDate) {
-        this.dueDate = dueDate;
-    }
+	public String getBorrowerId() {
+		return borrowerId;
+	}
 
-    public void setContractPeriodInDays(int contractPeriodInDays) {
-        this.contractPeriodInDays = contractPeriodInDays;
-    }
+	public int getContractPeriodInDays() {
+		return contractPeriodInDays;
+	}
 
-    public OwnsRelationship(User user, Book book, long createdDate, String status, long lastModifiedDate) {
-        super(user, book, status, createdDate, lastModifiedDate);
-    }
+	public String getDueDate() {
+		return dueDate;
+	}
 
-    public OwnsRelationship() {
-        super();
-    }
+	public String getGoodreadsStatus() {
+		return goodreadsStatus;
+	}
 
+	public void setBorrowerId(String borrowerId) {
 
-    public OwnsRelationship(User user, Book book, long createdDate, String status, long lastModifiedDate, String goodreadsStatus) {
-        super(user, book, status, createdDate, lastModifiedDate);
-        this.goodreadsStatus = goodreadsStatus;
-    }
+		this.borrowerId = borrowerId;
+	}
+
+	public void setContractPeriodInDays(int contractPeriodInDays) {
+		this.contractPeriodInDays = contractPeriodInDays;
+	}
+
+	public void setDueDate(String dueDate) {
+		this.dueDate = dueDate;
+	}
+
+	public void setGoodreadsStatus(String goodreadsStatus) {
+		this.goodreadsStatus = goodreadsStatus;
+	}
 
 }

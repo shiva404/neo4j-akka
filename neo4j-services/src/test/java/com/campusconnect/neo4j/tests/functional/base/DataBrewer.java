@@ -3,7 +3,6 @@ package com.campusconnect.neo4j.tests.functional.base;
 import com.campusconnect.neo4j.types.*;
 import com.github.javafaker.Faker;
 
-
 import java.util.*;
 
 /**
@@ -18,6 +17,11 @@ public class DataBrewer {
     public static Book getFakeBook()
     {
         return new Book(faker.name().name(), UUID.randomUUID().toString());
+    }
+    
+    public static Group getFakeGroup()
+    {
+    	return new Group(faker.name().name());
     }
     
     public static User getFakeUserWithAddress() {
@@ -53,4 +57,5 @@ public class DataBrewer {
     public static BorrowRequest getBorrowRequest(String ownerId, String borrwerId){
         return new BorrowRequest(ownerId, borrwerId, 25, System.currentTimeMillis(), "message");
     }
+
 }

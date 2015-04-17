@@ -26,42 +26,23 @@ public class Group {
     @LastModifiedDate
     private long lastModifiedTime;
 
-    @CreatedBy
-    private String createdBy;
-
     @LastModifiedBy
     private String lastModifiedBy;
-
-    private String collegeId;
-    private String departmentId;
 
     public Group(String name) {
         this.name = name;
     }
 
-    public Group(String name, String createdBy, String collegeId, String departmentId, long createdDate) {
+    public Group(String name,long createdDate) {
+    	
         this.name = name;
-        this.createdBy = createdBy;
-        this.collegeId = collegeId;
-        this.departmentId = departmentId;
         this.createdDate = createdDate;
     }
 
     public Group() {
     }
 
-    public Group(String name, String collegeId, String departmentId) {
-        this.name = name;
-        this.collegeId = collegeId;
-        this.departmentId = departmentId;
-    }
-
-    public Group(String collegeId, String name) {
-        this.collegeId = collegeId;
-        this.name = name;
-    }
-
-    public Long getNodeId() {
+      public Long getNodeId() {
 
         return nodeId;
     }
@@ -102,14 +83,6 @@ public class Group {
         this.lastModifiedTime = lastModifiedTime;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -118,19 +91,11 @@ public class Group {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public String getCollegeId() {
-        return collegeId;
-    }
+	@Override
+	public String toString() {
+		return "Group [nodeId=" + nodeId + ", id=" + id + ", name=" + name
+				+ ", createdDate=" + createdDate + ", lastModifiedTime="
+				+ lastModifiedTime + ", lastModifiedBy=" + lastModifiedBy + "]";
+	}
 
-    public void setCollegeId(String collegeId) {
-        this.collegeId = collegeId;
-    }
-
-    public String getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(String departmentId) {
-        this.departmentId = departmentId;
-    }
 }

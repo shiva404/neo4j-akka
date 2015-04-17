@@ -7,6 +7,8 @@ import java.util.List;
  */
 public class OwnedBooksPage {
     private int offset;
+    private List<OwnedBook> ownedBooks;
+
     private int size;
 
     public OwnedBooksPage() {
@@ -18,29 +20,27 @@ public class OwnedBooksPage {
         this.ownedBooks = ownedBooks;
     }
 
-    List<OwnedBook> ownedBooks;
-
     public int getOffset() {
         return offset;
-    }
-
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
     }
 
     public List<OwnedBook> getOwnedBooks() {
         return ownedBooks;
     }
 
+    public int getSize() {
+        return size;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+
     public void setOwnedBooks(List<OwnedBook> ownedBooks) {
         this.ownedBooks = ownedBooks;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 }

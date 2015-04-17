@@ -4,6 +4,7 @@ import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.exceptions.DataDuplicateException;
 import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
 import com.campusconnect.neo4j.types.*;
 import com.campusconnect.neo4j.util.Validator;
@@ -48,7 +49,14 @@ public class UserResource {
 
     @POST
     public Response createUser(@QueryParam("accessToken") final String accessToken, final User user) throws URISyntaxException {
+    	
     	StringBuffer validateUserDataMessage = Validator.validateUserObject(user);
+    	User existingUser = userDao.getUserByFbId(user.getFbId());
+    	
+    	if(null!=existingUser)
+    	{
+    		throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
+    	}
     	
     	if(null!=validateUserDataMessage)
     	{

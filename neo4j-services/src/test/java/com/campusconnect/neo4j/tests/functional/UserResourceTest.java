@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
  */
 public class UserResourceTest extends TestBase {
 
-    private User createdUser;
+    private static User createdUser;
     private User createdUser2;
     
     private Book createdBook;
@@ -26,6 +26,15 @@ public class UserResourceTest extends TestBase {
     private Book lentBook;
     
     private User updatedUser;
+    
+    public static String createUser()
+    {
+    	ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithAddress()).post(ClientResponse.class);
+     	assert clientResponse.getStatus() == 201;
+     	createdUser = clientResponse.getEntity(User.class);
+     	String userId = createdUser.getId();
+    	return userId;
+    }
     
     @Test
     public void testFavouritesAdditionToUser()

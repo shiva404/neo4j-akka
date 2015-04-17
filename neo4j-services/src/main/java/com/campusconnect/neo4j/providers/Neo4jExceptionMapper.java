@@ -28,5 +28,4 @@ public class Neo4jExceptionMapper implements ExceptionMapper<Throwable> {
 			return Response.status(500).entity(neo4jErrorResponse).build();
 		}
 	}
-
 }

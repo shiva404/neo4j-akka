@@ -30,6 +30,8 @@ public interface UserDao {
 
     List<BorrowedBook> getBorrowedBooks(String userId);
 
+    void addAddressToUser(Address address, User user);
+
     List<WishListBook> getWishListBooks(String userId);
 
     void synchWishListRec(String userId);

@@ -80,7 +80,10 @@
         <constructor-arg index="1" ref="bookDao"/>
         <constructor-arg index="2" ref="fbDao" />
         <constructor-arg index="3" ref="goodreadsDao" />
+        <constructor-arg index="4" ref="addressDao" />
     </bean>
+    
+
     
     <bean class="com.campusconnect.neo4j.akka.goodreads.api.GetBook" id="getBook">
         <constructor-arg index="0" ref="goodReadsClient" />
@@ -111,8 +114,6 @@
 
     <bean class="com.campusconnect.neo4j.akka.facebook.client.FacebookClient" id="facebookClient">
         <constructor-arg index="0" value="${fb.client.url}"/>
-
-
     </bean>
 
     <bean class="com.campusconnect.neo4j.akka.facebook.api.GetUserProfileImage" id="getUserProfileImage">
@@ -123,6 +124,10 @@
         <constructor-arg index="0" ref="connectionFactory" />
         <constructor-arg index="1" ref="getFbFriendsRouter" />
         <constructor-arg index="2" ref="successListener" />
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.goodreads.api.GetUser" id="getUser">
+        <constructor-arg index="0" ref="goodreadsOauthClient" />
         
     </bean>
 
@@ -161,6 +166,8 @@
             </bean>
         </property>
     </bean>
+    
+    <bean id="addressDao" class="com.campusconnect.neo4j.da.AddressDaoImpl" />
     
     <bean id="friendsBookSearchForWishListWorker" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
         <property name="actorSystem" ref="actorSystem"/>

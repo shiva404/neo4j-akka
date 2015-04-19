@@ -9,6 +9,8 @@ import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
 import com.googlecode.ehcache.annotations.Property;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.util.UUID;
  * Created by sn1 on 2/16/15.
  */
 public class BookDaoImpl implements BookDao {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookDaoImpl.class);
 
     private Neo4jTemplate neo4jTemplate;
     private GoodreadsDao goodreadsDao;
@@ -108,6 +111,7 @@ public class BookDaoImpl implements BookDao {
         try {
             Book book = bookRepository.findBySchemaPropertyValue("goodreadsId", goodreadsId);
             if(book == null) {
+                LOGGER.info("Goodreads book is not in there datsbase fetching from goodreads. Id: " + goodreadsId);
                 final Book bookByGoodreadId = goodreadsDao.getBookById(goodreadsId);
                 bookByGoodreadId.setId(UUID.randomUUID().toString());
                 goodreadsAsynchHandler.saveBook(bookByGoodreadId);
@@ -122,7 +126,7 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     @Cacheable(cacheName = "bookByGRIdCache", keyGenerator = @KeyGenerator(name="HashCodeCacheKeyGenerator", properties = @Property( name="includeMethod", value="false")))
-    public Book getBookByGoodreadsId(@PartialCacheKey String goodreadsId, Book book) {
+    public Book getBookByGoodreadsIdAndSaveIfNotExists(@PartialCacheKey String goodreadsId, Book book) {
         Book bookByGoodreadsId = bookRepository.findBySchemaPropertyValue("goodreadsId", goodreadsId);
         if(bookByGoodreadsId == null) {
             book.setId(UUID.randomUUID().toString());
@@ -130,6 +134,8 @@ public class BookDaoImpl implements BookDao {
         }
         return bookByGoodreadsId;
     }
+    
+    
 
     @Override
     public void addWishBookToUser(WishListRelationship wishListRelationship) {
@@ -139,5 +145,12 @@ public class BookDaoImpl implements BookDao {
     @Override
     public void createGoodreadsFriendBookRec(GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation) {
         neo4jTemplate.save(goodreadsFriendBookRecRelation);
+    }
+
+    @Override
+    public Book getBookByIsbn(String isbn) throws IOException {
+        Book book = goodreadsDao.getBookByISBN(isbn);
+        Book goodreadsBook = getBookByGoodreadsIdAndSaveIfNotExists(book.getGoodreadsAuthorId(), book);
+        return goodreadsBook;
     }
 }

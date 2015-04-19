@@ -49,6 +49,13 @@ public class BookResource {
         return Response.ok().entity(book).build();
     }
     
+    @GET
+    @Path("isbn/{isbn}")
+    public Response getBookByISBN(@PathParam("isbn") final String isbn) throws IOException {
+        Book book = bookDao.getBookByIsbn(isbn);
+        return Response.ok().entity(book).build();
+    }
+    
     @POST
     @Path("{bookId}/borrow")
     public Response borrowBook(@PathParam("bookId") String bookId, BorrowRequest borrowRequest){
@@ -61,18 +68,35 @@ public class BookResource {
     }
     
     @PUT
-    @Path("{bookId}/users/{userId}")
+    @Path("{bookId}/users/{userId}/borrow")
     public Response updateStatus(@PathParam("bookId") String bookId, @PathParam("userId") String userId, 
                                  @QueryParam("borrowerId") String borrowerId, @QueryParam("status") String status) {
         //locked - for user
         //agreed - for borrower
         Book book = bookDao.getBook(bookId);
         User user = userDao.getUser(userId);
-        User borrower = userDao.getUser(borrowerId);
-        if(status.equals("agreed"))
-            bookDao.updateBookStatusOnAgreement(user, book, borrower);
+        if(status.equals("agreed")){
+           if(borrowerId != null){
+               User borrower = userDao.getUser(borrowerId);
+               if(borrower != null)
+               bookDao.updateBookStatusOnAgreement(user, book, borrower);
+               
+                   //todo: throw error userNot found
+           } else {
+               //todo throw exception
+           }
+        }
+            
         else if(status.equals("success"))
-            bookDao.updateBookStatusOnSuccess(user, book, borrower);
+            if(borrowerId != null){
+                User borrower = userDao.getUser(borrowerId);
+                if(borrower != null)
+                    bookDao.updateBookStatusOnAgreement(user, book, borrower);
+
+                //todo: throw error userNot found
+            } else {
+                //todo throw borrower not found
+            }
         return Response.ok().build();
     }
     

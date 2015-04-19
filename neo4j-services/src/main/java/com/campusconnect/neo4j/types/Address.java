@@ -6,35 +6,64 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 
+import java.io.Serializable;
+
 /**
  * Created by sn1 on 2/23/15.
  */
 @NodeEntity
-public class Address {
+public class Address implements Serializable {
     @GraphId
     private Long id;
 
-    public String getAddressType() {
-        return addressType;
+    public String getType() {
+        return type;
     }
 
-    public void setAddressType(String addressType) {
-        this.addressType = addressType;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    private String addressType; //HOME, WORK, OTHER
-    private String addressLine1;
-    private String addressLine2;
+    private String type; //HOME, WORK, OTHER
+    private String line1;
+    private String line2;
     private String landmark;
     private String city;
     private String state;
     private String country;
     private String zipCode;
+    private String latitude;
+    private String longitude;
+    public Address(String latitude, String longitude, String type, long createdDate, long lastModifiedTime) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.type = type;
+        this.createdDate = createdDate;
+        this.lastModifiedTime = lastModifiedTime;
+    }
+
     @CreatedDate
     private long createdDate;
     
     @LastModifiedDate
     private long lastModifiedTime;
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
 
     public long getCreatedDate() {
         return createdDate;
@@ -60,9 +89,9 @@ public class Address {
         this.id = id;
     }
 
-    public Address(String addressType, String addressLine1, String zipCode) {
-        this.addressType = addressType;
-        this.addressLine1 = addressLine1;
+    public Address(String type, String line1, String zipCode) {
+        this.type = type;
+        this.line1 = line1;
         this.zipCode = zipCode;
     }
 
@@ -74,9 +103,9 @@ public class Address {
     public String toString() {
         return "Address{" +
                 "id=" + id +
-                ", addressType='" + addressType + '\'' +
-                ", addressLine1='" + addressLine1 + '\'' +
-                ", addressLine2='" + addressLine2 + '\'' +
+                ", type='" + type + '\'' +
+                ", line1='" + line1 + '\'' +
+                ", line2='" + line2 + '\'' +
                 ", landmark='" + landmark + '\'' +
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
@@ -87,10 +116,10 @@ public class Address {
                 '}';
     }
 
-    public Address(String addressType, String addressLine1, String addressLine2, String landmark, String city, String state, String country, String zipCode) {
-        this.addressType = addressType;
-        this.addressLine1 = addressLine1;
-        this.addressLine2 = addressLine2;
+    public Address(String type, String line1, String line2, String landmark, String city, String state, String country, String zipCode) {
+        this.type = type;
+        this.line1 = line1;
+        this.line2 = line2;
         this.landmark = landmark;
         this.city = city;
         this.state = state;
@@ -98,20 +127,20 @@ public class Address {
         this.zipCode = zipCode;
     }
 
-    public String getAddressLine1() {
-        return addressLine1;
+    public String getLine1() {
+        return line1;
     }
 
-    public void setAddressLine1(String addressLine1) {
-        this.addressLine1 = addressLine1;
+    public void setLine1(String line1) {
+        this.line1 = line1;
     }
 
-    public String getAddressLine2() {
-        return addressLine2;
+    public String getLine2() {
+        return line2;
     }
 
-    public void setAddressLine2(String addressLine2) {
-        this.addressLine2 = addressLine2;
+    public void setLine2(String line2) {
+        this.line2 = line2;
     }
 
     public String getLandmark() {

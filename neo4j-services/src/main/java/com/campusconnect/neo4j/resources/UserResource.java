@@ -2,19 +2,31 @@ package com.campusconnect.neo4j.resources;
 
 import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
+import com.campusconnect.neo4j.da.iface.AddressDao;
 import com.campusconnect.neo4j.da.iface.BookDao;
+import com.campusconnect.neo4j.da.iface.ReminderDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.exceptions.DataDuplicateException;
+import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
 import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.util.Validator;
+
+import static com.campusconnect.neo4j.util.ErrorCodes.*;
+
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.data.annotation.CreatedBy;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by sn1 on 1/22/15.
@@ -23,30 +35,45 @@ import java.util.Map;
 @Consumes("application/json")
 @Produces("application/json")
 public class UserResource {
-    private UserDao userDao;
+    private AddressDao addressDao;
     private BookDao bookDao;
     private FBDao fbDao;
     private GoodreadsDao goodreadsDao;
-
-    public UserResource() {
+    private UserDao userDao;
+    private ReminderDao reminderDao;
     
+    public UserResource() {
     }
 
-    public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao) {
+    public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao, AddressDao addressDao,ReminderDao reminderDao) {
         this.userDao = userDao;
         this.bookDao = bookDao;
         this.fbDao = fbDao;
         this.goodreadsDao = goodreadsDao;
+        this.addressDao = addressDao;
+        this.reminderDao = reminderDao;
     }
 
     @POST
     public Response createUser(@QueryParam("accessToken") final String accessToken, final User user) throws URISyntaxException {
-        addPropertiesForCreate(user);
+    	
+    	StringBuffer validateUserDataMessage = Validator.validateUserObject(user);
+    	User existingUser = userDao.getUserByFbId(user.getFbId());
+    	
+    	if(null!=existingUser)
+    	{
+    		throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
+    	}
+    	
+    	if(null!=validateUserDataMessage)
+    	{
+    		throw new InvalidInputDataException(INVALId_ARGMENTS,validateUserDataMessage.toString());
+    	}
+    	addPropertiesForCreate(user);
         User createdUser = userDao.createUser(user, accessToken);
         return Response.created(new URI("/user/" + createdUser.getId())).entity(createdUser).build();
     }
-    
-    
+
     @PUT
     @Path("{userId}/fields")
     public Response updateUserFields(@PathParam("userId") final String userId, Fields fields) throws Exception {
@@ -100,11 +127,36 @@ public class UserResource {
         User updatedUser = userDao.updateUser(userId, user);
         return Response.ok().entity(updatedUser).build();
     }
+    
+    @GET
+    @Path("{userId}/addresses/{addressId}")
+    public Response getAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId) {
+        Address updatedAddress = addressDao.getAddress(addressId);
+        return Response.ok().entity(updatedAddress).build();
+    }
 
-    @PUT
+    @GET
     @Path("{userId}/addresses")
-    public Response addAddress(@PathParam("userId") final String userId, final Address address){
-        return null;
+    public Response getAddress(@PathParam("userId") final String userId, final Address address){
+        List<Address> addresses = addressDao.getAddresses(userId);
+        AddressesPage addressesPage = new AddressesPage(addresses.size(), 0, addresses);
+        return Response.ok().entity(addressesPage).build();
+    }
+    
+    @POST
+    @Path("{userId}/addresses")
+    public Response addAddress(@PathParam("userId") String userId, Address address) {
+        User user = userDao.getUser(userId);
+        Address createdAddress = addressDao.createAddress(address, userId);
+        userDao.addAddressToUser(createdAddress, user);
+        return Response.ok().entity(createdAddress).build();
+    }
+    
+    @PUT
+    @Path("{userId}/addresses/{addressId}")
+    public Response updateAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId, Address address) {
+       Address updatedAddress = addressDao.updateAddress(address, userId);
+       return Response.ok().entity(updatedAddress).build();
     }
     
     @POST
@@ -182,7 +234,43 @@ public class UserResource {
         }
         return Response.ok().build();
     }
+    
+    @GET
+    @Path("{userId}/followers")
+    public Response getFollowers(@PathParam("userId") final String userId)
+    {
+    	final List<User> followers = userDao.getFollowers(userId);
+    	UsersPage usersPage = new UsersPage(0,followers.size(),followers);
+    	return Response.ok().entity(usersPage).build();
+    }
+    
+    @GET
+    @Path("{userId}/following")
+    public Response getFollowing(@PathParam("userId") final String userId)
+    {
+    	final List<User> following = userDao.getFollowing(userId);
+    	UsersPage usersPage = new UsersPage(0, following.size(), following);
+    	return Response.ok().entity(usersPage).build();
+    }
 
+    @POST
+    @Path("{userId}/follow/{followUserId}")
+    public Response follow(@PathParam("userId") final String userId, @PathParam("followUserId") final String followUserId)
+    {
+    	
+		return null;
+    	
+    }
+    
+    @PUT
+    @Path("{userId}/favourites")
+    public Response setFavourites(@PathParam("userId") final String userId,final Favourites favourites)
+    {
+    	 User user = userDao.getUser(userId);
+    	 user.setFavorites(favourites.getFavourites());
+    	 userDao.updateUser(userId, user);
+         return Response.ok().build();
+    }
     private void addPropertiesForCreate(User user) {
         final long createdDate = System.currentTimeMillis();
         user.setCreatedDate(createdDate);
@@ -218,23 +306,6 @@ public class UserResource {
         return properties;
     }
 
-    private Address addAddress(User user, Address address){
-//        Address createdAddress = addressDao.createAddress(address);
-//        addressDao.linkAddressToUser(user, address, getRequiredHeadersForAddressLink(address.getAddressType()));
-//        return createdAddress;
-        return null;
-    }
-
-    private List<Address> addAddressesToUser(User user, List<Address> addresses) {
-        if(addresses != null){
-            List<Address> createdAddresses = new ArrayList<>();
-            for (Address address : addresses) {
-                createdAddresses.add(addAddress(user, address));
-            }
-            return createdAddresses;
-        }
-        return null;
-    }
 
     //    public void approveCollegeAccess(String userId, String collegeId, String createdBy, String role){
 //        User user = userDao.getUser(userId);
@@ -244,4 +315,63 @@ public class UserResource {
 
     //    public void addCollegeAccess(String userId, String groupId, String role) {
 //    }
+    
+    
+    @POST
+    @Path("{userId}/reminders")
+	public Response createReminder(Reminder reminder,@PathParam("userId") final String userId,@QueryParam("reminderAbout") final ReminderAbout reminderAbout,@QueryParam("createdBy")final String createdBy)
+	{
+		setReminderCreateProperties(reminder);
+		Reminder createdReminder = reminderDao.createReminder(reminder);
+		User reminderForUser = userDao.getUser(userId);
+		long currentTime = System.currentTimeMillis();
+		ReminderRelationShip reminderRelationShip = new ReminderRelationShip(
+				createdBy, currentTime, reminderForUser, currentTime,
+				reminderAbout.toString(), reminder);
+		userDao.setReminder(reminderRelationShip);
+		return Response.created(null).entity(createdReminder).build();
+		
+	}
+
+    @PUT
+    @Path("{userId}/reminders/{reminderId}")
+    public Response updateReminder(Reminder reminder,@PathParam("userId") final String userId,@PathParam("reminderId") final String reminderId,@QueryParam("createdBy") final String createdBy)
+    {
+    	
+    	Reminder updatedReminder = reminderDao.updateReminder(reminderId,reminder);
+    	return Response.ok().entity(updatedReminder).build();
+    }
+    
+    @DELETE
+    @Path("{userId}/reminders/{reminderId}")
+    public Response deleteReminder(@PathParam("userId") final String userId,@PathParam("reminderId") final String reminderId)
+    {
+    	reminderDao.deleteReminder(reminderId);
+    	return Response.ok().build();
+    }
+    
+    @GET
+    @Path("{userId}/reminders/{reminderId}")
+    public Response getReminder(@PathParam("userId") final String userId,@PathParam("reminderId") final String reminderId)
+    {
+    	 Reminder reminder = reminderDao.getReminder(reminderId);
+    	return Response.ok().entity(reminder).build();
+		
+    	
+    }
+    
+    @GET
+    @Path("{userId}/reminders")
+    public Response getAllReminders(@PathParam("userId") final String userId)
+    {
+    	final List<Reminder> reminders = reminderDao.getAllReminders(userId);
+	ReminderPage reminderPage = new ReminderPage(0,reminders.size(),reminders);
+	return Response.ok().entity(reminderPage).build();
+    }
+    
+	private void setReminderCreateProperties(Reminder reminder) {
+		Long currentTime = System.currentTimeMillis();
+		reminder.setCreatedDate(currentTime);
+		reminder.setLastModifiedTime(currentTime);
+	}
 }

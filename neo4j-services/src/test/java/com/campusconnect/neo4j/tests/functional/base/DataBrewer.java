@@ -3,7 +3,6 @@ package com.campusconnect.neo4j.tests.functional.base;
 import com.campusconnect.neo4j.types.*;
 import com.github.javafaker.Faker;
 
-
 import java.util.*;
 
 /**
@@ -18,6 +17,11 @@ public class DataBrewer {
     public static Book getFakeBook()
     {
         return new Book(faker.name().name(), UUID.randomUUID().toString());
+    }
+    
+    public static Group getFakeGroup()
+    {
+    	return new Group(faker.name().name());
     }
     
     public static User getFakeUserWithAddress() {
@@ -39,9 +43,9 @@ public class DataBrewer {
     
     public static Address getFakeAddress(String addressType) {
         Address address = new Address();
-        address.setAddressLine1(faker.address().streetAddressNumber());
-        address.setAddressLine2(faker.address().secondaryAddress());
-        address.setAddressType(addressType);
+        address.setLine1(faker.address().streetAddressNumber());
+        address.setLine2(faker.address().secondaryAddress());
+        address.setType(addressType);
         address.setLandmark("landMark");
         address.setCity(faker.address().cityPrefix() + " " + faker.address().citySuffix());
         address.setState(faker.address().stateAbbr());
@@ -53,4 +57,17 @@ public class DataBrewer {
     public static BorrowRequest getBorrowRequest(String ownerId, String borrwerId){
         return new BorrowRequest(ownerId, borrwerId, 25, System.currentTimeMillis(), "message");
     }
+
+    public static Reminder getFakeReminder()
+    {
+    	
+    	Long currentTime = System.currentTimeMillis(); 
+    	return new Reminder(currentTime, currentTime,"Collect the Book", currentTime);
+    }
+
+	public static Object getFakeReminder(String reminderMessage) {
+		Long currentTime = System.currentTimeMillis(); 
+    	return new Reminder(currentTime, currentTime,reminderMessage, currentTime);
+
+	}
 }

@@ -27,10 +27,10 @@ public class UserGroupRelationship {
 	private long lastModified;
 
 	private String role;
-	
+
 	@StartNode
 	private User user;
-	
+
 	public UserGroupRelationship() {
 	}
 

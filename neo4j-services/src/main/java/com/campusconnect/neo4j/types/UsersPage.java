@@ -7,6 +7,8 @@ public class UsersPage {
 	private int offset;
 	private int size;
 
+	List<User> users;
+
 	public UsersPage() {
 	}
 
@@ -16,26 +18,24 @@ public class UsersPage {
 		this.users = Users;
 	}
 
-	List<User> users;
-
 	public int getOffset() {
 		return offset;
-	}
-
-	public void setOffset(int offset) {
-		this.offset = offset;
 	}
 
 	public int getSize() {
 		return size;
 	}
 
-	public void setSize(int size) {
-		this.size = size;
-	}
-
 	public List<User> getUsers() {
 		return users;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
 	}
 
 	public void setUsers(List<User> Users) {

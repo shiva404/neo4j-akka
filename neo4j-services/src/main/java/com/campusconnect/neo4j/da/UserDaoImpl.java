@@ -5,6 +5,7 @@ import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.*;
+
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,4 +198,11 @@ public class UserDaoImpl implements UserDao {
         }
         return borrowedBooks;
     }
+    
+    @Override
+	public void setReminder(ReminderRelationShip reminderRelationShip) {
+		
+		neo4jTemplate.save(reminderRelationShip);
+		
+	}
 }

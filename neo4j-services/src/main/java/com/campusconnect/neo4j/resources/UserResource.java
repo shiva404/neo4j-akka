@@ -4,6 +4,7 @@ import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.iface.AddressDao;
 import com.campusconnect.neo4j.da.iface.BookDao;
+import com.campusconnect.neo4j.da.iface.ReminderDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.exceptions.DataDuplicateException;
 import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
@@ -13,6 +14,7 @@ import com.campusconnect.neo4j.util.Validator;
 import static com.campusconnect.neo4j.util.ErrorCodes.*;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.data.annotation.CreatedBy;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -24,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by sn1 on 1/22/15.
@@ -32,20 +35,106 @@ import java.util.Set;
 @Consumes("application/json")
 @Produces("application/json")
 public class UserResource {
-    private UserDao userDao;
+    private AddressDao addressDao;
     private BookDao bookDao;
     private FBDao fbDao;
     private GoodreadsDao goodreadsDao;
-    private AddressDao addressDao;
+    private UserDao userDao;
+    private ReminderDao reminderDao;
+    
     public UserResource() {
     }
 
-    public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao, AddressDao addressDao) {
+    public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao, AddressDao addressDao,ReminderDao reminderDao) {
         this.userDao = userDao;
         this.bookDao = bookDao;
         this.fbDao = fbDao;
         this.goodreadsDao = goodreadsDao;
         this.addressDao = addressDao;
+        this.reminderDao = reminderDao;
+    }
+
+    @POST
+    @Path("{userId}/addresses")
+    public Response addAddress(@PathParam("userId") String userId, Address address) {
+        Address createdAddress = addressDao.createAddress(address);
+        User user = userDao.getUser(userId);
+        userDao.addAddressToUser(createdAddress, user);
+        return Response.ok().entity(createdAddress).build();
+    }
+
+    private Address addAddress(User user, Address address){
+//        Address createdAddress = addressDao.createAddress(address);
+//        addressDao.linkAddressToUser(user, address, getRequiredHeadersForAddressLink(address.getType()));
+//        return createdAddress;
+        return null;
+    }
+
+    private List<Address> addAddressesToUser(User user, List<Address> addresses) {
+        if(addresses != null){
+            List<Address> createdAddresses = new ArrayList<>();
+            for (Address address : addresses) {
+                createdAddresses.add(addAddress(user, address));
+            }
+            return createdAddresses;
+        }
+        return null;
+    }
+
+    @POST
+    @Path("{userId}/books/{bookId}/own")
+    public Response addBook(@PathParam("userId") final String userId, 
+                            @PathParam("bookId") final String bookId,
+                            @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
+        
+        User user = userDao.getUser(userId);
+        Book book = bookDao.getBook(bookId);
+        long now = System.currentTimeMillis();
+        bookDao.addBookToUser(new OwnsRelationship(user, book, now, status, now));
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("{userId}/books/{bookId}/wish")
+    public Response addBookToWishList(@PathParam("userId") final String userId,
+                            @PathParam("bookId") final String bookId,
+                            @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
+        
+        User user = userDao.getUser(userId);
+        Book book = bookDao.getBook(bookId);
+        long now = System.currentTimeMillis();
+        bookDao.addWishBookToUser(new WishListRelationship(user, book, status, now, now));
+        return Response.ok().build();
+    }
+    
+    private void addPropertiesForCreate(User user) {
+        final long createdDate = System.currentTimeMillis();
+        user.setCreatedDate(createdDate);
+        user.setLastModifiedDate(createdDate);
+    }
+
+    @PUT
+    @Path("{userId}/books/{bookId}/own")
+    public Response changeBookStatus(@PathParam("userId") final String userId, 
+                            @PathParam("bookId") final String bookId,
+                            @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
+        
+        User user = userDao.getUser(userId);
+        Book book = bookDao.getBook(bookId);
+        
+        bookDao.updateOwnedBookStatus(user, book, status);
+        return Response.ok().build();
+    }
+    
+    private void checkWhetherSynchIsNeeded(User user, Fields fields) {
+        for (Field field : fields.getFields()) {
+            if(field.getName().contains("goodreadsAccessTokenSecret")) {
+                goodreadsDao.getAndSaveBooksFromGoodreads(user.getId(), user.getGoodreadsId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret());
+            }
+            else if(field.getName().contains("fbId")) {
+                //todo kick off fb stuff
+            }
+        }
     }
 
     @POST
@@ -67,68 +156,16 @@ public class UserResource {
         User createdUser = userDao.createUser(user, accessToken);
         return Response.created(new URI("/user/" + createdUser.getId())).entity(createdUser).build();
     }
-
-    @PUT
-    @Path("{userId}/fields")
-    public Response updateUserFields(@PathParam("userId") final String userId, Fields fields) throws Exception {
-        //todo: validate passed fields are valid or not
-        User user = userDao.getUser(userId);
-        setUpdatedFields(user, fields);
-        user.setLastModifiedDate(System.currentTimeMillis());
-        User updatedUser = userDao.updateUser(userId, user);
-        checkWhetherSynchIsNeeded(updatedUser, fields);
-        return Response.ok().entity(updatedUser).build();
-    }
-
-    private void checkWhetherSynchIsNeeded(User user, Fields fields) {
-        for (Field field : fields.getFields()) {
-            if(field.getName().contains("goodreadsAccessTokenSecret")) {
-                goodreadsDao.getAndSaveBooksFromGoodreads(user.getId(), user.getGoodreadsId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret());
-            }
-            else if(field.getName().contains("fbId")) {
-                //todo kick off fb stuff
-            }
-        }
-    }
-
-    private void setUpdatedFields(User user, Fields fields) throws Exception {
-        for (Field field : fields.getFields()){
-            BeanUtils.setProperty(user, field.getName(), field.getValue());
-        }
-    }
-
-    @GET
-    @Path("{userId}")
-    public Response getUser(@PathParam("userId") final String userId) {
-        User user = userDao.getUser(userId);
-        return Response.ok().entity(user).build();
+    
+    @POST
+    @Path("{userId}/follow/{followUserId}")
+    public Response follow(@PathParam("userId") final String userId, @PathParam("followUserId") final String followUserId)
+    {
+    	
+		return null;
+    	
     }
     
-    @GET
-    @Path("fbId/{fbId}")
-    public Response getUserByFbId(@PathParam("fbId") final String fbId) {
-        User user = userDao.getUserByFbId(fbId);
-        if(user == null){
-            return Response.status(Response.Status.NOT_FOUND).entity(new Neo4jErrorResponse("NOT_FOUND", "client", "User is nto found with fbId : " + fbId)).build();
-        }
-        return Response.ok().entity(user).build();
-    }
-
-    @PUT
-    @Path("{userId}")
-    public Response updateUser(@PathParam("userId") final String userId, User user) {
-        user.setLastModifiedDate(System.currentTimeMillis());
-        User updatedUser = userDao.updateUser(userId, user);
-        return Response.ok().entity(updatedUser).build();
-    }
-    
-    @GET
-    @Path("{userId}/addresses/{addressId}")
-    public Response getAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId) {
-        Address updatedAddress = addressDao.getAddress(addressId);
-        return Response.ok().entity(updatedAddress).build();
-    }
-
     @GET
     @Path("{userId}/addresses")
     public Response getAddress(@PathParam("userId") final String userId, final Address address){
@@ -137,66 +174,11 @@ public class UserResource {
         return Response.ok().entity(addressesPage).build();
     }
     
-    @POST
-    @Path("{userId}/addresses")
-    public Response addAddress(@PathParam("userId") String userId, Address address) {
-        Address createdAddress = addressDao.createAddress(address);
-        User user = userDao.getUser(userId);
-        userDao.addAddressToUser(createdAddress, user);
-        return Response.ok().entity(createdAddress).build();
-    }
-    
-    @PUT
+    @GET
     @Path("{userId}/addresses/{addressId}")
-    public Response updateAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId, Address address) {
-       Address updatedAddress = addressDao.updateAddress(address);
-       return Response.ok().entity(updatedAddress).build();
-    }
-    
-    @POST
-    @Path("{userId}/books/{bookId}/own")
-    public Response addBook(@PathParam("userId") final String userId, 
-                            @PathParam("bookId") final String bookId,
-                            @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
-        
-        User user = userDao.getUser(userId);
-        Book book = bookDao.getBook(bookId);
-        long now = System.currentTimeMillis();
-        bookDao.addBookToUser(new OwnsRelationship(user, book, now, status, now));
-        return Response.ok().build();
-    }
-    
-    @POST
-    @Path("{userId}/books/{bookId}/wish")
-    public Response addBookToWishList(@PathParam("userId") final String userId,
-                            @PathParam("bookId") final String bookId,
-                            @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
-        
-        User user = userDao.getUser(userId);
-        Book book = bookDao.getBook(bookId);
-        long now = System.currentTimeMillis();
-        bookDao.addWishBookToUser(new WishListRelationship(user, book, status, now, now));
-        return Response.ok().build();
-    }
-    
-    @PUT
-    @Path("{userId}/books/{bookId}/own")
-    public Response changeBookStatus(@PathParam("userId") final String userId, 
-                            @PathParam("bookId") final String bookId,
-                            @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
-        
-        User user = userDao.getUser(userId);
-        Book book = bookDao.getBook(bookId);
-        
-        bookDao.updateOwnedBookStatus(user, book, status);
-        return Response.ok().build();
-    }
-    
-    @PUT
-    @Path("{userId}/books/wishlist/rec")
-    public Response synchWishListRec(@PathParam("userId") final String userId) {
-        userDao.synchWishListRec(userId);
-        return Response.ok().build();
+    public Response getAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId) {
+        Address updatedAddress = addressDao.getAddress(addressId);
+        return Response.ok().entity(updatedAddress).build();
     }
     
     @GET
@@ -246,30 +228,6 @@ public class UserResource {
     	UsersPage usersPage = new UsersPage(0, following.size(), following);
     	return Response.ok().entity(usersPage).build();
     }
-
-    @POST
-    @Path("{userId}/follow/{followUserId}")
-    public Response follow(@PathParam("userId") final String userId, @PathParam("followUserId") final String followUserId)
-    {
-    	
-		return null;
-    	
-    }
-    
-    @PUT
-    @Path("{userId}/favourites")
-    public Response setFavourites(@PathParam("userId") final String userId,final Favourites favourites)
-    {
-    	 User user = userDao.getUser(userId);
-    	 user.setFavorites(favourites.getFavourites());
-    	 userDao.updateUser(userId, user);
-         return Response.ok().build();
-    }
-    private void addPropertiesForCreate(User user) {
-        final long createdDate = System.currentTimeMillis();
-        user.setCreatedDate(createdDate);
-        user.setLastModifiedDate(createdDate);
-    }
     
     private Map<String, Object> getHeadersForAddingBook(String status) {
         Map<String, Object> properties = new HashMap<>();
@@ -278,6 +236,7 @@ public class UserResource {
         properties.put("lastModifiedDate", System.currentTimeMillis());
         return properties;
     }
+    
     private Map<String, Object> getHeadersForStatusUpdate(String status) {
         Map<String, Object> properties = new HashMap<>();
         properties.put("status", status);
@@ -299,23 +258,70 @@ public class UserResource {
         properties.put("type", addressType);
         return properties;
     }
-
-    private Address addAddress(User user, Address address){
-//        Address createdAddress = addressDao.createAddress(address);
-//        addressDao.linkAddressToUser(user, address, getRequiredHeadersForAddressLink(address.getType()));
-//        return createdAddress;
-        return null;
+    
+    @GET
+    @Path("{userId}")
+    public Response getUser(@PathParam("userId") final String userId) {
+        User user = userDao.getUser(userId);
+        return Response.ok().entity(user).build();
+    }
+    @GET
+    @Path("fbId/{fbId}")
+    public Response getUserByFbId(@PathParam("fbId") final String fbId) {
+        User user = userDao.getUserByFbId(fbId);
+        if(user == null){
+            return Response.status(Response.Status.NOT_FOUND).entity(new Neo4jErrorResponse("NOT_FOUND", "client", "User is nto found with fbId : " + fbId)).build();
+        }
+        return Response.ok().entity(user).build();
+    }
+    
+    @PUT
+    @Path("{userId}/favourites")
+    public Response setFavourites(@PathParam("userId") final String userId,final Favourites favourites)
+    {
+    	 User user = userDao.getUser(userId);
+    	 user.setFavorites(favourites.getFavourites());
+    	 userDao.updateUser(userId, user);
+         return Response.ok().build();
+    }
+    private void setUpdatedFields(User user, Fields fields) throws Exception {
+        for (Field field : fields.getFields()){
+            BeanUtils.setProperty(user, field.getName(), field.getValue());
+        }
+    }
+    
+    @PUT
+    @Path("{userId}/books/wishlist/rec")
+    public Response synchWishListRec(@PathParam("userId") final String userId) {
+        userDao.synchWishListRec(userId);
+        return Response.ok().build();
     }
 
-    private List<Address> addAddressesToUser(User user, List<Address> addresses) {
-        if(addresses != null){
-            List<Address> createdAddresses = new ArrayList<>();
-            for (Address address : addresses) {
-                createdAddresses.add(addAddress(user, address));
-            }
-            return createdAddresses;
-        }
-        return null;
+    @PUT
+    @Path("{userId}/addresses/{addressId}")
+    public Response updateAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId, Address address) {
+       Address updatedAddress = addressDao.updateAddress(address);
+       return Response.ok().entity(updatedAddress).build();
+    }
+
+    @PUT
+    @Path("{userId}")
+    public Response updateUser(@PathParam("userId") final String userId, User user) {
+        user.setLastModifiedDate(System.currentTimeMillis());
+        User updatedUser = userDao.updateUser(userId, user);
+        return Response.ok().entity(updatedUser).build();
+    }
+
+    @PUT
+    @Path("{userId}/fields")
+    public Response updateUserFields(@PathParam("userId") final String userId, Fields fields) throws Exception {
+        //todo: validate passed fields are valid or not
+        User user = userDao.getUser(userId);
+        setUpdatedFields(user, fields);
+        user.setLastModifiedDate(System.currentTimeMillis());
+        User updatedUser = userDao.updateUser(userId, user);
+        checkWhetherSynchIsNeeded(updatedUser, fields);
+        return Response.ok().entity(updatedUser).build();
     }
 
     //    public void approveCollegeAccess(String userId, String collegeId, String createdBy, String role){
@@ -326,4 +332,63 @@ public class UserResource {
 
     //    public void addCollegeAccess(String userId, String groupId, String role) {
 //    }
+    
+    
+    @POST
+    @Path("{userId}/reminders")
+	public Response createReminder(Reminder reminder,@PathParam("userId") final String userId,@QueryParam("reminderAbout") final ReminderAbout reminderAbout,@QueryParam("createdBy")final String createdBy)
+	{
+		setReminderCreateProperties(reminder);
+		Reminder createdReminder = reminderDao.createReminder(reminder);
+		User reminderForUser = userDao.getUser(userId);
+		long currentTime = System.currentTimeMillis();
+		ReminderRelationShip reminderRelationShip = new ReminderRelationShip(
+				createdBy, currentTime, reminderForUser, currentTime,
+				reminderAbout.toString(), reminder);
+		userDao.setReminder(reminderRelationShip);
+		return Response.created(null).entity(createdReminder).build();
+		
+	}
+
+    @PUT
+    @Path("{userId}/reminders/{reminderId}")
+    public Response updateReminder(Reminder reminder,@PathParam("userId") final String userId,@PathParam("reminderId") final String reminderId,@QueryParam("createdBy") final String createdBy)
+    {
+    	
+    	Reminder updatedReminder = reminderDao.updateReminder(reminderId,reminder);
+    	return Response.ok().entity(updatedReminder).build();
+    }
+    
+    @DELETE
+    @Path("{userId}/reminders/{reminderId}")
+    public Response deleteReminder(@PathParam("userId") final String userId,@PathParam("reminderId") final String reminderId)
+    {
+    	reminderDao.deleteReminder(reminderId);
+    	return Response.ok().build();
+    }
+    
+    @GET
+    @Path("{userId}/reminders/{reminderId}")
+    public Response getReminder(@PathParam("userId") final String userId,@PathParam("reminderId") final String reminderId)
+    {
+    	 Reminder reminder = reminderDao.getReminder(reminderId);
+    	return Response.ok().entity(reminder).build();
+		
+    	
+    }
+    
+    @GET
+    @Path("{userId}/reminders")
+    public Response getAllReminders(@PathParam("userId") final String userId)
+    {
+    	final List<Reminder> reminders = reminderDao.getAllReminders(userId);
+	ReminderPage reminderPage = new ReminderPage(0,reminders.size(),reminders);
+	return Response.ok().entity(reminderPage).build();
+    }
+    
+	private void setReminderCreateProperties(Reminder reminder) {
+		Long currentTime = System.currentTimeMillis();
+		reminder.setCreatedDate(currentTime);
+		reminder.setLastModifiedTime(currentTime);
+	}
 }

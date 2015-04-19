@@ -74,6 +74,7 @@ public class GroupResource {
 	public Response updateGroup(@PathParam("groupId") final String groupId,
 			Group group) {
 		Group groupToBeUpdated = groupDao.updateGroup(groupId, group);
+		group.setLastModifiedTime(System.currentTimeMillis());
 		return Response.created(null).entity(groupToBeUpdated).build();
 	}
 

@@ -49,7 +49,7 @@ public class UserGroupRelationTest extends TestBase {
 		
 		UserIdsPage userIdsPage = new UserIdsPage(0,bulkUserIds.size(),bulkUserIds);
 		
-		ClientResponse clientResponseForBulkAdditionOfUsers = resource.path("groups").path(groupId).path("bulk").queryParam("createdBy", userIdAdmin).type("application/json").entity(userIdsPage).post(ClientResponse.class);
+		ClientResponse clientResponseForBulkAdditionOfUsers = resource.path("groups").path(groupId).path("users").path("bulk").queryParam("createdBy", userIdAdmin).type("application/json").entity(userIdsPage).post(ClientResponse.class);
 		assert clientResponseForBulkAdditionOfUsers.getStatus() == 200;
 		
 		ClientResponse clientResponseForBulkAdditionOfUsersResp = resource.path("groups").path(groupId).path("users").type("application/json").get(ClientResponse.class);

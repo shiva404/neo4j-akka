@@ -58,4 +58,16 @@ public class DataBrewer {
         return new BorrowRequest(ownerId, borrwerId, 25, System.currentTimeMillis(), "message");
     }
 
+    public static Reminder getFakeReminder()
+    {
+    	
+    	Long currentTime = System.currentTimeMillis(); 
+    	return new Reminder(currentTime, currentTime,"Collect the Book", currentTime);
+    }
+
+	public static Object getFakeReminder(String reminderMessage) {
+		Long currentTime = System.currentTimeMillis(); 
+    	return new Reminder(currentTime, currentTime,reminderMessage, currentTime);
+
+	}
 }

@@ -119,7 +119,7 @@ public class UserResource {
         }
         return Response.ok().entity(user).build();
     }
-
+   
     @PUT
     @Path("{userId}")
     public Response updateUser(@PathParam("userId") final String userId, User user) {
@@ -157,6 +157,13 @@ public class UserResource {
     public Response updateAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId, Address address) {
        Address updatedAddress = addressDao.updateAddress(address, userId);
        return Response.ok().entity(updatedAddress).build();
+    }
+    
+    @DELETE
+    @Path("{userId}/addresses/{addressId}")
+    public Response deleteAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId) {
+       addressDao.deleteAddress(addressId, userId);
+       return Response.ok().build();
     }
     
     @POST

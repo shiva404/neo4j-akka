@@ -238,6 +238,10 @@ public class UserResource {
                 final List<BorrowedBook> borrowedBooks = userDao.getBorrowedBooks(userId);
                 BorrowedBooksPage borrowedBooksPage = new BorrowedBooksPage(0, borrowedBooks.size(), borrowedBooks);
                 return Response.ok().entity(borrowedBooksPage).build();
+            case "wishList":
+                List<WishListBook> wishListBooks = userDao.getWishListBooks(userId);
+                WishListBooksPage wishListBooksPage = new WishListBooksPage(0, wishListBooks.size(), wishListBooks);
+                return Response.ok().entity(wishListBooksPage).build();
         }
         return Response.ok().build();
     }

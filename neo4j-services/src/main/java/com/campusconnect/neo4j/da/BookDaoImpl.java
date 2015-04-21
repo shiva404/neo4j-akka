@@ -9,14 +9,17 @@ import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
 import com.googlecode.ehcache.annotations.Property;
+import org.neo4j.rest.graphdb.entity.RestNode;
+import org.neo4j.rest.graphdb.entity.RestRelationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.neo4j.conversion.Result;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by sn1 on 2/16/15.
@@ -152,5 +155,36 @@ public class BookDaoImpl implements BookDao {
         Book book = goodreadsDao.getBookByISBN(isbn);
         Book goodreadsBook = getBookByGoodreadsIdAndSaveIfNotExists(book.getGoodreadsAuthorId(), book);
         return goodreadsBook;
+    }
+
+    @Override
+    public Book getBook(String bookId, String userId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("bookId", bookId);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book {id: {bookId}}) - [relation] - (user:User {id: {userId}}) return relation, book", params);
+        //todo throw not found
+        return getBookDetails(mapResult);
+    }
+
+    private Book getBookDetails(Result<Map<String, Object>> mapResult) {
+        Book book = null;
+        for (Map<String, Object> objectMap : mapResult) {
+            RestNode bookNode = (RestNode) objectMap.get("book");
+            RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
+
+            book = neo4jTemplate.convert(bookNode, Book.class);
+            if(rawWishRelationship.getType().name().equals("OWNS")){
+                book.setBookType("OWNS");
+                OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawWishRelationship, OwnsRelationship.class);
+                book.getAdditionalProperties().putAll(ownsRelationship.getFieldsAsMap());
+            }
+            if(rawWishRelationship.getType().name().equals("BORROWED")) {
+                book.setBookType("BORROWED");
+                BorrowRelation borrowRelation = neo4jTemplate.convert(rawWishRelationship, BorrowRelation.class);
+                book.getAdditionalProperties().putAll(borrowRelation.getFieldsAsMap());
+            }
+        }
+        return book;
     }
 }

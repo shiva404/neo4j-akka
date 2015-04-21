@@ -37,8 +37,15 @@ public class BookResource {
 
     @GET
     @Path("{bookId}")
-    public Response getBook(@PathParam("bookId") String bookId) {
+    public Response getBook(@PathParam("bookId") String bookId, @QueryParam("expectedType") final String expectedType) {
         Book book = bookDao.getBook(bookId);
+        return Response.ok().entity(book).build();
+    }
+    
+    @GET
+    @Path("{bookId}/users/{userId}")
+    public Response getBookWithRespectToUser(@PathParam("bookId") String bookId, @PathParam("userId") final String userId, @QueryParam("expectedType") final String expectedType) {
+        Book book = bookDao.getBook(bookId, userId);
         return Response.ok().entity(book).build();
     }
     

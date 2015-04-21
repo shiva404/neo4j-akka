@@ -42,4 +42,6 @@ public interface BookDao {
     void createGoodreadsFriendBookRec(GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation);
     
     Book getBookByIsbn(String isbn) throws IOException;
+
+    Book getBook(String bookId, String userId);
 }

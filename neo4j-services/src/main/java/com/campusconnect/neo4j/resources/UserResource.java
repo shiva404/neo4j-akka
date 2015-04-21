@@ -258,7 +258,8 @@ public class UserResource {
     public Response follow(@PathParam("userId") final String userId, @PathParam("followUserId") final String followUserId)
     {
     	
-		return null;
+    	userDao.createFollowingRelation(userDao.getUser(userId), userDao.getUser(followUserId));
+		return Response.ok().build();
     	
     }
     

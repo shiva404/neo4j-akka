@@ -1,11 +1,13 @@
 package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
+import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.*;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +20,27 @@ import java.util.*;
  * Created by sn1 on 1/19/15.
  */
 public class UserDaoImpl implements UserDao {
+	
+	
+	public static final String DELIMITER = ":";
 
     @Autowired
     UserRepository userRepository;
     @Autowired
     GoodreadsAsynchHandler goodreadsAsynchHandler;
+    @Autowired 
+    AuditEventDao auditEventDao;
     
     @Autowired
     private FBDao fbDao;
     
     private Neo4jTemplate neo4jTemplate;
+    ObjectMapper objectMapper;
 
     public UserDaoImpl(Neo4jTemplate neo4jTemplate) {
+    	
         this.neo4jTemplate = neo4jTemplate;
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
@@ -42,10 +52,39 @@ public class UserDaoImpl implements UserDao {
                 user.setProfileImageUrl(profileImageUrl);
             }
         }
-        return neo4jTemplate.save(user);
+        User createdUser = neo4jTemplate.save(user);
+        
+        addEventForUser(createdUser);
+        
+        return createdUser;
     }
     
-    @Override
+    private void addEventForUser(User createdUser) {
+	
+    	try
+    	{
+    	Event userCreatedEvent = new Event(AuditEventType.CREATED.toString(), null);
+    	String serializedEvent = objectMapper.writeValueAsString(userCreatedEvent);
+    	Long currentTime = System.currentTimeMillis();
+    	AuditEvent auditEvent =  new AuditEvent();
+    	Set<String> events = auditEvent.getEvents();  	
+    	String eventString = currentTime+DELIMITER+serializedEvent; 	
+    	events.add(eventString);
+    	auditEventDao.createEvent(auditEvent);
+    	
+    	UserEventRelationship userEventRelationship =  new UserEventRelationship(auditEvent, createdUser);
+    	neo4jTemplate.save(userEventRelationship);
+    	
+    	}
+    	catch(Exception e)
+    	{
+    		//Change it to handle failure
+    		e.printStackTrace();
+    	}
+    	
+	}
+
+	@Override
     @Cacheable(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public User getUser(String userId) {
         return userRepository.findBySchemaPropertyValue("id", userId);
@@ -59,7 +98,16 @@ public class UserDaoImpl implements UserDao {
     @Override
     @TriggersRemove(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public void createFollowingRelation(@PartialCacheKey User user1, User user2) {
-        neo4jTemplate.createRelationshipBetween(user1, user2, FollowingRelation.class, UserRelationType.FOLLOWING.toString(), false);
+   
+    	neo4jTemplate.createRelationshipBetween(user1, user2, FollowingRelation.class, UserRelationType.FOLLOWING.toString(), false);
+    	AuditEvent auditEventOfUSer = auditEventDao.getEvents(user1.getId());
+    	
+    	
+    	Long currentTime = System.currentTimeMillis();
+    	String targetUserId = user2.getId();
+    	String targetUserName = user2.getName();
+    	String targetUrl = "users/" + targetUserId;
+    	Target target = new Target(IdType.USER_ID.toString(), targetUserName, targetUrl);	
     }
 
     @Override

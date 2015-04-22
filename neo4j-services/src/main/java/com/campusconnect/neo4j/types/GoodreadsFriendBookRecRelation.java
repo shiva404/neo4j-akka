@@ -12,12 +12,13 @@ public class GoodreadsFriendBookRecRelation extends BookRelation {
     public GoodreadsFriendBookRecRelation() {
     }
 
-    public GoodreadsFriendBookRecRelation(User user, Book book, String status, String friendGoodreadsId, String friendImageUrl, String friendName) {
+    public GoodreadsFriendBookRecRelation(User user, Book book, String status, String friendId, String friendGoodreadsId, String friendImageUrl, String friendName) {
 
         super(user, book, status);
         this.friendGoodreadsId = friendGoodreadsId;
         this.friendImageUrl = friendImageUrl;
         this.friendName = friendName;
+        this.friendId = friendId;
     }
 
     public String getFriendGoodreadsId() {
@@ -49,6 +50,13 @@ public class GoodreadsFriendBookRecRelation extends BookRelation {
     private String friendGoodreadsId;
     private String friendImageUrl;
     private String friendName;
-    
-    
+    private String friendId;
+
+    public String getFriendId() {
+        return friendId;
+    }
+
+    public void setFriendId(String friendId) {
+        this.friendId = friendId;
+    }
 }

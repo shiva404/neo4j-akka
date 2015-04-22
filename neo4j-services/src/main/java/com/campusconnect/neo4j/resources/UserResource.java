@@ -14,19 +14,15 @@ import com.campusconnect.neo4j.util.Validator;
 import static com.campusconnect.neo4j.util.ErrorCodes.*;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.springframework.data.annotation.CreatedBy;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Created by sn1 on 1/22/15.
@@ -175,7 +171,7 @@ public class UserResource {
         User user = userDao.getUser(userId);
         Book book = bookDao.getBook(bookId);
         long now = System.currentTimeMillis();
-        bookDao.addBookToUser(new OwnsRelationship(user, book, now, status, now));
+        bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status, now));
         return Response.ok().build();
     }
     

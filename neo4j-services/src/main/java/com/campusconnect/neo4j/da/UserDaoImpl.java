@@ -55,6 +55,11 @@ public class UserDaoImpl implements UserDao {
     public User getUserByFbId(String fbId) {
         return userRepository.findBySchemaPropertyValue("fbId", fbId);
     }
+    
+    @Override
+    public User getUserByGoodreadsId(String goodreadsId) {
+        return userRepository.findBySchemaPropertyValue("goodreadsId", goodreadsId);
+    }
 
     @Override
     @TriggersRemove(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
@@ -201,8 +206,7 @@ public class UserDaoImpl implements UserDao {
     
     @Override
 	public void setReminder(ReminderRelationShip reminderRelationShip) {
-		
 		neo4jTemplate.save(reminderRelationShip);
-		
 	}
+    
 }

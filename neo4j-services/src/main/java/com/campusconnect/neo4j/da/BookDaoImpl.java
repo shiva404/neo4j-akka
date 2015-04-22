@@ -43,7 +43,6 @@ public class BookDaoImpl implements BookDao {
         this.goodreadsAsynchHandler = goodreadsAsynchHandler;
     }
 
-
     @Override
     public Book createBook(Book book) {
         return neo4jTemplate.save(book);
@@ -55,8 +54,13 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public void addBookToUser(OwnsRelationship ownsRelationship) {
+    public void listBookAsOwns(OwnsRelationship ownsRelationship) {
         neo4jTemplate.save(ownsRelationship);
+    }
+    
+    @Override
+    public void listBookAsRead(ReadRelation readRelation) {
+        neo4jTemplate.save(readRelation);
     }
 
     @Override

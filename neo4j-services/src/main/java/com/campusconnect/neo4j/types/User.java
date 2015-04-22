@@ -31,6 +31,8 @@ public class User implements Serializable {
     private String goodreadsAccessToken;
     private String goodreadsAccessTokenSecret;
     private String goodreadsAuthStatus;
+    
+    @Indexed()
     private String goodreadsId;
     @Indexed(unique = true)
     private String id;

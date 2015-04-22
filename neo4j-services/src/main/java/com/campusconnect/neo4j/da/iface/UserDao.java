@@ -40,4 +40,6 @@ public interface UserDao {
 
 	void setReminder(ReminderRelationShip reminderRelationShip);
 
+    User getUserByGoodreadsId(String goodreadsId);
+
 }

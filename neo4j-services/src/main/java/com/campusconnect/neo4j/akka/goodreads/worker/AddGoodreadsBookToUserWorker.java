@@ -28,7 +28,7 @@ public class AddGoodreadsBookToUserWorker extends UntypedActor {
              if(addGoodreadsBookToUserTask.getShelfName().equals(GoodreadsStatus.TO_READ.toString())){
                 bookDao.addWishBookToUser(new WishListRelationship(user, book, "wish", now, now));
              } else
-                 bookDao.addBookToUser(new OwnsRelationship(user, book, now, null, now, addGoodreadsBookToUserTask.getShelfName()));
+                 bookDao.listBookAsRead(new ReadRelation(user, book, null, now, now, addGoodreadsBookToUserTask.getShelfName()));
         }
     }
 }

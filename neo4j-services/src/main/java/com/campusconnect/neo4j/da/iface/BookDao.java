@@ -16,7 +16,9 @@ public interface BookDao {
 
     Book getBook(String bookId);
 
-    void addBookToUser(OwnsRelationship ownsRelationship);
+    void listBookAsOwns(OwnsRelationship ownsRelationship);
+
+    void listBookAsRead(ReadRelation readRelation);
 
     @Transactional
     void updateOwnedBookStatus(User user, Book book, String status);

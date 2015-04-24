@@ -13,6 +13,15 @@ public class UserRecommendation {
     private String friendName;
     private String userId;
     private long createDate;
+    private String friendId;
+
+    public String getFriendId() {
+        return friendId;
+    }
+
+    public void setFriendId(String friendId) {
+        this.friendId = friendId;
+    }
 
     public void setBook(Book book) {
         this.book = book;
@@ -70,6 +79,6 @@ public class UserRecommendation {
         this.friendName = goodreadsFriendsRec.getFriendName();
         this.userId = goodreadsFriendsRec.getFriendName();
         this.createDate = goodreadsFriendsRec.getCreatedDate();
-
+        this.friendId = goodreadsFriendsRec.getFriendId();
     }
 }

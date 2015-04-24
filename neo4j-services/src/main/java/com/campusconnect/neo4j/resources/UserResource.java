@@ -220,6 +220,12 @@ public class UserResource {
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
+            
+            case "read": {
+                final List<Book> readBooks = userDao.getReadBooks(userId);
+                BooksPage booksPage = new BooksPage(0, readBooks.size(), readBooks);
+                return Response.ok().entity(booksPage).build();
+            }
             case "available": {
                 final List<OwnedBook> ownedBooks = userDao.getAvailableBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
@@ -326,7 +332,7 @@ public class UserResource {
     
     @POST
     @Path("{userId}/reminders")
-	public Response createReminder(Reminder reminder,@PathParam("userId") final String userId,@QueryParam("reminderAbout") final ReminderAbout reminderAbout,@QueryParam("createdBy")final String createdBy)
+	public Response createReminder(Reminder reminder,@PathParam("userId") final String userId,@QueryParam("reminderAbout") final String reminderAbout, @QueryParam("createdBy")final String createdBy)
 	{
 		setReminderCreateProperties(reminder);
 		Reminder createdReminder = reminderDao.createReminder(reminder);
@@ -334,7 +340,7 @@ public class UserResource {
 		long currentTime = System.currentTimeMillis();
 		ReminderRelationShip reminderRelationShip = new ReminderRelationShip(
 				createdBy, currentTime, reminderForUser, currentTime,
-				reminderAbout.toString(), reminder);
+				reminderAbout, reminder);
 		userDao.setReminder(reminderRelationShip);
 		return Response.created(null).entity(createdReminder).build();
 		
@@ -342,7 +348,7 @@ public class UserResource {
 
     @PUT
     @Path("{userId}/reminders/{reminderId}")
-    public Response updateReminder(Reminder reminder,@PathParam("userId") final String userId,@PathParam("reminderId") final String reminderId,@QueryParam("createdBy") final String createdBy)
+    public Response updateReminder(Reminder reminder,@PathParam("userId") final String userId,@PathParam("reminderId") final String reminderId)
     {
     	
     	Reminder updatedReminder = reminderDao.updateReminder(reminderId,reminder);
@@ -366,6 +372,8 @@ public class UserResource {
 		
     	
     }
+    
+    
     
     @GET
     @Path("{userId}/reminders")

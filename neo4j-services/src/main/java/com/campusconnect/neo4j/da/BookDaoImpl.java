@@ -4,6 +4,7 @@ import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.OwnsRelationshipRepository;
+import com.campusconnect.neo4j.repositories.UserRecRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
@@ -36,6 +37,9 @@ public class BookDaoImpl implements BookDao {
 
     @Autowired
     OwnsRelationshipRepository ownsRelationshipRepository;
+    
+    @Autowired
+    UserRecRepository userRecRepository;
 
     public BookDaoImpl(Neo4jTemplate neo4jTemplate, GoodreadsDao goodreadsDao, GoodreadsAsynchHandler goodreadsAsynchHandler) {
         this.neo4jTemplate = neo4jTemplate;
@@ -160,6 +164,27 @@ public class BookDaoImpl implements BookDao {
         Book goodreadsBook = getBookByGoodreadsIdAndSaveIfNotExists(book.getGoodreadsAuthorId(), book);
         return goodreadsBook;
     }
+    
+    @Override
+    public List<UserRecommendation> getRecommendationsForUserAndBook(String bookId, String userId) {
+        List<GoodreadsFriendBookRecRelation> friendBookRecRelations = userRecRepository.getGoodreadsFriendBookRecRelations(userId, bookId);
+        List<UserRecommendation> userRecommendations = convertToUserRec(friendBookRecRelations);
+        return userRecommendations;
+    }
+
+    private List<UserRecommendation> convertToUserRec(List<GoodreadsFriendBookRecRelation> friendBookRecRelations) {
+        List<UserRecommendation> userRecommendations = new ArrayList<>();
+        for(GoodreadsFriendBookRecRelation friendBookRecRelation : friendBookRecRelations) {
+            UserRecommendation userRecommendation = new UserRecommendation();
+            userRecommendation.setFriendGoodreadsId(friendBookRecRelation.getFriendGoodreadsId());
+            userRecommendation.setFriendImageUrl(friendBookRecRelation.getFriendImageUrl());
+            userRecommendation.setFriendName(friendBookRecRelation.getFriendName());
+            userRecommendation.setFriendId(friendBookRecRelation.getFriendId());
+            
+            userRecommendations.add(userRecommendation);
+        }
+        return userRecommendations;
+    }
 
     @Override
     public Book getBook(String bookId, String userId) {
@@ -168,10 +193,10 @@ public class BookDaoImpl implements BookDao {
         params.put("bookId", bookId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book {id: {bookId}}) - [relation] - (user:User {id: {userId}}) return relation, book", params);
         //todo throw not found
-        return getBookDetails(mapResult);
+        return getBookDetails(mapResult, userId);
     }
 
-    private Book getBookDetails(Result<Map<String, Object>> mapResult) {
+    private Book getBookDetails(Result<Map<String, Object>> mapResult, String userId) {
         Book book = null;
         for (Map<String, Object> objectMap : mapResult) {
             RestNode bookNode = (RestNode) objectMap.get("book");
@@ -182,11 +207,20 @@ public class BookDaoImpl implements BookDao {
                 book.setBookType("OWNS");
                 OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawWishRelationship, OwnsRelationship.class);
                 book.getAdditionalProperties().putAll(ownsRelationship.getFieldsAsMap());
+                return book;
             }
             if(rawWishRelationship.getType().name().equals("BORROWED")) {
                 book.setBookType("BORROWED");
                 BorrowRelation borrowRelation = neo4jTemplate.convert(rawWishRelationship, BorrowRelation.class);
                 book.getAdditionalProperties().putAll(borrowRelation.getFieldsAsMap());
+                return book;
+            }
+            if(rawWishRelationship.getType().name().equals("WISH")) {
+                book.setBookType("WISH");
+                //find if there are any recommendations
+                List<UserRecommendation> userRecommendations = getRecommendationsForUserAndBook(book.getId(), userId);
+                book.getAdditionalProperties().put("recommendations", userRecommendations);
+                return book;
             }
         }
         return book;

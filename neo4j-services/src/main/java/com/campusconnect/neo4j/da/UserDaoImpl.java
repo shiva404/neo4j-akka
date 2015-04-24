@@ -2,6 +2,7 @@ package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.*;
@@ -21,6 +22,10 @@ public class UserDaoImpl implements UserDao {
 
     @Autowired
     UserRepository userRepository;
+    
+    @Autowired
+    BookRepository bookRepository;
+    
     @Autowired
     GoodreadsAsynchHandler goodreadsAsynchHandler;
     
@@ -92,6 +97,11 @@ public class UserDaoImpl implements UserDao {
         params.put("userId", userId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS]->(books:Book) return books, relation", params);
         return getOwnedBooksFromResultMap(mapResult);
+    }
+    
+    @Override
+    public List<Book> getReadBooks(String userId) {
+        return bookRepository.getBooks(userId);
     }
 
     @Override

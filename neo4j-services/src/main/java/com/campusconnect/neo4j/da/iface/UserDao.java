@@ -14,6 +14,8 @@ public interface UserDao {
 
     User createUser(User user, String accessToken);
 
+    List<Book> getReadBooks(String userId);
+
     List<OwnedBook> getAvailableBooks(String userId);
 
 	List<BorrowedBook> getBorrowedBooks(String userId);

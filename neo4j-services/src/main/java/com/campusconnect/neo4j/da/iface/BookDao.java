@@ -7,6 +7,7 @@ import com.googlecode.ehcache.annotations.Property;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by sn1 on 3/11/15.
@@ -44,6 +45,8 @@ public interface BookDao {
     void createGoodreadsFriendBookRec(GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation);
     
     Book getBookByIsbn(String isbn) throws IOException;
+
+    List<UserRecommendation> getRecommendationsForUserAndBook(String bookId, String userId);
 
     Book getBook(String bookId, String userId);
 }

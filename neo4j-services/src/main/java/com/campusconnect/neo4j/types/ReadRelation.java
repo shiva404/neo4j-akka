@@ -22,5 +22,7 @@ public class ReadRelation extends BookRelation {
     }
 
     String goodreadsStatus;
-    
+
+    public ReadRelation() {
+    }
 }

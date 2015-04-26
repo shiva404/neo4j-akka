@@ -22,7 +22,7 @@ public class Book implements Serializable {
     @Indexed(unique = true)
     private String id;
 
-    @Indexed
+    @Indexed()
     private Integer goodreadsId;
 
     private String authorName;

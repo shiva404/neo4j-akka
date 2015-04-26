@@ -49,4 +49,6 @@ public interface BookDao {
     List<UserRecommendation> getRecommendationsForUserAndBook(String bookId, String userId);
 
     Book getBook(String bookId, String userId);
+    
+    Book getBookByGoodreadsIdWithUser(Integer goodreadsId, String userId);
 }

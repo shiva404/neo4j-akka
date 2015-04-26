@@ -54,12 +54,22 @@ public class UserResource {
     public Response createUser(@QueryParam("accessToken") final String accessToken, final User user) throws URISyntaxException {
     	
     	StringBuffer validateUserDataMessage = Validator.validateUserObject(user);
-    	User existingUser = userDao.getUserByFbId(user.getFbId());
-    	
-    	if(null!=existingUser)
-    	{
-    		throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
-    	}
+    	if(user.getFbId() != null) {
+            User existingUser = userDao.getUserByFbId(user.getFbId());
+            if(null!=existingUser)
+            {
+                throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
+            }    
+        }
+        
+        if(user.getGoogleId() != null) {
+            User existingUser = userDao.getUserByGoogleId(user.getGoogleId());
+            if(null!=existingUser)
+            {
+                throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
+            }    
+        }
+        
     	
     	if(null!=validateUserDataMessage)
     	{
@@ -369,10 +379,18 @@ public class UserResource {
     {
     	 Reminder reminder = reminderDao.getReminder(reminderId);
     	return Response.ok().entity(reminder).build();
-		
-    	
     }
     
+    @GET
+    @Path("{googleId}/googleId")
+    public Response getUserByGoogleId(@PathParam("googleId") final String googleId){
+        User user = userDao.getUserByGoogleId(googleId);
+        if(user == null){
+            return Response.status(Response.Status.NOT_FOUND).entity(new Neo4jErrorResponse("NOT_FOUND", "client", "User is nto found with googleId : " + googleId)).build();
+        }
+        return Response.ok().entity(user).build();
+
+    }
     
     
     @GET

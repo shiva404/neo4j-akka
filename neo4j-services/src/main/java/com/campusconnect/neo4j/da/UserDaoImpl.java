@@ -49,7 +49,7 @@ public class UserDaoImpl implements UserDao {
         }
         return neo4jTemplate.save(user);
     }
-    
+
     @Override
     @Cacheable(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public User getUser(String userId) {
@@ -64,6 +64,11 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User getUserByGoodreadsId(String goodreadsId) {
         return userRepository.findBySchemaPropertyValue("goodreadsId", goodreadsId);
+    }
+
+    @Override
+    public User getUserByGoogleId(String googleId) {
+        return userRepository.findBySchemaPropertyValue("googleId", googleId);
     }
 
     @Override
@@ -193,7 +198,6 @@ public class UserDaoImpl implements UserDao {
         for (Map<String, Object> objectMap : mapResult) {
             RestNode bookNode = (RestNode) objectMap.get("books");
             RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
-
             Book book = neo4jTemplate.convert(bookNode, Book.class);
             GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation = neo4jTemplate.convert(rawWishRelationship, GoodreadsFriendBookRecRelation.class);
             userRecommendations.add(new UserRecommendation(book, goodreadsFriendBookRecRelation));

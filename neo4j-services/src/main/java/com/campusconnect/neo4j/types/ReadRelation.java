@@ -25,4 +25,11 @@ public class ReadRelation extends BookRelation {
 
     public ReadRelation() {
     }
+    
+    @Override
+    public String toString() {
+        return "ReadRelation{" +
+                "goodreadsStatus='" + goodreadsStatus + '\'' +
+                '}';
+    }
 }

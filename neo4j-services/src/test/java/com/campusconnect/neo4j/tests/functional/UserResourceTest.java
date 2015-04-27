@@ -50,7 +50,7 @@ public class UserResourceTest extends TestBase {
     	 
     	 favourites.setFavourites(favTopics);
     	
-    	 ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithAddress()).post(ClientResponse.class);
+    	ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithAddress()).post(ClientResponse.class);
      	assert clientResponse.getStatus() == 201;
      	createdUser = clientResponse.getEntity(User.class);
      	String userId = createdUser.getId();

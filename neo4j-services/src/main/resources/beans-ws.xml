@@ -92,6 +92,7 @@
         <constructor-arg index="3" ref="goodreadsDao" />
         <constructor-arg index="4" ref="addressDao" />
         <constructor-arg index="5" ref="reminderDao"/>
+        <constructor-arg index="6" ref="auditEventDao"/>
     </bean>
     
 
@@ -179,6 +180,7 @@
     </bean>
     
     <bean id="addressDao" class="com.campusconnect.neo4j.da.AddressDaoImpl" />
+    <bean id="auditEventDao" class="com.campusconnect.neo4j.da.AuditEventDaoImpl"/>
     
     <bean id="friendsBookSearchForWishListWorker" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
         <property name="actorSystem" ref="actorSystem"/>

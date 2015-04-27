@@ -3,6 +3,7 @@ package com.campusconnect.neo4j.resources;
 import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.iface.AddressDao;
+import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.ReminderDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
@@ -14,15 +15,21 @@ import com.campusconnect.neo4j.util.Validator;
 import static com.campusconnect.neo4j.util.ErrorCodes.*;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.data.annotation.CreatedBy;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by sn1 on 1/22/15.
@@ -37,17 +44,19 @@ public class UserResource {
     private GoodreadsDao goodreadsDao;
     private UserDao userDao;
     private ReminderDao reminderDao;
+    private AuditEventDao auditEventDao;
     
     public UserResource() {
     }
 
-    public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao, AddressDao addressDao,ReminderDao reminderDao) {
+    public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao, AddressDao addressDao,ReminderDao reminderDao,AuditEventDao auditEventDao) {
         this.userDao = userDao;
         this.bookDao = bookDao;
         this.fbDao = fbDao;
         this.goodreadsDao = goodreadsDao;
         this.addressDao = addressDao;
         this.reminderDao = reminderDao;
+        this.auditEventDao = auditEventDao;
     }
 
     @POST
@@ -71,6 +80,11 @@ public class UserResource {
         }
         
     	
+//    	if(null!=existingUser)
+//    	{
+//    		throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
+//    	}
+//
     	if(null!=validateUserDataMessage)
     	{
     		throw new InvalidInputDataException(INVALId_ARGMENTS,validateUserDataMessage.toString());
@@ -104,9 +118,18 @@ public class UserResource {
     }
 
     private void setUpdatedFields(User user, Fields fields) throws Exception {
+    	ObjectMapper objectMapper = new ObjectMapper();
         for (Field field : fields.getFields()){
             BeanUtils.setProperty(user, field.getName(), field.getValue());
         }
+        Long currentTime = System.currentTimeMillis();
+    	String targetUserId = user.getId();
+    	String targetUserName = objectMapper.writeValueAsString(fields);
+    	String targetUrl = null;
+    	Target target = new Target(IdType.USER_ID.toString(), targetUserName, targetUrl);
+     	Event followedUSerEvent = new Event(AuditEventType.USER_UPDATED.toString(), target,currentTime);
+    	auditEventDao.addEvent(targetUserId, followedUSerEvent);
+  
     }
 
     @GET
@@ -125,7 +148,7 @@ public class UserResource {
         }
         return Response.ok().entity(user).build();
     }
-   
+
     @PUT
     @Path("{userId}")
     public Response updateUser(@PathParam("userId") final String userId, User user) {
@@ -161,7 +184,7 @@ public class UserResource {
     @PUT
     @Path("{userId}/addresses/{addressId}")
     public Response updateAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId, Address address) {
-       Address updatedAddress = addressDao.updateAddress(address, userId);
+       Address updatedAddress = addressDao.updateAddress(address, userId);     
        return Response.ok().entity(updatedAddress).build();
     }
     
@@ -280,9 +303,17 @@ public class UserResource {
     @Path("{userId}/follow/{followUserId}")
     public Response follow(@PathParam("userId") final String userId, @PathParam("followUserId") final String followUserId)
     {
-    	
-		return null;
-    	
+    	userDao.createFollowingRelation(userDao.getUser(userId), userDao.getUser(followUserId));
+		return Response.ok().build(); 	
+    }
+    
+    @POST
+    @Path("{userId}/friend/{friendUserId}")
+    public Response friend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId)
+    {
+//    	userDao.createFriendRelation(userDao.getUser(userId), userDao.getUser(friendUserId));
+//		return Response.ok().build();
+        return null;
     }
     
     @PUT
@@ -400,6 +431,35 @@ public class UserResource {
     	final List<Reminder> reminders = reminderDao.getAllReminders(userId);
 	ReminderPage reminderPage = new ReminderPage(0,reminders.size(),reminders);
 	return Response.ok().entity(reminderPage).build();
+    }
+    
+    
+    @GET
+    @Path("{userId}/events")
+    public Response getAllEvents(@PathParam("userId")final String userId)
+    {
+    	ObjectMapper objectMapper = new ObjectMapper();
+    	AuditEvent auditEvent = auditEventDao.getEvents(userId);
+    	Set<String> event = auditEvent.getEvents();
+    	List<Event> events = new LinkedList<Event>();
+    	
+    	 for(String eachEvent:event)
+    	 {
+    		 try
+    		 {
+    			 System.out.println("each event" + eachEvent);
+    		 Event eventDeserialised = objectMapper.readValue(eachEvent, Event.class);
+    		 events.add(eventDeserialised);		 
+    		 }
+    		 catch(Exception e)
+    		 {
+    			 e.printStackTrace();
+    		 }
+    	 }
+    	
+    	 EventPage eventPage = new EventPage(0, events.size(), events);
+    	 
+    	return Response.ok().entity(eventPage).build();
     }
     
 	private void setReminderCreateProperties(Reminder reminder) {

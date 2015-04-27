@@ -6,8 +6,8 @@ package com.campusconnect.neo4j.types;
 public class Field {
     private String name;
     private String value;
-
-    public String getName() {
+    
+	public String getName() {
         return name;
     }
 

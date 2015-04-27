@@ -1,6 +1,8 @@
 package com.campusconnect.neo4j.types;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sn1 on 3/22/15.
@@ -20,5 +22,13 @@ public class WishListBook extends Book implements Serializable {
     }
 
     public WishListBook() {
+    }
+    
+    private List<UserRecommendation> userRecommendations;
+
+    public List<UserRecommendation> getUserRecommendations() {
+        if(userRecommendations == null)
+            userRecommendations = new ArrayList<>();
+        return userRecommendations;
     }
 }

@@ -14,6 +14,8 @@ public interface UserDao {
 
     User createUser(User user, String accessToken);
 
+    List<Book> getReadBooks(String userId);
+
     List<OwnedBook> getAvailableBooks(String userId);
 
 	List<BorrowedBook> getBorrowedBooks(String userId);
@@ -40,6 +42,7 @@ public interface UserDao {
 
 	void setReminder(ReminderRelationShip reminderRelationShip);
 
-	void createFriendRelation(User user, User user2);
+    User getUserByGoodreadsId(String goodreadsId);
 
+    User getUserByGoogleId(String googleId);
 }

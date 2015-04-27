@@ -3,6 +3,7 @@ package com.campusconnect.neo4j.da;
 import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.*;
@@ -25,6 +26,9 @@ public class UserDaoImpl implements UserDao {
 	@Autowired
     UserRepository userRepository;
     @Autowired
+    BookRepository bookRepository;
+    
+    @Autowired
     GoodreadsAsynchHandler goodreadsAsynchHandler;
     @Autowired 
     AuditEventDao auditEventDao;
@@ -36,7 +40,6 @@ public class UserDaoImpl implements UserDao {
     ObjectMapper objectMapper;
 
     public UserDaoImpl(Neo4jTemplate neo4jTemplate) {
-    	
         this.neo4jTemplate = neo4jTemplate;
         this.objectMapper = new ObjectMapper();
     }
@@ -70,8 +73,8 @@ public class UserDaoImpl implements UserDao {
         }
         return createdUser;
     }
-
-	@Override
+    
+    @Override
     @Cacheable(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public User getUser(String userId) {
         return userRepository.findBySchemaPropertyValue("id", userId);
@@ -80,6 +83,16 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User getUserByFbId(String fbId) {
         return userRepository.findBySchemaPropertyValue("fbId", fbId);
+    }
+    
+    @Override
+    public User getUserByGoodreadsId(String goodreadsId) {
+        return userRepository.findBySchemaPropertyValue("goodreadsId", goodreadsId);
+    }
+
+    @Override
+    public User getUserByGoogleId(String googleId) {
+        return userRepository.findBySchemaPropertyValue("googleId", googleId);
     }
 
     @Override
@@ -130,6 +143,11 @@ public class UserDaoImpl implements UserDao {
         params.put("userId", userId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS]->(books:Book) return books, relation", params);
         return getOwnedBooksFromResultMap(mapResult);
+    }
+    
+    @Override
+    public List<Book> getReadBooks(String userId) {
+        return bookRepository.getBooks(userId);
     }
 
     @Override
@@ -262,12 +280,6 @@ public class UserDaoImpl implements UserDao {
 	public void setReminder(ReminderRelationShip reminderRelationShip) {
 		
 		neo4jTemplate.save(reminderRelationShip);
-		
-	}
-
-	@Override
-	public void createFriendRelation(User user, User user2) {
-		k
 		
 	}
 }

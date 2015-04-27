@@ -21,14 +21,17 @@ public class AddGoodreadsBookToUserWorker extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if(message instanceof AddGoodreadsBookToUserTask) {
             AddGoodreadsBookToUserTask addGoodreadsBookToUserTask = (AddGoodreadsBookToUserTask) message;
-            Book book = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(addGoodreadsBookToUserTask.getBook().getGoodreadsId().toString(), addGoodreadsBookToUserTask.getBook());
+           // Book book = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(addGoodreadsBookToUserTask.getBook().getGoodreadsId().toString(), addGoodreadsBookToUserTask.getBook());
+            Book book = bookDao.getBookByGoodreadsId(addGoodreadsBookToUserTask.getBook().getGoodreadsId().toString());
             User user = userDao.getUser(addGoodreadsBookToUserTask.getUserId());
 
+            //todo: dont create a relation if already exists
+            
             final long now = System.currentTimeMillis();
              if(addGoodreadsBookToUserTask.getShelfName().equals(GoodreadsStatus.TO_READ.toString())){
                 bookDao.addWishBookToUser(new WishListRelationship(user, book, "wish", now, now));
              } else
-                 bookDao.addBookToUser(new OwnsRelationship(user, book, now, null, now, addGoodreadsBookToUserTask.getShelfName()));
+                 bookDao.listBookAsRead(new ReadRelation(user, book, null, now, now, addGoodreadsBookToUserTask.getShelfName()));
         }
     }
 }

@@ -31,7 +31,13 @@ public class User implements Serializable {
     private String goodreadsAccessToken;
     private String goodreadsAccessTokenSecret;
     private String goodreadsAuthStatus;
+    
+    @Indexed()
     private String goodreadsId;
+    
+    @Indexed()
+    private String googleId;
+
     @Indexed(unique = true)
     private String id;
     @LastModifiedDate
@@ -40,6 +46,16 @@ public class User implements Serializable {
     @GraphId
     private Long nodeId;
     private String phone;
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    private String gender;
     
     private String profileImageUrl;
 
@@ -62,6 +78,14 @@ public class User implements Serializable {
         this.phone = phone;
     }
 
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
+    
     public Set<Address> getAddresses() {
         return addresses;
     }

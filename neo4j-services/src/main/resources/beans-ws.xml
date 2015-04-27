@@ -21,6 +21,8 @@
     <neo4j:repositories base-package="com.campusconnect.neo4j.repositories"/>
     <neo4j:config base-package="com.campusconnect.neo4j.types" graphDatabaseService="graphDatabaseService"/>
     
+    <bean class="com.campusconnect.neo4j.providers.Neo4jExceptionMapper" scope="singleton" id="exceptionMapper" />
+    
     <bean id="graphDatabaseService"
           class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase" name="graphDatabaseService">
         <constructor-arg index="0" value="http://127.0.0.1:7474/db/data"/>
@@ -47,6 +49,11 @@
     <bean class="com.campusconnect.neo4j.resources.GroupResource" id="groupResource">
         <constructor-arg index="0" ref="groupDao"/>
         <constructor-arg index="1" ref="userDao"/>
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.facebook.api.GetUserProfile" id="getUserProfile">
+        <constructor-arg index="0" ref="facebookClient" />
+        <constructor-arg index="1" ref="connectionFactory" />
     </bean>
 
     <bean class="com.campusconnect.neo4j.da.GroupDao" id="groupDao">

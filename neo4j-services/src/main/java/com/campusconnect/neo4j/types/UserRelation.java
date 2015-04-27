@@ -7,7 +7,7 @@ import org.springframework.data.neo4j.annotation.*;
 /**
  * Created by sn1 on 1/19/15.
  */
-
+@RelationshipEntity(type = "CONNECTION")
 public abstract class UserRelation {
     @GraphId
     private Long id;

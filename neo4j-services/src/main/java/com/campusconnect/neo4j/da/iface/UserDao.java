@@ -40,4 +40,6 @@ public interface UserDao {
 
 	void setReminder(ReminderRelationShip reminderRelationShip);
 
+	void createFriendRelation(User user, User user2);
+
 }

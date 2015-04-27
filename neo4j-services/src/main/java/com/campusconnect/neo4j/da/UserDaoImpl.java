@@ -22,9 +22,7 @@ import java.util.*;
 public class UserDaoImpl implements UserDao {
 	
 	
-	public static final String DELIMITER = ":";
-
-    @Autowired
+	@Autowired
     UserRepository userRepository;
     @Autowired
     GoodreadsAsynchHandler goodreadsAsynchHandler;
@@ -52,37 +50,26 @@ public class UserDaoImpl implements UserDao {
                 user.setProfileImageUrl(profileImageUrl);
             }
         }
+      
         User createdUser = neo4jTemplate.save(user);
-        
-        addEventForUser(createdUser);
-        
+        try
+        {
+        Long currentTime = System.currentTimeMillis();
+        Event userCreatedEvent = new Event(AuditEventType.CREATED.toString(), null,currentTime);
+        String serializedEvent = objectMapper.writeValueAsString(userCreatedEvent);
+    	AuditEvent auditEvent = new AuditEvent();
+    	Set<String> events = auditEvent.getEvents();
+    	events.add(serializedEvent);
+    	auditEvent = auditEventDao.saveEvent(auditEvent);
+    		UserEventRelationship userEventRelationship = new UserEventRelationship(auditEvent , createdUser);
+    		neo4jTemplate.save(userEventRelationship);
+        }
+        catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
         return createdUser;
     }
-    
-    private void addEventForUser(User createdUser) {
-	
-    	try
-    	{
-    	Event userCreatedEvent = new Event(AuditEventType.CREATED.toString(), null);
-    	String serializedEvent = objectMapper.writeValueAsString(userCreatedEvent);
-    	Long currentTime = System.currentTimeMillis();
-    	AuditEvent auditEvent =  new AuditEvent();
-    	Set<String> events = auditEvent.getEvents();  	
-    	String eventString = currentTime+DELIMITER+serializedEvent; 	
-    	events.add(eventString);
-    	auditEventDao.createEvent(auditEvent);
-    	
-    	UserEventRelationship userEventRelationship =  new UserEventRelationship(auditEvent, createdUser);
-    	neo4jTemplate.save(userEventRelationship);
-    	
-    	}
-    	catch(Exception e)
-    	{
-    		//Change it to handle failure
-    		e.printStackTrace();
-    	}
-    	
-	}
 
 	@Override
     @Cacheable(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
@@ -100,20 +87,28 @@ public class UserDaoImpl implements UserDao {
     public void createFollowingRelation(@PartialCacheKey User user1, User user2) {
    
     	neo4jTemplate.createRelationshipBetween(user1, user2, FollowingRelation.class, UserRelationType.FOLLOWING.toString(), false);
-    	AuditEvent auditEventOfUSer = auditEventDao.getEvents(user1.getId());
     	
-    	
+    	try
+    	{
     	Long currentTime = System.currentTimeMillis();
     	String targetUserId = user2.getId();
     	String targetUserName = user2.getName();
     	String targetUrl = "users/" + targetUserId;
     	Target target = new Target(IdType.USER_ID.toString(), targetUserName, targetUrl);	
+    	Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), target,currentTime);
+    	auditEventDao.addEvent(user1.getId(), followedUSerEvent);
+    	
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
     }
 
     @Override
     @TriggersRemove(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public User updateUser(@PartialCacheKey String userId, User user) {
-        return neo4jTemplate.save(user);
+    	return neo4jTemplate.save(user);
     }
 
     @Override
@@ -181,6 +176,22 @@ public class UserDaoImpl implements UserDao {
             address = neo4jTemplate.save(address);
         AddressRelation addressRelation = new AddressRelation(user, address);
         neo4jTemplate.save(addressRelation);
+        
+        try
+        {
+        	Long currentTime = System.currentTimeMillis();
+        	
+        	String targetEvent = objectMapper.writeValueAsString(address);
+        	
+        	Target target = new Target(IdType.USER_ID.toString(), targetEvent, null);	
+        	Event addAddressToUserEvent = new Event(AuditEventType.ADDED_ADDRESS.toString(), target,currentTime);
+        	auditEventDao.addEvent(user.getId(), addAddressToUserEvent);
+
+        }
+        catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
     } 
     
     
@@ -251,6 +262,12 @@ public class UserDaoImpl implements UserDao {
 	public void setReminder(ReminderRelationShip reminderRelationShip) {
 		
 		neo4jTemplate.save(reminderRelationShip);
+		
+	}
+
+	@Override
+	public void createFriendRelation(User user, User user2) {
+		k
 		
 	}
 }

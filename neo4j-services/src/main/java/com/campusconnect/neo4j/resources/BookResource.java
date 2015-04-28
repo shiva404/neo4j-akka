@@ -98,7 +98,7 @@ public class BookResource {
             if(borrowerId != null){
                 User borrower = userDao.getUser(borrowerId);
                 if(borrower != null)
-                    bookDao.updateBookStatusOnAgreement(user, book, borrower);
+                    bookDao.updateBookStatusOnSuccess(user, book, borrower);
 
                 //todo: throw error userNot found
             } else {

@@ -85,7 +85,7 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public void addBookToBorrower(User borrower, Book book, BorrowRequest borrowRequest) {
-        BorrowRelation borrowRelation = new BorrowRelation(borrower, book, "pending");
+        BorrowRelation borrowRelation = new BorrowRelation(borrower, book, "progress");
         borrowRelation.setBorrowDate(borrowRequest.getBorrowDate());
         borrowRelation.setContractPeriodInDays(borrowRequest.getContractPeriodInDays());
         borrowRelation.setAdditionalComments(borrowRequest.getAdditionalMessage());

@@ -18,19 +18,11 @@ import com.campusconnect.neo4j.types.Reminder;
 @Consumes("application/json")
 @Produces("application/json")
 public class ReminderResource {
-	
+
 	private ReminderDao reminderDao;
 
 	public ReminderResource(ReminderDao reminderDao) {
 		super();
 		this.reminderDao = reminderDao;
 	}
-	
-	
-	
-
-	
-	
-	
-
 }

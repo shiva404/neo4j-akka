@@ -22,16 +22,16 @@ public interface BookDao {
     void listBookAsRead(ReadRelation readRelation);
 
     @Transactional
-    void updateOwnedBookStatus(User user, Book book, String status);
+    void updateOwnedBookStatus(User user, Book book, String status, String userComment);
 
     void addBookToBorrower(User borrower, Book book, BorrowRequest borrowRequest);
 
-    void updateBookStatusOnAgreement(User user, Book book, User borrower);
+    void updateBookStatusOnAgreement(User user, Book book, User borrower, String userComment);
 
-    void updateBookStatusOnSuccess(User user, Book book, User borrower);
+    void updateBookStatusOnSuccess(User user, Book book, User borrower, String userComment);
 
     @Transactional
-    void updateBorrowedBookStatus(User user, Book book, String status);
+    void updateBorrowedBookStatus(User user, Book book, String status, String userComment);
 
     SearchResult search(String queryString);
 

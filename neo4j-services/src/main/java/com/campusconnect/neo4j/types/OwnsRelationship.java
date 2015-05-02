@@ -21,8 +21,23 @@ public class OwnsRelationship extends BookRelation {
 	private String dueDate;
 
 	private String goodreadsStatus;
+    
+    private String userComment;
 
-	public OwnsRelationship() {
+    public String getUserComment() {
+        return userComment;
+    }
+
+    public void setUserComment(String userComment) {
+        this.userComment = userComment;
+    }
+
+    public void setContractPeriodInDays(Integer contractPeriodInDays) {
+
+        this.contractPeriodInDays = contractPeriodInDays;
+    }
+
+    public OwnsRelationship() {
 		super();
 	}
 

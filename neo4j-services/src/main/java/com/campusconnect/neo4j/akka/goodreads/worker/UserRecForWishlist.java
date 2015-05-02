@@ -47,10 +47,11 @@ public class UserRecForWishlist extends UntypedActor {
                                 userRecForWishListTask.getUserId(), userRecForWishListTask.getGoodreadsId(), userRecForWishListTask.getFriend(), userRecForWishListTask.getWishListBooks(),
                                 userRecForWishListTask.getPage() + 1, userRecForWishListTask.getUserRecommendations()), getSender());
                     }
-
                     for (Review review : reviews.getReview()) {
-                        com.campusconnect.neo4j.types.Book book = BookMapper.getBookFromGoodreadsBook(review.getBook());
-                        books.add(book);
+                        if(review.getShelves() != null && !review.getShelves().isEmpty() && !review.getShelves().get(0).getName().equals(GoodreadsStatus.TO_READ.toString())){
+                            com.campusconnect.neo4j.types.Book book = BookMapper.getBookFromGoodreadsBook(review.getBook());
+                            books.add(book);
+                        }
                     }
                 }
 

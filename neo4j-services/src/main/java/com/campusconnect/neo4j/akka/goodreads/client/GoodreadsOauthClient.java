@@ -63,26 +63,26 @@ public class GoodreadsOauthClient {
 //        System.out.println(response.getBody());
 //    }
     
- 
-    public void getFriendsForUser(String userId, String accessToken, String secret) {
-      
-        UriBuilder uriBuilder = new UriBuilderImpl();
-        uriBuilder.path("https://www.goodreads.com");
-        uriBuilder.path("friend/user");
-        uriBuilder.path(userId);
-        uriBuilder.queryParam("format", "xml");
-        Token sAccessToken = new Token(accessToken, secret);
-        OAuthRequest getBooksRequest = new OAuthRequest(Verb.GET, uriBuilder.build().toString());
-        getsService().signRequest(sAccessToken, getBooksRequest);
-        Response response = getBooksRequest.send();
-//        System.out.printf(response.getBody());
 //
-    }
+//    public void getFriendsForUser(String userId, String accessToken, String secret) {
+//
+//        UriBuilder uriBuilder = new UriBuilderImpl();
+//        uriBuilder.path("https://www.goodreads.com");
+//        uriBuilder.path("friend/user");
+//        uriBuilder.path(userId);
+//        uriBuilder.queryParam("format", "xml");
+//        Token sAccessToken = new Token(accessToken, secret);
+//        OAuthRequest getBooksRequest = new OAuthRequest(Verb.GET, uriBuilder.build().toString());
+//        getsService().signRequest(sAccessToken, getBooksRequest);
+//        Response response = getBooksRequest.send();
+////        System.out.printf(response.getBody());
+////
+//    }
     
 
-    public static void main(String[] args) {
-        GoodreadsOauthClient goodreadsOauthClient = new GoodreadsOauthClient("QLM3lL2nqXe4LujHQt12A", "Aegcm52QdTinBh6g5fZe81S5cVYdKk9P6IDVS38pDOw");
-        goodreadsOauthClient.init();
-        goodreadsOauthClient.getFriendsForUser("22748455", "KztlD3JKfZ1qJfeqQCEqfg", "nlcbU0zMdDUWs0QB032JfdUGOGWAJXCgy7GvEnoQ");
-    }
+//    public static void main(String[] args) {
+//        GoodreadsOauthClient goodreadsOauthClient = new GoodreadsOauthClient("QLM3lL2nqXe4LujHQt12A", "Aegcm52QdTinBh6g5fZe81S5cVYdKk9P6IDVS38pDOw");
+//        goodreadsOauthClient.init();
+//        goodreadsOauthClient.getFriendsForUser("22748455", "KztlD3JKfZ1qJfeqQCEqfg", "nlcbU0zMdDUWs0QB032JfdUGOGWAJXCgy7GvEnoQ");
+//    }
 }

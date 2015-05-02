@@ -83,6 +83,17 @@
         <constructor-arg index="0" ref="neo4jTemplate"/>
         <constructor-arg index="1" ref="goodreadsDao" />
         <constructor-arg index="2" ref="goodreadsAsynchHandler" />
+        <constructor-arg index="3" ref="emailDao" />
+        <constructor-arg index="4" ref="userDao" />
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.da.EmailDaoImpl" id="emailDao" >
+        <constructor-arg index="0" ref="neo4jAsynchHandler"/>
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.util.Neo4jAsynchHandler" id="neo4jAsynchHandler">
+        <constructor-arg index="0" ref="borrowInitEmailRouter" />
+        <constructor-arg index="1" ref="utilSuccessListener" />
     </bean>
 
     <bean class="com.campusconnect.neo4j.resources.UserResource">
@@ -170,6 +181,16 @@
         </property>
     </bean>
     
+    <bean id="borrowInitEmailRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.util.worker.email.BorrowInitEmailWorker"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="${akka.friends.get.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
     <bean id="getFriendsRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
         <property name="actorSystem" ref="actorSystem"/>
         <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.GetFriends"/>
@@ -201,6 +222,11 @@
                 <constructor-arg type="int" value="${akka.friends.get.workers.count}"/>
             </bean>
         </property>
+    </bean>
+    
+    <bean id="utilSuccessListener" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.util.worker.email.SuccessListener"/>
     </bean>
 
     

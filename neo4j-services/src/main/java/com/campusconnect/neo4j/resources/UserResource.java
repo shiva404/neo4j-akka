@@ -230,7 +230,7 @@ public class UserResource {
         User user = userDao.getUser(userId);
         Book book = bookDao.getBook(bookId);
         
-        bookDao.updateOwnedBookStatus(user, book, status);
+        bookDao.updateOwnedBookStatus(user, book, status, null);
         return Response.ok().build();
     }
     

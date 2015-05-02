@@ -2,6 +2,8 @@ package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
 import com.campusconnect.neo4j.da.iface.BookDao;
+import com.campusconnect.neo4j.da.iface.EmailDao;
+import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.OwnsRelationshipRepository;
 import com.campusconnect.neo4j.repositories.UserRecRepository;
@@ -31,6 +33,8 @@ public class BookDaoImpl implements BookDao {
     private Neo4jTemplate neo4jTemplate;
     private GoodreadsDao goodreadsDao;
     private GoodreadsAsynchHandler goodreadsAsynchHandler;
+    private EmailDao emailDao;
+    private UserDao userDao;
 
     @Autowired
     BookRepository bookRepository;
@@ -41,10 +45,12 @@ public class BookDaoImpl implements BookDao {
     @Autowired
     UserRecRepository userRecRepository;
 
-    public BookDaoImpl(Neo4jTemplate neo4jTemplate, GoodreadsDao goodreadsDao, GoodreadsAsynchHandler goodreadsAsynchHandler) {
+    public BookDaoImpl(Neo4jTemplate neo4jTemplate, GoodreadsDao goodreadsDao, GoodreadsAsynchHandler goodreadsAsynchHandler, EmailDao emailDao, UserDao userDao) {
         this.neo4jTemplate = neo4jTemplate;
         this.goodreadsDao = goodreadsDao;
         this.goodreadsAsynchHandler = goodreadsAsynchHandler;
+        this.emailDao = emailDao;
+        this.userDao = userDao;
     }
 
     @Override
@@ -74,12 +80,13 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     @Transactional
-    public void updateOwnedBookStatus(User user, Book book, String status) {
+    public void updateOwnedBookStatus(User user, Book book, String status, String userComment) {
         OwnsRelationship relationship = neo4jTemplate.getRelationshipBetween(user, book, OwnsRelationship.class, RelationTypes.OWNS.toString());
         if (relationship == null) //todo: throw an exception
             return;
         relationship.setStatus(status);
         relationship.setLastModifiedDate(System.currentTimeMillis());
+        relationship.setUserComment(userComment);
         neo4jTemplate.save(relationship);
     }
 
@@ -91,28 +98,33 @@ public class BookDaoImpl implements BookDao {
         borrowRelation.setAdditionalComments(borrowRequest.getAdditionalMessage());
         borrowRelation.setOwnerUserId(borrowRequest.getOwnerUserId());
         neo4jTemplate.save(borrowRelation);
+        
+        User ownerUser = userDao.getUser(borrowRelation.getOwnerUserId());
+        
+        emailDao.sendBorrowBookInitEmail(borrower, ownerUser, book);
     }
 
     @Override
-    public void updateBookStatusOnAgreement(User user, Book book, User borrower) {
-        updateOwnedBookStatus(user, book, "locked");
-        updateBorrowedBookStatus(borrower, book, "agreed");
+    public void updateBookStatusOnAgreement(User user, Book book, User borrower, String userComment) {
+        updateOwnedBookStatus(user, book, "locked", userComment);
+        updateBorrowedBookStatus(borrower, book, "agreed", userComment);
     }
 
     @Override
-    public void updateBookStatusOnSuccess(User user, Book book, User borrower) {
-        updateOwnedBookStatus(user, book, "lent");
-        updateBorrowedBookStatus(borrower, book, "borrowed");
+    public void updateBookStatusOnSuccess(User user, Book book, User borrower, String userComment) {
+        updateOwnedBookStatus(user, book, "lent", userComment);
+        updateBorrowedBookStatus(borrower, book, "borrowed", userComment);
     }
 
     @Override
     @Transactional
-    public void updateBorrowedBookStatus(User user, Book book, String status) {
+    public void updateBorrowedBookStatus(User user, Book book, String status, String userComment) {
         BorrowRelation relationship = neo4jTemplate.getRelationshipBetween(user, book, BorrowRelation.class, RelationTypes.BORROWED.toString());
         if (relationship == null) //todo: throw an exception
             return;
         relationship.setStatus(status);
         relationship.setLastModifiedDate(System.currentTimeMillis());
+        relationship.setAdditionalComments(userComment);
         neo4jTemplate.save(relationship);
     }
 

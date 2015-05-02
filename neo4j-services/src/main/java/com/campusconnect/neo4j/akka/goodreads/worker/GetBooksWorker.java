@@ -18,6 +18,8 @@ import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.core.UriBuilder;
@@ -29,6 +31,7 @@ import java.util.List;
  * Created by sn1 on 3/12/15.
  */
 public class GetBooksWorker extends UntypedActor {
+    private static Logger logger = LoggerFactory.getLogger(GetBooksWorker.class);
     
     @Autowired
     private GoodreadsOauthClient goodreadsOauthClient;
@@ -94,8 +97,11 @@ public class GetBooksWorker extends UntypedActor {
                         bookDao.listBookAsRead(new ReadRelation(user, dbBook, null, now, now, shelf));    
                 }
             }
-        if(Integer.parseInt(reviews.getEnd()) == Integer.parseInt(reviews.getTotal()))
+        if(Integer.parseInt(reviews.getEnd()) == Integer.parseInt(reviews.getTotal())){
+            logger.info("Firing for user rec for wishlist");
             goodreadsAsynchHandler.getFriendRecForUser(user.getId(), user.getGoodreadsId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret());
+        }
+
         return books;
     }
 }

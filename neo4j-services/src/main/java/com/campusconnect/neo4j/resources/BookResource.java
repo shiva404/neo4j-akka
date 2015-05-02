@@ -77,7 +77,7 @@ public class BookResource {
     @PUT
     @Path("{bookId}/users/{userId}/borrow")
     public Response updateStatus(@PathParam("bookId") String bookId, @PathParam("userId") String userId, 
-                                 @QueryParam("borrowerId") String borrowerId, @QueryParam("status") String status) {
+                                 @QueryParam("borrowerId") String borrowerId, @QueryParam("status") String status, @QueryParam("sharePh ") String phoneSharing, BorrowRequest borrowRequest) {
         //locked - for user
         //agreed - for borrower
         Book book = bookDao.getBook(bookId);
@@ -86,7 +86,7 @@ public class BookResource {
            if(borrowerId != null){
                User borrower = userDao.getUser(borrowerId);
                if(borrower != null)
-               bookDao.updateBookStatusOnAgreement(user, book, borrower);
+               bookDao.updateBookStatusOnAgreement(user, book, borrower, borrowRequest.getAdditionalMessage());
                
                    //todo: throw error userNot found
            } else {
@@ -98,7 +98,7 @@ public class BookResource {
             if(borrowerId != null){
                 User borrower = userDao.getUser(borrowerId);
                 if(borrower != null)
-                    bookDao.updateBookStatusOnAgreement(user, book, borrower);
+                    bookDao.updateBookStatusOnSuccess(user, book, borrower, borrowRequest.getAdditionalMessage());
 
                 //todo: throw error userNot found
             } else {

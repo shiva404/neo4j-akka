@@ -11,39 +11,14 @@ import org.springframework.data.neo4j.annotation.StartNode;
  */
 @RelationshipEntity(type = "addresses")
 public class AddressRelation {
-    @StartNode
-    private User user;
-    
     @EndNode
     private Address address;
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
-    public Long getId() {
-        return id;
-
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    
     @GraphId
     Long id;
+
+    @StartNode
+    private User user;
 
     public AddressRelation() {
     }
@@ -52,5 +27,30 @@ public class AddressRelation {
 
         this.user = user;
         this.address = address;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public Long getId() {
+        return id;
+
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

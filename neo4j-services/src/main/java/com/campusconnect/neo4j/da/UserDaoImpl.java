@@ -2,6 +2,7 @@ package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
+import com.campusconnect.neo4j.da.iface.NotificationDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
@@ -34,6 +35,9 @@ public class UserDaoImpl implements UserDao {
     AuditEventDao auditEventDao;
     
     @Autowired
+    NotificationDao notificationDao;
+    
+    @Autowired
     private FBDao fbDao;
     
     private Neo4jTemplate neo4jTemplate;
@@ -62,10 +66,19 @@ public class UserDaoImpl implements UserDao {
         String serializedEvent = objectMapper.writeValueAsString(userCreatedEvent);
     	AuditEvent auditEvent = new AuditEvent();
     	Set<String> events = auditEvent.getEvents();
+    	NotificationEntity notificationEntityFresh = new NotificationEntity();
+    	NotificationEntity notificationEntityPast = new NotificationEntity();
     	events.add(serializedEvent);
     	auditEvent = auditEventDao.saveEvent(auditEvent);
+    	notificationEntityFresh = notificationDao.savenotification(notificationEntityFresh);
+    	notificationEntityPast = notificationDao.savenotification(notificationEntityPast);
     		UserEventRelationship userEventRelationship = new UserEventRelationship(auditEvent , createdUser);
+    		UserNotificationRelationship userFreshNotificationRelationship = new UserNotificationRelationship(createdUser, notificationEntityFresh,NotificationType.FRESH.toString());
+    		UserNotificationRelationship userPastNotificationRelationship =  new UserNotificationRelationship(createdUser, notificationEntityPast, NotificationType.PAST.toString());
+    		neo4jTemplate.save(userFreshNotificationRelationship);
+    		neo4jTemplate.save(userPastNotificationRelationship);
     		neo4jTemplate.save(userEventRelationship);
+    	
         }
         catch(Exception e)
         {
@@ -104,13 +117,18 @@ public class UserDaoImpl implements UserDao {
     	try
     	{
     	Long currentTime = System.currentTimeMillis();
-    	String targetUserId = user2.getId();
-    	String targetUserName = user2.getName();
-    	String targetUrl = "users/" + targetUserId;
-    	Target target = new Target(IdType.USER_ID.toString(), targetUserName, targetUrl);	
-    	Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), target,currentTime);
+    	String targetEventUserId = user2.getId();
+    	String targetEventUserName = user2.getName();
+    	String targetEventUrl = "users/" + targetEventUserId;
+    	String targetNotificationUserId = user1.getId();
+    	String targetNoitficationUrl = "users/" + targetNotificationUserId;
+    	String targetNotificationstring = user1.getName();
+    	Target targetEvent = new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);	
+    	Target targetNotification = new Target(IdType.USER_ID.toString(), "is following you",targetNoitficationUrl);
+    	Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetEvent,currentTime);
+    	Notification followedNotification = new Notification(targetNotification, currentTime);
     	auditEventDao.addEvent(user1.getId(), followedUSerEvent);
-    	
+    	notificationDao.addNotification(targetNotificationUserId, followedNotification);	
     	}
     	catch(Exception e)
     	{

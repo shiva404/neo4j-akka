@@ -1,5 +1,7 @@
 package com.campusconnect.neo4j.da;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -26,10 +28,26 @@ public class AuditEventDaoImpl implements AuditEventDao {
 	}
 
 	@Override
-	public AuditEvent getEvents(String userId) {
+	public List<Event> getEvents(String userId) {
 		
 		AuditEvent auditEvent = auditEventRepository.getAuditEventForUser(userId);
-		return auditEvent;
+		Set<String> event = auditEvent.getEvents();
+    	List<Event> events = new LinkedList<Event>();
+    	
+    	 for(String eachEvent:event)
+    	 {
+    		 try
+    		 {
+    			 System.out.println("each event" + eachEvent);
+    		 Event eventDeserialised = objectMapper.readValue(eachEvent, Event.class);
+    		 events.add(eventDeserialised);		 
+    		 }
+    		 catch(Exception e)
+    		 {
+    			 e.printStackTrace();
+    		 }
+    	 }
+		return events;
 	}
 
 	@Override
@@ -38,10 +56,10 @@ public class AuditEventDaoImpl implements AuditEventDao {
 		{
 		String serializedEvent = objectMapper.writeValueAsString(event);
     	String eventString = serializedEvent;
-    	AuditEvent auditEventOfUSer = getEvents(userId);
-    	Set<String> events = auditEventOfUSer.getEvents();
+    	AuditEvent auditEvent = auditEventRepository.getAuditEventForUser(userId);
+    	Set<String> events = auditEvent.getEvents();
     	events.add(eventString);   	
-    	return saveEvent(auditEventOfUSer);
+    	return saveEvent(auditEvent);
 		}
 		catch(Exception e)
 		{

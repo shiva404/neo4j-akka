@@ -93,7 +93,6 @@ public class BookResource {
                //todo throw exception
            }
         }
-            
         else if(status.equals("success"))
             if(borrowerId != null){
                 User borrower = userDao.getUser(borrowerId);

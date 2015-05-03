@@ -7,14 +7,24 @@ import org.springframework.data.neo4j.annotation.*;
 /**
  * Created by sn1 on 1/19/15.
  */
-@RelationshipEntity(type = "CONNECTION")
-public abstract class UserRelation {
+@RelationshipEntity(type = "CONNECTED")
+public class UserRelation {
     @GraphId
     private Long id;
     @StartNode
     private User user1;
     @EndNode
     private User user2;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    private String type;
 
     @CreatedDate
     private long createdDate;
@@ -52,7 +62,8 @@ public abstract class UserRelation {
     }
 
 
-    public UserRelation(User user1, User user2, long createdDate) {
+    public UserRelation(User user1, User user2, long createdDate, String type) {
+        this.type = type;
         this.user1 = user1;
         this.user2 = user2;
         this.createdDate = createdDate;

@@ -54,6 +54,9 @@ public class FriendsBookSearchForWishListWorker extends UntypedActor {
             Response response = getBooksRequest.send();
             GetFriendsResponse getFriendsResponse = ResponseUtils.getEntity(response.getBody(), GetFriendsResponse.class);
             final Friends friends = getFriendsResponse.getFriends();
+            
+            
+            
             if(friends != null && Integer.parseInt(friends.getTotal()) != 0) {
                 List<UserRecommendation> existingRecommendations = userDao.getUserRecommendations(getFriendsTask.getUserId());
 
@@ -63,6 +66,8 @@ public class FriendsBookSearchForWishListWorker extends UntypedActor {
                             getFriendsTask.getGoodreadsId(), getFriendsTask.getPage() + 1, getFriendsTask.getWishListBooks()),getSelf());
                 }
                 logger.info("acquiring data from friends of number: " + friends.getUser().size() + " for user :" + getFriendsTask.getUserId() + " page : "+  getFriendsTask.getPage());
+                
+                               
                 for(User user : friends.getUser()) {
                     goodreadsAsynchHandler.getUserRecForWishListRouter().tell(new UserRecForWishListTask(getFriendsTask.getAccessToken(), getFriendsTask.getAccessSecret(), getFriendsTask.getUserId(),
                             getFriendsTask.getGoodreadsId(), user, getFriendsTask.getWishListBooks(), 1, existingRecommendations), getSelf());

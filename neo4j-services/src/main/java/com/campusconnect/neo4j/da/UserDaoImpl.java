@@ -109,25 +109,25 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    @TriggersRemove(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public void createFollowingRelation(@PartialCacheKey User user1, User user2) {
+//    @TriggersRemove(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+    public void createFollowingRelation(@PartialCacheKey User user, User follower) {
    
-    	neo4jTemplate.createRelationshipBetween(user1, user2, FollowingRelation.class, UserRelationType.FOLLOWING.toString(), false);
+    	neo4jTemplate.createRelationshipBetween(user, follower, FollowingRelation.class, UserRelationType.FOLLOWING.toString(), false);
     	
     	try
     	{
     	Long currentTime = System.currentTimeMillis();
-    	String targetEventUserId = user2.getId();
-    	String targetEventUserName = user2.getName();
+    	String targetEventUserId = follower.getId();
+    	String targetEventUserName = follower.getName();
     	String targetEventUrl = "users/" + targetEventUserId;
-    	String targetNotificationUserId = user1.getId();
+    	String targetNotificationUserId = user.getId();
     	String targetNoitficationUrl = "users/" + targetNotificationUserId;
-    	String targetNotificationstring = user1.getName();
+    	String targetNotificationstring = user.getName();
     	Target targetEvent = new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);	
     	Target targetNotification = new Target(IdType.USER_ID.toString(), "is following you",targetNoitficationUrl);
     	Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetEvent,currentTime);
     	Notification followedNotification = new Notification(targetNotification, currentTime);
-    	auditEventDao.addEvent(user1.getId(), followedUSerEvent);
+    	auditEventDao.addEvent(targetEventUserId, followedUSerEvent);
     	notificationDao.addNotification(targetNotificationUserId, followedNotification);	
     	}
     	catch(Exception e)
@@ -155,7 +155,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    @Cacheable(cacheName = "userOwnedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+//    @Cacheable(cacheName = "userOwnedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<OwnedBook> getOwnedBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
@@ -198,7 +198,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    @Cacheable(cacheName = "userBorrowedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+//    @Cacheable(cacheName = "userBorrowedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<BorrowedBook> getBorrowedBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
@@ -232,7 +232,7 @@ public class UserDaoImpl implements UserDao {
     
     
     @Override
-    @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+//    @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<WishListBook> getWishListBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);

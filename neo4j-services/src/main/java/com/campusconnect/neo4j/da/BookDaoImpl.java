@@ -98,9 +98,7 @@ public class BookDaoImpl implements BookDao {
         borrowRelation.setAdditionalComments(borrowRequest.getAdditionalMessage());
         borrowRelation.setOwnerUserId(borrowRequest.getOwnerUserId());
         neo4jTemplate.save(borrowRelation);
-        
         User ownerUser = userDao.getUser(borrowRelation.getOwnerUserId());
-        
         emailDao.sendBorrowBookInitEmail(borrower, ownerUser, book);
     }
 
@@ -108,6 +106,7 @@ public class BookDaoImpl implements BookDao {
     public void updateBookStatusOnAgreement(User user, Book book, User borrower, String userComment) {
         updateOwnedBookStatus(user, book, "locked", userComment);
         updateBorrowedBookStatus(borrower, book, "agreed", userComment);
+        emailDao.sendAcceptedToLendBookEmail(user, borrower, book);
     }
 
     @Override

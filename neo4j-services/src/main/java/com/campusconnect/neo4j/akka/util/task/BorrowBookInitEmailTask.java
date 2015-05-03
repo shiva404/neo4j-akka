@@ -8,26 +8,26 @@ import com.campusconnect.neo4j.types.User;
  * Created by sn1 on 5/1/15.
  */
 public class BorrowBookInitEmailTask {
-    public User toUser;
-    public Book book;
-    public User fromUser;
+    private Book book;
+    private User borrower;
+    private User owner;
 
-    public User getFromUser() {
-        return fromUser;
-    }
+    public BorrowBookInitEmailTask(User owner, Book book, User borrower) {
 
-    public BorrowBookInitEmailTask(User toUser, Book book, User fromUser) {
-
-        this.toUser = toUser;
+        this.owner = owner;
         this.book = book;
-        this.fromUser = fromUser;
-    }
-
-    public User getToUser() {
-        return toUser;
+        this.borrower = borrower;
     }
 
     public Book getBook() {
         return book;
+    }
+
+    public User getBorrower() {
+        return borrower;
+    }
+
+    public User getOwner() {
+        return owner;
     }
 }

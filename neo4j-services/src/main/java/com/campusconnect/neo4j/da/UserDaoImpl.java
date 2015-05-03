@@ -112,8 +112,10 @@ public class UserDaoImpl implements UserDao {
 //    @TriggersRemove(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public void createFollowingRelation(@PartialCacheKey User user, User follower) {
    
-    	neo4jTemplate.createRelationshipBetween(user, follower, FollowingRelation.class, UserRelationType.FOLLOWING.toString(), false);
-    	
+        long now = System.currentTimeMillis();
+    	UserRelation userRelation = new UserRelation(user, follower, now, UserRelationType.FOLLOWING.toString());
+        neo4jTemplate.save(userRelation);
+        
     	try
     	{
     	Long currentTime = System.currentTimeMillis();

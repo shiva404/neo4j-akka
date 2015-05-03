@@ -9,7 +9,6 @@ import com.campusconnect.neo4j.akka.goodreads.task.AddGoodreadsBookToUserTask;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.types.Book;
-import com.campusconnect.neo4j.types.FollowingRelation;
 import com.campusconnect.neo4j.types.GoodreadsStatus;
 import com.campusconnect.neo4j.types.ReadRelation;
 import com.campusconnect.neo4j.types.User;

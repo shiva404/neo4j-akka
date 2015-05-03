@@ -67,6 +67,7 @@ public class FriendsBookSearchForWishListWorker extends UntypedActor {
                 }
                 logger.info("acquiring data from friends of number: " + friends.getUser().size() + " for user :" + getFriendsTask.getUserId() + " page : "+  getFriendsTask.getPage());
                 
+              
                                
                 for(User user : friends.getUser()) {
                     goodreadsAsynchHandler.getUserRecForWishListRouter().tell(new UserRecForWishListTask(getFriendsTask.getAccessToken(), getFriendsTask.getAccessSecret(), getFriendsTask.getUserId(),

@@ -27,16 +27,11 @@ public class AddFriendsFromGoodReadsWorker extends UntypedActor {
 	        	for(com.campusconnect.neo4j.akka.goodreads.types.User goodReadsUser :addFriendsFromGoodReadsTask.getFriends().getUser())
 	        	{
 	        		User grUser = userDao.getUserByGoodreadsId(goodReadsUser.getId());
-	        		if(null!= grUser)
+	        		if(null!= grUser && null!=userDao.getUsersRelationShip(addFriendsFromGoodReadsTask.getUser(), grUser))
 	        		{
-	        			//ToDo add friend Relationship here 
-	        			userDao.createFollowingRelation(addFriendsFromGoodReadsTask.getUser(),grUser);
+	        			userDao.createFriendRelation(addFriendsFromGoodReadsTask.getUser(),grUser);
 	        		}
 	        	}
-	        	
-	          
 	        }
 	    }
-	         
-
 }

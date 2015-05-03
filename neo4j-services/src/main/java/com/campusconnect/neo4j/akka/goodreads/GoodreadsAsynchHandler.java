@@ -31,8 +31,17 @@ public class GoodreadsAsynchHandler {
     private ActorRef friendsBookSearchForWishListRouter;
     private ActorRef getFriendsRouter;
     private ActorRef userRecForWishListRouter;
+    private ActorRef addGoodReadsFriendsRouter;
 
-    public ActorRef getUserRecForWishListRouter() {
+    public ActorRef getAddGoodReadsFriendsRouter() {
+		return addGoodReadsFriendsRouter;
+	}
+
+	public void setAddGoodReadsFriendsRouter(ActorRef addGoodReadsFriendsRouter) {
+		this.addGoodReadsFriendsRouter = addGoodReadsFriendsRouter;
+	}
+
+	public ActorRef getUserRecForWishListRouter() {
         return userRecForWishListRouter;
     }
 

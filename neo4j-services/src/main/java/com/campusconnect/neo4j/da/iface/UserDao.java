@@ -10,7 +10,11 @@ import java.util.List;
 public interface UserDao {
     void addAddressToUser(Address address, User user);
 
-    void createFollowingRelation(User user1, User user2);
+    void createFollowingRelation(User user, User follower);
+    
+    UserRelation getUsersRelationShip(User user,User fellowUser);
+    
+    void  createFriendRelation(User user, User friend);
 
     User createUser(User user, String accessToken);
 

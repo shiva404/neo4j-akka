@@ -5,6 +5,7 @@ import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.da.iface.NotificationDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.repositories.BookRepository;
+import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.*;
@@ -28,6 +29,8 @@ public class UserDaoImpl implements UserDao {
     UserRepository userRepository;
     @Autowired
     BookRepository bookRepository;
+    @Autowired
+    UserRelationRepository userRelationRepository;
     
     @Autowired
     GoodreadsAsynchHandler goodreadsAsynchHandler;
@@ -130,6 +133,34 @@ public class UserDaoImpl implements UserDao {
     	Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetEvent,currentTime);
     	Notification followedNotification = new Notification(targetNotification, currentTime);
     	auditEventDao.addEvent(targetEventUserId, followedUSerEvent);
+    	notificationDao.addNotification(targetNotificationUserId, followedNotification);	
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
+    }
+    
+    public void createFriendRelation(@PartialCacheKey User user, User friend) {
+    	   
+        long now = System.currentTimeMillis();
+    	UserRelation userRelation = new UserRelation(user, friend, now, UserRelationType.FRIEND.toString());
+        neo4jTemplate.save(userRelation);
+        
+    	try
+    	{
+    	Long currentTime = System.currentTimeMillis();
+    	String targetEventUserId = friend.getId();
+    	String targetEventUserName = friend.getName();
+    	String targetEventUrl = "users/" + targetEventUserId;
+    	String targetNotificationUserId = user.getId();
+    	String targetNoitficationUrl = "users/" + targetNotificationUserId;
+    	String targetNotificationstring = user.getName();
+    	Target targetEvent = new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);	
+    	Target targetNotification = new Target(IdType.USER_ID.toString(), "is friends with you",targetNoitficationUrl);
+    	Event befriendUSerEvent = new Event(AuditEventType.FRIEND.toString(), targetEvent,currentTime);
+    	Notification followedNotification = new Notification(targetNotification, currentTime);
+    	auditEventDao.addEvent(targetEventUserId, befriendUSerEvent);
     	notificationDao.addNotification(targetNotificationUserId, followedNotification);	
     	}
     	catch(Exception e)
@@ -301,5 +332,10 @@ public class UserDaoImpl implements UserDao {
 		
 		neo4jTemplate.save(reminderRelationShip);
 		
+	}
+
+	@Override
+	public UserRelation getUsersRelationShip(User user, User fellowUser) {
+		return userRelationRepository.getUsersRelationship(user.getId(), fellowUser.getId());
 	}
 }

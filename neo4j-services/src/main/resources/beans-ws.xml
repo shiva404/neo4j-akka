@@ -72,6 +72,7 @@
         <property name="friendsBookSearchForWishListRouter" ref="friendsBookSearchForWishListWorker" />
         <property name="getFriendsRouter" ref="getFriendsRouter" />
         <property name="addGoodReadsFriendsRouter" ref="addGoodReadsFriends"/>
+        <property name="replaceGRIdWithUserIdRouter" ref="replaceGRIdWithUserId" />
     </bean>
 
     <bean id="goodreadsDao" class="com.campusconnect.neo4j.da.GoodreadsDao">
@@ -87,6 +88,8 @@
         <constructor-arg index="3" ref="emailDao" />
         <constructor-arg index="4" ref="userDao" />
     </bean>
+    
+    <bean class="com.campusconnect.neo4j.da.UtilsDao" id="utilsDao" />
     
     <bean class="com.campusconnect.neo4j.da.EmailDaoImpl" id="emailDao" >
         <constructor-arg index="0" ref="neo4jAsynchHandler"/>
@@ -258,6 +261,16 @@
         <property name="routerConfig">
             <bean class="akka.routing.SmallestMailboxPool">
                 <constructor-arg type="int" value="${akka.save.book.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="replaceGRIdWithUserId" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.ReplaceGRIdWithUserIdForRec"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="5"/>
             </bean>
         </property>
     </bean>

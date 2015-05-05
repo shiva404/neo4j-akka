@@ -333,6 +333,9 @@ public class UserDaoImpl implements UserDao {
 		neo4jTemplate.save(reminderRelationShip);
 		
 	}
+    
+
+
 
 	@Override
 	public UserRelation getUsersRelationShip(User user, User fellowUser) {

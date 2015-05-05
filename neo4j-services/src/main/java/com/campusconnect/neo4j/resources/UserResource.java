@@ -63,7 +63,6 @@ public class UserResource {
         this.reminderDao = reminderDao;
         this.auditEventDao = auditEventDao;
         this.notificationDao = notificationDao;
-        		
     }
 
     @POST
@@ -117,6 +116,7 @@ public class UserResource {
         for (Field field : fields.getFields()) {
             if(field.getName().contains("goodreadsAccessTokenSecret")) {
                 goodreadsDao.getAndSaveBooksFromGoodreads(user.getId(), user.getGoodreadsId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret());
+                goodreadsDao.replaceGoodreadsRecWithUserId(user.getId(), Integer.parseInt(user.getGoodreadsId()), user.getProfileImageUrl());
             }
             else if(field.getName().contains("fbId")) {
                 //todo kick off fb stuff

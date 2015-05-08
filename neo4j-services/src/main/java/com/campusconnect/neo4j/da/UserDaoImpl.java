@@ -69,6 +69,8 @@ public class UserDaoImpl implements UserDao {
         String serializedEvent = objectMapper.writeValueAsString(userCreatedEvent);
     	AuditEvent auditEvent = new AuditEvent();
     	Set<String> events = auditEvent.getEvents();
+        auditEvent.setUserId(createdUser.getId());
+        auditEvent.setUserName(createdUser.getName());
     	NotificationEntity notificationEntityFresh = new NotificationEntity();
     	NotificationEntity notificationEntityPast = new NotificationEntity();
     	events.add(serializedEvent);
@@ -182,7 +184,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    @Cacheable(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+ //   @Cacheable(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<User> getFollowing(String userId) {
         return userRepository.getFollowing(userId);
     }
@@ -333,6 +335,9 @@ public class UserDaoImpl implements UserDao {
 		neo4jTemplate.save(reminderRelationShip);
 		
 	}
+    
+
+
 
 	@Override
 	public UserRelation getUsersRelationShip(User user, User fellowUser) {

@@ -79,4 +79,8 @@ public class GoodreadsDao {
         GetBookResponse getBookResponse = getBook.getBookByISBN(isbn);
         return BookMapper.getBookFromGoodreadsBook(getBookResponse.getBook());
     }
+
+    public void replaceGoodreadsRecWithUserId(String id, Integer goodreadsId, String profileImageUrl) {
+        goodreadsAsynchHandler.replaceGoodreadsIdWithUserId(id, goodreadsId, profileImageUrl);
+    }
 }

@@ -10,11 +10,31 @@ import org.springframework.data.neo4j.annotation.NodeEntity;
 @NodeEntity
 public class AuditEvent {
 
-	private Set<String> events;
-	
-	@GraphId
-	private Long nodeId; 
+    @GraphId
+    private Long nodeId;
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    private String userName;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    private String userId;
+   
+	private Set<String> events;
+    
 	public Set<String> getEvents() {
 		
 		if(null== events)

@@ -11,6 +11,7 @@ import java.util.List;
  */
 public interface GoodreadsRecRepository extends GraphRepository<GoodreadsFriendBookRecRelation> {
     
-    @Query("match (user")
+    @Query("MATCH (user:User) - [grec:GR_REC {friendGoodreadsId:{0}}]-(book: Book) return grec")
     public List<GoodreadsFriendBookRecRelation> getGoodreadsRecById(Integer goodreadsId);
+    
 }

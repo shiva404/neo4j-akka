@@ -24,6 +24,7 @@ import org.springframework.data.annotation.CreatedBy;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -63,7 +64,6 @@ public class UserResource {
         this.reminderDao = reminderDao;
         this.auditEventDao = auditEventDao;
         this.notificationDao = notificationDao;
-        		
     }
 
     @POST
@@ -85,8 +85,8 @@ public class UserResource {
                 throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
             }    
         }
-        
-    	
+
+
 //    	if(null!=existingUser)
 //    	{
 //    		throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
@@ -94,7 +94,7 @@ public class UserResource {
 //
     	if(null!=validateUserDataMessage)
     	{
-    		throw new InvalidInputDataException(INVALId_ARGMENTS,validateUserDataMessage.toString());
+    		throw new InvalidInputDataException(INVALId_ARGMENTS, validateUserDataMessage.toString());
     	}
     	addPropertiesForCreate(user);
         User createdUser = userDao.createUser(user, accessToken);
@@ -117,6 +117,7 @@ public class UserResource {
         for (Field field : fields.getFields()) {
             if(field.getName().contains("goodreadsAccessTokenSecret")) {
                 goodreadsDao.getAndSaveBooksFromGoodreads(user.getId(), user.getGoodreadsId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret());
+                goodreadsDao.replaceGoodreadsRecWithUserId(user.getId(), Integer.parseInt(user.getGoodreadsId()), user.getProfileImageUrl());
             }
             else if(field.getName().contains("fbId")) {
                 //todo kick off fb stuff
@@ -336,6 +337,7 @@ public class UserResource {
         final long createdDate = System.currentTimeMillis();
         user.setCreatedDate(createdDate);
         user.setLastModifiedDate(createdDate);
+        user.setGoodreadsAuthStatus(GoodreadsAuthStatus.NONE.toString());
     }
     
     private Map<String, Object> getHeadersForAddingBook(String status) {
@@ -440,21 +442,26 @@ public class UserResource {
     
     
     @GET
-    @Path("{userId}/events")
-    public Response getAllEvents(@PathParam("userId")final String userId)
+    @Path("{userId}/timeline/events")
+    public Response getActivityEvents(@PathParam("userId") final String userId)
     {
-    	ObjectMapper objectMapper = new ObjectMapper();
     	List<Event> events = auditEventDao.getEvents(userId);
     	 EventPage eventPage = new EventPage(0, events.size(), events);
     	return Response.ok().entity(eventPage).build();
     }
     
+    @GET
+    @Path("{userId}/timeline/feed")
+    public Response getFeedForTheUser(@PathParam("userId") final String userId) throws IOException {
+        List<Event> events = auditEventDao.getFeedEvents(userId);
+        EventPage eventPage = new EventPage(0, events.size(), events);
+        return Response.ok().entity(eventPage).build();
+    }
     
     @GET
     @Path("{userId}/notifications")
     public Response getNotifications(@PathParam("userId")final String userId,@QueryParam("filter") @DefaultValue("fresh")final String filter)
     {
-    	ObjectMapper objectMapper = new ObjectMapper();
     	//AuditEvent auditEvent = auditEventDao.getEvents(userId);
     	List<Notification> notifications = notificationDao.getNotifications(userId,filter);
     	NotificationPage notificationPage = new NotificationPage(0, notifications.size(), notifications); 

@@ -23,7 +23,8 @@ public class User implements Serializable {
 
     @CreatedDate
     private long createdDate;
-
+    
+    @Indexed
     private String email;
     private Set<String> favorites;
     @Indexed()

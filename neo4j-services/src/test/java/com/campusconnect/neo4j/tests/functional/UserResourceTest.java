@@ -36,6 +36,26 @@ public class UserResourceTest extends TestBase {
     	return userId;
     }
     
+    public static String createKnowUserWithGoogleId(String userName,String email,String googleId)
+    {
+    	ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithKnownEmailAddressAndGoogleId(userName,email,googleId)).post(ClientResponse.class);
+     	assert clientResponse.getStatus() == 201;
+     	createdUser = clientResponse.getEntity(User.class);
+     	System.out.println(createdUser.getEmail() + createdUser.getName());
+     	String userId = createdUser.getId();
+    	return userId;
+    }
+    
+    public static String createKnowUserWithFbId(String userName,String email,String fbId)
+    {
+    	ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithKnownEmailAddressAndFbId(userName, email,fbId)).post(ClientResponse.class);
+     	assert clientResponse.getStatus() == 201;
+     	createdUser = clientResponse.getEntity(User.class);
+     	System.out.println(createdUser.getEmail() + createdUser.getName());
+     	String userId = createdUser.getId();
+    	return userId;
+    }
+    
     @Test
     public void testFavouritesAdditionToUser()
     {
@@ -171,5 +191,21 @@ public class UserResourceTest extends TestBase {
         ClientResponse borrowedBooksCR = resource.path("users").path(createdUser2.getId()).path("books").queryParam("filter", "borrowed").accept("application/json").get(ClientResponse.class);
         assert borrowedBooksCR.getStatus() == 200;
         BorrowedBooksPage borrowedBooksPage = borrowedBooksCR.getEntity(BorrowedBooksPage.class);
+    }
+    
+    @Test
+    public void  testIdempotencyOfCreationOfUser()
+    {
+    	String userId1 = createKnowUserWithGoogleId("Namitha", "xyz@gmail.com", "xyzGoogleId");
+    	String userId2 = createKnowUserWithFbId("Namitha", "xyz@gmail.com", "xyzFbId");
+    	System.out.println(userId1);
+    	System.out.println(userId2);
+    	assert userId1.toLowerCase().equals(userId2.toLowerCase());
+    	
+    	String userId4 = createKnowUserWithFbId("Namitha", "abc@gmail.com", "abcFbId");
+    	String userId3 = createKnowUserWithGoogleId("Namitha", "abc@gmail.com", "abcGoogleId");
+    	assert userId4.toLowerCase().equals(userId3.toLowerCase());
+    	
+    	
     }
 }

@@ -113,6 +113,10 @@ public class UserDaoImpl implements UserDao {
         return userRepository.findBySchemaPropertyValue("googleId", googleId);
     }
 
+    public User getUserByEmail(String email)
+    {
+    	return userRepository.findBySchemaPropertyValue("email", email);
+    }
     @Override
 //    @TriggersRemove(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public void createFollowingRelation(@PartialCacheKey User user, User follower) {

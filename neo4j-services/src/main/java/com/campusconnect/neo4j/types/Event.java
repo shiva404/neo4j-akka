@@ -23,7 +23,6 @@ public class Event {
 	}
 
 	public Event(String auditEventType, Target target, Long timeStamp) {
-		super();
 		this.auditEventType = auditEventType;
 		this.target = target;
 		this.timeStamp = timeStamp;

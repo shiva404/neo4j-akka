@@ -49,4 +49,6 @@ public interface UserDao {
     User getUserByGoodreadsId(String goodreadsId);
 
     User getUserByGoogleId(String googleId);
+    
+    User getUserByEmail(String email);
 }

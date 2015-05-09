@@ -70,11 +70,32 @@ public class UserResource {
     public Response createUser(@QueryParam("accessToken") final String accessToken, final User user) throws URISyntaxException {
     	
     	StringBuffer validateUserDataMessage = Validator.validateUserObject(user);
-    	if(user.getFbId() != null) {
+    	 
+    	 if(user.getEmail()!= null)
+         {
+         	User existingUser = userDao.getUserByEmail(user.getEmail());
+             if(null!=existingUser)
+             {
+            	 if(existingUser.getFbId() == null && user.getFbId() != null){
+            		 existingUser.setFbId(user.getFbId());
+            		 existingUser = userDao.updateUser(existingUser.getId(), existingUser);
+            	 }
+            		 
+            	 if(existingUser.getGoogleId() == null && user.getGoogleId() != null){
+            		 existingUser.setGoogleId(user.getGoogleId());
+            		 existingUser = userDao.updateUser(existingUser.getId(), existingUser);
+            	 }
+            		 
+            	 
+             	return Response.created(new URI("/user/" + existingUser.getId())).entity(existingUser).build();
+             }  
+         }
+    	
+    	if(user.getFbId() != null ) {
             User existingUser = userDao.getUserByFbId(user.getFbId());
             if(null!=existingUser)
             {
-                throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
+            	return Response.created(new URI("/user/" + existingUser.getId())).entity(existingUser).build();
             }    
         }
         
@@ -82,22 +103,19 @@ public class UserResource {
             User existingUser = userDao.getUserByGoogleId(user.getGoogleId());
             if(null!=existingUser)
             {
-                throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
+            	return Response.created(new URI("/user/" + existingUser.getId())).entity(existingUser).build();
             }    
         }
+        
+       
 
-
-//    	if(null!=existingUser)
-//    	{
-//    		throw new DataDuplicateException(DATA_DUPLICATE,"User already Exists");
-//    	}
-//
     	if(null!=validateUserDataMessage)
     	{
     		throw new InvalidInputDataException(INVALId_ARGMENTS, validateUserDataMessage.toString());
     	}
     	addPropertiesForCreate(user);
         User createdUser = userDao.createUser(user, accessToken);
+        
         return Response.created(new URI("/user/" + createdUser.getId())).entity(createdUser).build();
     }
 

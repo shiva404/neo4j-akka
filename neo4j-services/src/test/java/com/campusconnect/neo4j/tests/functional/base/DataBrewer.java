@@ -32,12 +32,21 @@ public class DataBrewer {
         return user;
     }
     
-    public static User getFakeUserWithKnownEmailAddressAndGoogleId() {
-        User user = new User("Shiva Kumar", "shiva.n404@gmail.com", faker.phoneNumber().phoneNumber());
+    public static User getFakeUserWithKnownEmailAddressAndGoogleId(String userName,String email,String googleId) {
+        User user = new User(userName,email, faker.phoneNumber().phoneNumber());
         Set<Address> addresses = new HashSet<>();
         addresses.add(getFakeAddress(AddressType.HOME.toString()));
         user.setAddresses(addresses);
-        user.setGoogleId("105609898189858031660");
+        user.setGoogleId(googleId);
+        return user;
+    }
+    
+    public static User getFakeUserWithKnownEmailAddressAndFbId(String userName,String email,String fbId) {
+        User user = new User(userName,email, faker.phoneNumber().phoneNumber());
+        Set<Address> addresses = new HashSet<>();
+        addresses.add(getFakeAddress(AddressType.HOME.toString()));
+        user.setAddresses(addresses);
+        user.setFbId(fbId);
         return user;
     }
     

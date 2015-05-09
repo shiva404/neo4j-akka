@@ -31,6 +31,25 @@ public class User implements Serializable {
     private String goodreadsAccessToken;
     private String goodreadsAccessTokenSecret;
     private String goodreadsAuthStatus;
+
+    public String getGoodReadsSynchStatus() {
+        return goodReadsSynchStatus;
+    }
+
+    public void setGoodReadsSynchStatus(String goodReadsSynchStatus) {
+        this.goodReadsSynchStatus = goodReadsSynchStatus;
+    }
+
+    public long getLastGoodreadsSychDate() {
+        return lastGoodreadsSychDate;
+    }
+
+    public void setLastGoodreadsSychDate(long lastGoodreadsSychDate) {
+        this.lastGoodreadsSychDate = lastGoodreadsSychDate;
+    }
+
+    private String goodReadsSynchStatus;
+    private long lastGoodreadsSychDate;
     
     @Indexed()
     private String goodreadsId;

@@ -319,9 +319,9 @@ public class UserResource {
     @Path("{userId}/friend/{friendUserId}")
     public Response friend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId)
     {
-//    	userDao.createFriendRelation(userDao.getUser(userId), userDao.getUser(friendUserId));
-//		return Response.ok().build();
-        return null;
+    	userDao.createFriendRelation(userDao.getUser(userId), userDao.getUser(friendUserId));
+		return Response.ok().build();
+      //  return null;
     }
     
     @PUT

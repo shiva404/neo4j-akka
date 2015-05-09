@@ -36,6 +36,16 @@ public class UserResourceTest extends TestBase {
     	return userId;
     }
     
+    public static String createKnowUser()
+    {
+    	ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithKnownEmailAddressAndGoogleId()).post(ClientResponse.class);
+     	assert clientResponse.getStatus() == 201;
+     	createdUser = clientResponse.getEntity(User.class);
+     	System.out.println(createdUser.getEmail() + createdUser.getName());
+     	String userId = createdUser.getId();
+    	return userId;
+    }
+    
     @Test
     public void testFavouritesAdditionToUser()
     {

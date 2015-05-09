@@ -18,7 +18,8 @@ public class DataSetUp extends TestBase {
     public void dataSetUp() {
         //create User1
         
-    	String userId1 = UserResourceTest.createUser();
+    	String userId1 = UserResourceTest.createKnowUser();
+    	
     	
         //createUser2
     	String userId2 = UserResourceTest.createUser();

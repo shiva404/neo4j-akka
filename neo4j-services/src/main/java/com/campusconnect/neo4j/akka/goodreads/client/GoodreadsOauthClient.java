@@ -43,10 +43,9 @@ public class GoodreadsOauthClient {
                 .apiKey(sApiKey)
                 .apiSecret(sApiSecret)
                 .callback(CALLBACK)
-                .debug()
                 .build();
     }
-    
+
 //    public  void getShelvesForUser(String goodreadsId) {
 //        UriBuilder uriBuilder = new UriBuilderImpl();
 //        uriBuilder.path("https://www.goodreads.com");

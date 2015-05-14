@@ -78,14 +78,12 @@ public class DataBrewer {
 
     public static Reminder getFakeReminder()
     {
-    	
     	Long currentTime = System.currentTimeMillis(); 
-    	return new Reminder(currentTime, currentTime,"Collect the Book", currentTime);
+    	return new Reminder(currentTime, currentTime,"Collect the Book","Book Collection","Hi i am blah and i want to collect bull book from you tomo", currentTime);
     }
 
 	public static Object getFakeReminder(String reminderMessage) {
 		Long currentTime = System.currentTimeMillis(); 
-    	return new Reminder(currentTime, currentTime,reminderMessage, currentTime);
-
+		return new Reminder(currentTime, currentTime,"Collect the Book",reminderMessage,"Hi i am blah and i want to collect bull book from you tomo", currentTime);
 	}
 }

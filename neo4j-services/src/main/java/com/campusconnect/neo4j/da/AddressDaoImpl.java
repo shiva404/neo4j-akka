@@ -57,7 +57,7 @@ public class AddressDaoImpl implements AddressDao {
     	String targetEvent = objectMapper.writeValueAsString(updatedAddress);
     	
     	Target target = new Target(IdType.USER_ID.toString(), targetEvent, null);	
-    	Event updatedAddressUserEvent = new Event(AuditEventType.UPDATED_ADDRESS.toString(), target,currentTime);
+    	Event updatedAddressUserEvent = new Event(AuditEventType.UPDATED_ADDRESS.toString(), target,currentTime,false);
     	auditEventDao.addEvent(userId, updatedAddressUserEvent);
     	
     	}

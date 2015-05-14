@@ -140,9 +140,9 @@ public class UserResourceTest extends TestBase {
     public void listingBookE2EFlow() {
                 
         
-        ClientResponse addBookCR = resource.path("users").path(createdUser.getId()).path("books").path(createdBook.getId()).queryParam("status", "available").type("application/json").post(ClientResponse.class);
+        ClientResponse addBookCR = resource.path("users").path(createdUser.getId()).path("books").path(createdBook.getId()).path("own").queryParam("status", "available").type("application/json").put(ClientResponse.class);
         assert addBookCR.getStatus() == 200;
-        ClientResponse addBookCR2 = resource.path("users").path(createdUser.getId()).path("books").path(createdBook2.getId()).queryParam("status", "available").type("application/json").post(ClientResponse.class);
+        ClientResponse addBookCR2 = resource.path("users").path(createdUser.getId()).path("books").path(createdBook2.getId()).path("own").queryParam("status", "available").type("application/json").put(ClientResponse.class);
         assert addBookCR2.getStatus() == 200;
         
         ClientResponse updateBookStatusCR = resource.path("users").path(createdUser.getId()).path("books").path(createdBook.getId()).queryParam("status", "lent").type("application/json").put(ClientResponse.class);
@@ -159,7 +159,6 @@ public class UserResourceTest extends TestBase {
         assert availableBooksPage.getSize() == 1;
         availableBook = availableBooksPage.getOwnedBooks().get(0);
        
-
         ClientResponse lentBooks = resource.path("users").path(createdUser.getId()).path("books").queryParam("filter", "lent").accept("application/json").get(ClientResponse.class);
         assert lentBooks.getStatus() == 200;
         OwnedBooksPage lentBooksPage = lentBooks.getEntity(OwnedBooksPage.class);
@@ -205,7 +204,5 @@ public class UserResourceTest extends TestBase {
     	String userId4 = createKnowUserWithFbId("Namitha", "abc@gmail.com", "abcFbId");
     	String userId3 = createKnowUserWithGoogleId("Namitha", "abc@gmail.com", "abcGoogleId");
     	assert userId4.toLowerCase().equals(userId3.toLowerCase());
-    	
-    	
     }
 }

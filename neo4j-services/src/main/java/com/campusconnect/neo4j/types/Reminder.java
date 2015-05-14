@@ -11,24 +11,29 @@ import org.springframework.data.neo4j.annotation.NodeEntity;
 public class Reminder {
 	
 	@CreatedDate
-    private long createdDate;
+    private Long createdDate;
 	@LastModifiedDate
-    private long lastModifiedTime;
+    private Long lastModifiedTime;
 	@GraphId
     private Long nodeId;
+	private String subject;
 	private String reminderMessage;
+	private String description;
 	private Long reminderTime;
 	
 	public Reminder()
 	{}
 	
-	public Reminder(long createdDate, long lastModifiedTime,
-			String reminderMessage, Long reminderTime) {
+	public Reminder(Long createdDate, Long lastModifiedTime,
+			String subject,String reminderMessage,String description, Long reminderTime) {
 		super();
 		this.createdDate = createdDate;
 		this.lastModifiedTime = lastModifiedTime;
 		this.reminderMessage = reminderMessage;
 		this.reminderTime = reminderTime;
+		this.subject = subject;
+		this.reminderMessage = reminderMessage;
+		this.description = description;
 	}
 	public long getCreatedDate() {
 		return createdDate;

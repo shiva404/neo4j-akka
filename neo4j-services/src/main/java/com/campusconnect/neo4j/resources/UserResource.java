@@ -153,7 +153,7 @@ public class UserResource {
     	String targetUserName = objectMapper.writeValueAsString(fields);
     	String targetUrl = null;
     	Target target = new Target(IdType.USER_ID.toString(), targetUserName, targetUrl);
-     	Event followedUSerEvent = new Event(AuditEventType.USER_UPDATED.toString(), target,currentTime);
+     	Event followedUSerEvent = new Event(AuditEventType.USER_UPDATED.toString(), target,currentTime,false);
     	auditEventDao.addEvent(targetUserId, followedUSerEvent);
   
     }

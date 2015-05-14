@@ -2,37 +2,33 @@ package com.campusconnect.neo4j.types;
 
 public class Event {
 
-    //Use only when returning
-    @Deprecated
-    public Subject getSubject() {
-        return subject;
-    }
+    private String auditEventType;
     
-    //use only when returning event
-    @Deprecated
-    public void setSubject(Subject subject) {
-        this.subject = subject;
-    }
-
     private Subject subject;
-	private String auditEventType;
-	private Target target;
-	private  Long timeStamp;
 
+    private Target target;
+	private  Long timeStamp;
+	private boolean isPublic;
 	public Event(){
 	}
-
-	public Event(String auditEventType, Target target, Long timeStamp) {
+	public Event(String auditEventType, Target target, Long timeStamp,boolean isPublic) {
 		super();
 		this.auditEventType = auditEventType;
 		this.target = target;
 		this.timeStamp = timeStamp;
+		this.isPublic = isPublic;
 	}
 
 	public String getAuditEventType() {
 		return auditEventType;
 	}
-	
+
+	//Use only when returning
+    @Deprecated
+    public Subject getSubject() {
+        return subject;
+    }
+
 	public Target getTarget() {
 		return target;
 	}
@@ -40,9 +36,15 @@ public class Event {
 	public Long getTimeStamp() {
 		return timeStamp;
 	}
+	
 	public void setAuditEventType(String auditEventType) {
 		this.auditEventType = auditEventType;
 	}
+	//use only when returning event
+    @Deprecated
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
 	public void setTarget(Target target) {
 		this.target = target;
 	}

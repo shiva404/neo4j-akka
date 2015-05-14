@@ -47,10 +47,11 @@ public class UserRecForWishlist extends UntypedActor {
                                 userRecForWishListTask.getUserId(), userRecForWishListTask.getGoodreadsId(), userRecForWishListTask.getFriend(), userRecForWishListTask.getWishListBooks(),
                                 userRecForWishListTask.getPage() + 1, userRecForWishListTask.getUserRecommendations()), getSender());
                     }
-                    
                     for (Review review : reviews.getReview()) {
-                        com.campusconnect.neo4j.types.Book book = BookMapper.getBookFromGoodreadsBook(review.getBook());
-                        books.add(book);
+                        if(review.getShelves() != null && !review.getShelves().isEmpty() && !review.getShelves().get(0).getName().equals(GoodreadsStatus.TO_READ.toString())){
+                            com.campusconnect.neo4j.types.Book book = BookMapper.getBookFromGoodreadsBook(review.getBook());
+                            books.add(book);
+                        }
                     }
                 }
 
@@ -64,7 +65,9 @@ public class UserRecForWishlist extends UntypedActor {
                             }
                             else {
                                 User user = userDao.getUser(userRecForWishListTask.getUserId());
-                               bookDao.createGoodreadsFriendBookRec(new GoodreadsFriendBookRecRelation(user, wishListBook, "rec", userRecForWishListTask.getFriend().getId(), userRecForWishListTask.getFriend().getName(), userRecForWishListTask.getFriend().getImageUrl()));
+                                final String goodreadsId = userRecForWishListTask.getFriend().getId();
+                                User friend = userDao.getUserByGoodreadsId(goodreadsId);
+                                bookDao.createGoodreadsFriendBookRec(new GoodreadsFriendBookRecRelation(user, wishListBook, "rec", friend != null ? friend.getId() : null, goodreadsId, userRecForWishListTask.getFriend().getImageUrl(), userRecForWishListTask.getFriend().getName()));
                             }
                          }
                     }

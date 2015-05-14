@@ -23,7 +23,8 @@ public class User implements Serializable {
 
     @CreatedDate
     private long createdDate;
-
+    
+    @Indexed
     private String email;
     private Set<String> favorites;
     @Indexed()
@@ -31,7 +32,32 @@ public class User implements Serializable {
     private String goodreadsAccessToken;
     private String goodreadsAccessTokenSecret;
     private String goodreadsAuthStatus;
+
+    public String getGoodReadsSynchStatus() {
+        return goodReadsSynchStatus;
+    }
+
+    public void setGoodReadsSynchStatus(String goodReadsSynchStatus) {
+        this.goodReadsSynchStatus = goodReadsSynchStatus;
+    }
+
+    public long getLastGoodreadsSychDate() {
+        return lastGoodreadsSychDate;
+    }
+
+    public void setLastGoodreadsSychDate(long lastGoodreadsSychDate) {
+        this.lastGoodreadsSychDate = lastGoodreadsSychDate;
+    }
+
+    private String goodReadsSynchStatus;
+    private long lastGoodreadsSychDate;
+    
+    @Indexed()
     private String goodreadsId;
+    
+    @Indexed()
+    private String googleId;
+
     @Indexed(unique = true)
     private String id;
     @LastModifiedDate
@@ -40,6 +66,16 @@ public class User implements Serializable {
     @GraphId
     private Long nodeId;
     private String phone;
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    private String gender;
     
     private String profileImageUrl;
 
@@ -62,6 +98,14 @@ public class User implements Serializable {
         this.phone = phone;
     }
 
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
+    
     public Set<Address> getAddresses() {
         return addresses;
     }

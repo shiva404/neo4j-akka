@@ -10,9 +10,15 @@ import java.util.List;
 public interface UserDao {
     void addAddressToUser(Address address, User user);
 
-    void createFollowingRelation(User user1, User user2);
+    void createFollowingRelation(User user, User follower);
+    
+    UserRelation getUsersRelationShip(User user,User fellowUser);
+    
+    void  createFriendRelation(User user, User friend);
 
     User createUser(User user, String accessToken);
+
+    List<Book> getReadBooks(String userId);
 
     List<OwnedBook> getAvailableBooks(String userId);
 
@@ -40,4 +46,9 @@ public interface UserDao {
 
 	void setReminder(ReminderRelationShip reminderRelationShip);
 
+    User getUserByGoodreadsId(String goodreadsId);
+
+    User getUserByGoogleId(String googleId);
+    
+    User getUserByEmail(String email);
 }

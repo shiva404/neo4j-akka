@@ -21,6 +21,8 @@
     <neo4j:repositories base-package="com.campusconnect.neo4j.repositories"/>
     <neo4j:config base-package="com.campusconnect.neo4j.types" graphDatabaseService="graphDatabaseService"/>
     
+    <bean class="com.campusconnect.neo4j.providers.Neo4jExceptionMapper" scope="singleton" id="exceptionMapper" />
+    
     <bean id="graphDatabaseService"
           class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase" name="graphDatabaseService">
         <constructor-arg index="0" value="http://127.0.0.1:7474/db/data"/>
@@ -48,6 +50,11 @@
         <constructor-arg index="0" ref="groupDao"/>
         <constructor-arg index="1" ref="userDao"/>
     </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.facebook.api.GetUserProfile" id="getUserProfile">
+        <constructor-arg index="0" ref="facebookClient" />
+        <constructor-arg index="1" ref="connectionFactory" />
+    </bean>
 
     <bean class="com.campusconnect.neo4j.da.GroupDao" id="groupDao">
         <constructor-arg index="0" ref="neo4jTemplate"/>
@@ -64,6 +71,8 @@
         <property name="userRecForWishListRouter" ref="userRecForWishlist" />
         <property name="friendsBookSearchForWishListRouter" ref="friendsBookSearchForWishListWorker" />
         <property name="getFriendsRouter" ref="getFriendsRouter" />
+        <property name="addGoodReadsFriendsRouter" ref="addGoodReadsFriends"/>
+        <property name="replaceGRIdWithUserIdRouter" ref="replaceGRIdWithUserId" />
     </bean>
 
     <bean id="goodreadsDao" class="com.campusconnect.neo4j.da.GoodreadsDao">
@@ -76,6 +85,20 @@
         <constructor-arg index="0" ref="neo4jTemplate"/>
         <constructor-arg index="1" ref="goodreadsDao" />
         <constructor-arg index="2" ref="goodreadsAsynchHandler" />
+        <constructor-arg index="3" ref="emailDao" />
+        <constructor-arg index="4" ref="userDao" />
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.da.UtilsDao" id="utilsDao" />
+    
+    <bean class="com.campusconnect.neo4j.da.EmailDaoImpl" id="emailDao" >
+        <constructor-arg index="0" ref="neo4jAsynchHandler"/>
+    </bean>
+    
+    <bean class="com.campusconnect.neo4j.akka.util.Neo4jAsynchHandler" id="neo4jAsynchHandler">
+        <constructor-arg index="0" ref="borrowInitEmailRouter" />
+        <constructor-arg index="1" ref="utilSuccessListener" />
+        <constructor-arg index="2" ref="acceptToLendBookEmailRouter"/>
     </bean>
 
     <bean class="com.campusconnect.neo4j.resources.UserResource">
@@ -85,6 +108,8 @@
         <constructor-arg index="3" ref="goodreadsDao" />
         <constructor-arg index="4" ref="addressDao" />
         <constructor-arg index="5" ref="reminderDao"/>
+        <constructor-arg index="6" ref="auditEventDao"/>
+        <constructor-arg index="7" ref="notificationDao"/>
     </bean>
     
 
@@ -161,6 +186,26 @@
         </property>
     </bean>
     
+    <bean id="borrowInitEmailRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.util.worker.email.BorrowInitEmailWorker"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="${akka.friends.get.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
+     <bean id="acceptToLendBookEmailRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.util.worker.email.AcceptedToLendBookEmailWorker"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="${akka.friends.get.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
     <bean id="getFriendsRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
         <property name="actorSystem" ref="actorSystem"/>
         <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.GetFriends"/>
@@ -171,8 +216,19 @@
         </property>
     </bean>
     
-    <bean id="addressDao" class="com.campusconnect.neo4j.da.AddressDaoImpl" />
+    <bean id="addGoodReadsFriends" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.AddFriendsFromGoodReadsWorker"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg index="0" type="int" value="${akka.friends.get.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
     
+    <bean id="addressDao" class="com.campusconnect.neo4j.da.AddressDaoImpl" />
+    <bean id="auditEventDao" class="com.campusconnect.neo4j.da.AuditEventDaoImpl"/>
+     <bean id="notificationDao" class="com.campusconnect.neo4j.da.NotificationDaoImpl"/>
     <bean id="friendsBookSearchForWishListWorker" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
         <property name="actorSystem" ref="actorSystem"/>
         <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.FriendsBookSearchForWishListWorker"/>
@@ -192,6 +248,11 @@
             </bean>
         </property>
     </bean>
+    
+    <bean id="utilSuccessListener" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.util.worker.email.SuccessListener"/>
+    </bean>
 
     
     <bean id="saveBookToDbRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
@@ -200,6 +261,16 @@
         <property name="routerConfig">
             <bean class="akka.routing.SmallestMailboxPool">
                 <constructor-arg type="int" value="${akka.save.book.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="replaceGRIdWithUserId" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass" value="com.campusconnect.neo4j.akka.goodreads.worker.ReplaceGRIdWithUserIdForRec"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="5"/>
             </bean>
         </property>
     </bean>

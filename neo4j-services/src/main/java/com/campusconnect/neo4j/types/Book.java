@@ -1,10 +1,15 @@
 package com.campusconnect.neo4j.types;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by sn1 on 2/16/15.
@@ -17,7 +22,7 @@ public class Book implements Serializable {
     @Indexed(unique = true)
     private String id;
 
-    @Indexed
+    @Indexed()
     private Integer goodreadsId;
 
     private String authorName;
@@ -30,6 +35,29 @@ public class Book implements Serializable {
     private String description;
     private String publisher;
     private Integer numberOfPages;
+    
+    private String bookType;  //Owned, borrowed, wishlist
+
+    public String getBookType() {
+        return bookType;
+    }
+
+    public void setBookType(String bookType) {
+        this.bookType = bookType;
+    }
+
+    public Map<String, Object> getAdditionalProperties() {
+        if(additionalProperties == null)
+            additionalProperties = new HashMap<>();
+        return additionalProperties;
+    }
+
+    public void setAdditionalProperties(Map<String, Object> additionalProperties) {
+        this.additionalProperties = additionalProperties;
+    }
+
+
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     public Book(Integer goodreadsId, String authorName, String goodreadsAuthorId, String name, String isbn, String isbn13, int publishedYear, String description, String publisher, Integer numberOfPages, String imageUrl) {
         this.goodreadsId = goodreadsId;

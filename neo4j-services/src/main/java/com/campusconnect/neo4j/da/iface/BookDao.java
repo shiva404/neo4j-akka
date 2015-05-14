@@ -7,6 +7,7 @@ import com.googlecode.ehcache.annotations.Property;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by sn1 on 3/11/15.
@@ -16,19 +17,21 @@ public interface BookDao {
 
     Book getBook(String bookId);
 
-    void addBookToUser(OwnsRelationship ownsRelationship);
+    void listBookAsOwns(OwnsRelationship ownsRelationship);
+
+    void listBookAsRead(ReadRelation readRelation);
 
     @Transactional
-    void updateOwnedBookStatus(User user, Book book, String status);
+    void updateOwnedBookStatus(User user, Book book, String status, String userComment);
 
     void addBookToBorrower(User borrower, Book book, BorrowRequest borrowRequest);
 
-    void updateBookStatusOnAgreement(User user, Book book, User borrower);
+    void updateBookStatusOnAgreement(User user, Book book, User borrower, String userComment);
 
-    void updateBookStatusOnSuccess(User user, Book book, User borrower);
+    void updateBookStatusOnSuccess(User user, Book book, User borrower, String userComment);
 
     @Transactional
-    void updateBorrowedBookStatus(User user, Book book, String status);
+    void updateBorrowedBookStatus(User user, Book book, String status, String userComment);
 
     SearchResult search(String queryString);
 
@@ -42,4 +45,10 @@ public interface BookDao {
     void createGoodreadsFriendBookRec(GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation);
     
     Book getBookByIsbn(String isbn) throws IOException;
+
+    List<UserRecommendation> getRecommendationsForUserAndBook(String bookId, String userId);
+
+    Book getBook(String bookId, String userId);
+    
+    Book getBookByGoodreadsIdWithUser(Integer goodreadsId, String userId);
 }

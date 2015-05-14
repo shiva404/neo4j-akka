@@ -29,8 +29,7 @@ public class ReminderRelationShip {
 
 	private String type;
 	
-	public ReminderRelationShip()
-	{
+	public ReminderRelationShip() {
 		
 	}
 

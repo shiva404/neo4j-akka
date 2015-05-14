@@ -29,5 +29,4 @@ public class SaveBooksToDbWorker extends UntypedActor {
             unhandled(message);
         }
     }
-    
 }

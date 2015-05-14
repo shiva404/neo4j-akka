@@ -1,10 +1,7 @@
 package com.campusconnect.neo4j.akka.goodreads;
 
 import akka.actor.ActorRef;
-import com.campusconnect.neo4j.akka.goodreads.task.AddGoodreadsBookToUserTask;
-import com.campusconnect.neo4j.akka.goodreads.task.FriendsBookSearchForWishListTask;
-import com.campusconnect.neo4j.akka.goodreads.task.GetBooksTask;
-import com.campusconnect.neo4j.akka.goodreads.task.SaveBookTask;
+import com.campusconnect.neo4j.akka.goodreads.task.*;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.types.Book;
@@ -31,8 +28,27 @@ public class GoodreadsAsynchHandler {
     private ActorRef friendsBookSearchForWishListRouter;
     private ActorRef getFriendsRouter;
     private ActorRef userRecForWishListRouter;
+    private ActorRef addGoodReadsFriendsRouter;
 
-    public ActorRef getUserRecForWishListRouter() {
+    public ActorRef getReplaceGRIdWithUserIdRouter() {
+        return replaceGRIdWithUserIdRouter;
+    }
+
+    public void setReplaceGRIdWithUserIdRouter(ActorRef replaceGRIdWithUserIdRouter) {
+        this.replaceGRIdWithUserIdRouter = replaceGRIdWithUserIdRouter;
+    }
+
+    private ActorRef replaceGRIdWithUserIdRouter;
+
+    public ActorRef getAddGoodReadsFriendsRouter() {
+		return addGoodReadsFriendsRouter;
+	}
+
+	public void setAddGoodReadsFriendsRouter(ActorRef addGoodReadsFriendsRouter) {
+		this.addGoodReadsFriendsRouter = addGoodReadsFriendsRouter;
+	}
+
+	public ActorRef getUserRecForWishListRouter() {
         return userRecForWishListRouter;
     }
 
@@ -103,5 +119,9 @@ public class GoodreadsAsynchHandler {
     public void getFriendRecForUser(String userId, String goodreadsUserId, String accessToken, String accessTokenSecret) {
         List<WishListBook> wishListBooks = userDao.getWishListBooks(userId);
         friendsBookSearchForWishListRouter.tell(new FriendsBookSearchForWishListTask(accessToken, accessTokenSecret, userId, goodreadsUserId, 1, wishListBooks), successListener);
+    }
+
+    public void replaceGoodreadsIdWithUserId(String id, Integer goodreadsId, String profileImageUrl) {
+        replaceGRIdWithUserIdRouter.tell(new ReplaceGRIdWithUserIdForRecTask(id, goodreadsId, profileImageUrl), successListener);
     }
 }

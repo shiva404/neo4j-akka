@@ -1,11 +1,16 @@
 package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
+import com.campusconnect.neo4j.da.iface.AuditEventDao;
+import com.campusconnect.neo4j.da.iface.NotificationDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.repositories.BookRepository;
+import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.*;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +23,32 @@ import java.util.*;
  * Created by sn1 on 1/19/15.
  */
 public class UserDaoImpl implements UserDao {
-
-    @Autowired
+	
+	
+	@Autowired
     UserRepository userRepository;
     @Autowired
+    BookRepository bookRepository;
+    @Autowired
+    UserRelationRepository userRelationRepository;
+    
+    @Autowired
     GoodreadsAsynchHandler goodreadsAsynchHandler;
+    @Autowired 
+    AuditEventDao auditEventDao;
+    
+    @Autowired
+    NotificationDao notificationDao;
     
     @Autowired
     private FBDao fbDao;
     
     private Neo4jTemplate neo4jTemplate;
+    ObjectMapper objectMapper;
 
     public UserDaoImpl(Neo4jTemplate neo4jTemplate) {
         this.neo4jTemplate = neo4jTemplate;
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
@@ -42,7 +60,36 @@ public class UserDaoImpl implements UserDao {
                 user.setProfileImageUrl(profileImageUrl);
             }
         }
-        return neo4jTemplate.save(user);
+      
+        User createdUser = neo4jTemplate.save(user);
+        try
+        {
+        Long currentTime = System.currentTimeMillis();
+        Event userCreatedEvent = new Event(AuditEventType.CREATED.toString(), null,currentTime);
+        String serializedEvent = objectMapper.writeValueAsString(userCreatedEvent);
+    	AuditEvent auditEvent = new AuditEvent();
+    	Set<String> events = auditEvent.getEvents();
+        auditEvent.setUserId(createdUser.getId());
+        auditEvent.setUserName(createdUser.getName());
+    	NotificationEntity notificationEntityFresh = new NotificationEntity();
+    	NotificationEntity notificationEntityPast = new NotificationEntity();
+    	events.add(serializedEvent);
+    	auditEvent = auditEventDao.saveEvent(auditEvent);
+    	notificationEntityFresh = notificationDao.savenotification(notificationEntityFresh);
+    	notificationEntityPast = notificationDao.savenotification(notificationEntityPast);
+    		UserEventRelationship userEventRelationship = new UserEventRelationship(auditEvent , createdUser);
+    		UserNotificationRelationship userFreshNotificationRelationship = new UserNotificationRelationship(createdUser, notificationEntityFresh,NotificationType.FRESH.toString());
+    		UserNotificationRelationship userPastNotificationRelationship =  new UserNotificationRelationship(createdUser, notificationEntityPast, NotificationType.PAST.toString());
+    		neo4jTemplate.save(userFreshNotificationRelationship);
+    		neo4jTemplate.save(userPastNotificationRelationship);
+    		neo4jTemplate.save(userEventRelationship);
+    	
+        }
+        catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
+        return createdUser;
     }
     
     @Override
@@ -55,17 +102,86 @@ public class UserDaoImpl implements UserDao {
     public User getUserByFbId(String fbId) {
         return userRepository.findBySchemaPropertyValue("fbId", fbId);
     }
+    
+    @Override
+    public User getUserByGoodreadsId(String goodreadsId) {
+        return userRepository.findBySchemaPropertyValue("goodreadsId", goodreadsId);
+    }
 
     @Override
-    @TriggersRemove(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public void createFollowingRelation(@PartialCacheKey User user1, User user2) {
-        neo4jTemplate.createRelationshipBetween(user1, user2, FollowingRelation.class, UserRelationType.FOLLOWING.toString(), false);
+    public User getUserByGoogleId(String googleId) {
+        return userRepository.findBySchemaPropertyValue("googleId", googleId);
+    }
+
+    public User getUserByEmail(String email)
+    {
+    	return userRepository.findBySchemaPropertyValue("email", email);
+    }
+    @Override
+//    @TriggersRemove(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+    public void createFollowingRelation(@PartialCacheKey User user, User follower) {
+   
+        long now = System.currentTimeMillis();
+    	UserRelation userRelation = new UserRelation(user, follower, now, UserRelationType.FOLLOWING.toString());
+        neo4jTemplate.save(userRelation);
+        
+    	try
+    	{
+    	Long currentTime = System.currentTimeMillis();
+    	String targetEventUserId = follower.getId();
+    	String targetEventUserName = follower.getName();
+    	String targetEventUrl = "users/" + targetEventUserId;
+    	String targetNotificationUserId = user.getId();
+    	String targetNoitficationUrl = "users/" + targetNotificationUserId;
+    	String targetNotificationstring = user.getName();
+    	Target targetEvent = new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);	
+    	Target targetNotification = new Target(IdType.USER_ID.toString(), "is following you",targetNoitficationUrl);
+    	Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetEvent,currentTime);
+    	Notification followedNotification = new Notification(targetNotification, currentTime);
+    	auditEventDao.addEvent(targetEventUserId, followedUSerEvent);
+    	notificationDao.addNotification(targetNotificationUserId, followedNotification);	
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
+    }
+    
+    public void createFriendRelation(@PartialCacheKey User user, User friend) {
+    	   
+        long now = System.currentTimeMillis();
+    	UserRelation userRelation = new UserRelation(user, friend, now, UserRelationType.FRIEND.toString());
+        neo4jTemplate.save(userRelation);
+        
+    	try
+    	{
+    	Long currentTime = System.currentTimeMillis();
+    	
+    	String targetNotificationUserId = user.getId();
+    	String targetNoitficationUrl = "users/" + targetNotificationUserId;
+    	String targetNotificationstring = user.getName();
+    	Target targetEventUser = createTargetToUser(friend);
+    	Target targetEventFriend = createTargetToUser(user);
+    	Event beFriendUserEvent1 =  new Event(AuditEventType.FRIEND.toString(), targetEventUser,System.currentTimeMillis());
+    	Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend,System.currentTimeMillis());
+    	Target targetNotification = new Target(IdType.USER_ID.toString(), "is friends with you",targetNoitficationUrl);
+    //	Event beFriendUserEvent1 = createEventToUser(friend);
+    	
+    	Notification beFriendNotification = new Notification(targetNotification, currentTime);
+    	auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
+    	auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
+    	notificationDao.addNotification(targetNotificationUserId, beFriendNotification);	
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
     }
 
     @Override
     @TriggersRemove(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public User updateUser(@PartialCacheKey String userId, User user) {
-        return neo4jTemplate.save(user);
+    	return neo4jTemplate.save(user);
     }
 
     @Override
@@ -75,18 +191,23 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    @Cacheable(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+ //   @Cacheable(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<User> getFollowing(String userId) {
         return userRepository.getFollowing(userId);
     }
 
     @Override
-    @Cacheable(cacheName = "userOwnedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+//    @Cacheable(cacheName = "userOwnedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<OwnedBook> getOwnedBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS]->(books:Book) return books, relation", params);
         return getOwnedBooksFromResultMap(mapResult);
+    }
+    
+    @Override
+    public List<Book> getReadBooks(String userId) {
+        return bookRepository.getBooks(userId);
     }
 
     @Override
@@ -119,7 +240,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    @Cacheable(cacheName = "userBorrowedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+//    @Cacheable(cacheName = "userBorrowedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<BorrowedBook> getBorrowedBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
@@ -133,11 +254,27 @@ public class UserDaoImpl implements UserDao {
             address = neo4jTemplate.save(address);
         AddressRelation addressRelation = new AddressRelation(user, address);
         neo4jTemplate.save(addressRelation);
+        
+        try
+        {
+        	Long currentTime = System.currentTimeMillis();
+        	
+        	String targetEvent = objectMapper.writeValueAsString(address);
+        	
+        	Target target = new Target(IdType.USER_ID.toString(), targetEvent, null);	
+        	Event addAddressToUserEvent = new Event(AuditEventType.ADDED_ADDRESS.toString(), target,currentTime);
+        	auditEventDao.addEvent(user.getId(), addAddressToUserEvent);
+
+        }
+        catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
     } 
     
     
     @Override
-    @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+//    @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<WishListBook> getWishListBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
@@ -204,5 +341,22 @@ public class UserDaoImpl implements UserDao {
 		
 		neo4jTemplate.save(reminderRelationShip);
 		
+	}
+    
+
+public static Target createTargetToUser(User user)
+{
+	String targetEventUserId = user.getId();
+	String targetEventUserName = user.getName();
+	String targetEventUrl = "users/" + targetEventUserId;
+	return new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);
+//	return  new Event(AuditEventType.FRIEND.toString(), targetEvent,System.currentTimeMillis());
+	
+	
+}
+
+	@Override
+	public UserRelation getUsersRelationShip(User user, User fellowUser) {
+		return userRelationRepository.getUsersRelationship(user.getId(), fellowUser.getId());
 	}
 }

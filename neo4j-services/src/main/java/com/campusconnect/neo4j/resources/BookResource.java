@@ -37,8 +37,15 @@ public class BookResource {
 
     @GET
     @Path("{bookId}")
-    public Response getBook(@PathParam("bookId") String bookId) {
+    public Response getBook(@PathParam("bookId") String bookId, @QueryParam("expectedType") final String expectedType) {
         Book book = bookDao.getBook(bookId);
+        return Response.ok().entity(book).build();
+    }
+    
+    @GET
+    @Path("{bookId}/users/{userId}")
+    public Response getBookWithRespectToUser(@PathParam("bookId") String bookId, @PathParam("userId") final String userId, @QueryParam("expectedType") final String expectedType) {
+        Book book = bookDao.getBook(bookId, userId);
         return Response.ok().entity(book).build();
     }
     
@@ -70,7 +77,7 @@ public class BookResource {
     @PUT
     @Path("{bookId}/users/{userId}/borrow")
     public Response updateStatus(@PathParam("bookId") String bookId, @PathParam("userId") String userId, 
-                                 @QueryParam("borrowerId") String borrowerId, @QueryParam("status") String status) {
+                                 @QueryParam("borrowerId") String borrowerId, @QueryParam("status") String status, @QueryParam("sharePh ") String phoneSharing, BorrowRequest borrowRequest) {
         //locked - for user
         //agreed - for borrower
         Book book = bookDao.getBook(bookId);
@@ -79,19 +86,18 @@ public class BookResource {
            if(borrowerId != null){
                User borrower = userDao.getUser(borrowerId);
                if(borrower != null)
-               bookDao.updateBookStatusOnAgreement(user, book, borrower);
+               bookDao.updateBookStatusOnAgreement(user, book, borrower, borrowRequest.getAdditionalMessage());
                
                    //todo: throw error userNot found
            } else {
                //todo throw exception
            }
         }
-            
         else if(status.equals("success"))
             if(borrowerId != null){
                 User borrower = userDao.getUser(borrowerId);
                 if(borrower != null)
-                    bookDao.updateBookStatusOnAgreement(user, book, borrower);
+                    bookDao.updateBookStatusOnSuccess(user, book, borrower, borrowRequest.getAdditionalMessage());
 
                 //todo: throw error userNot found
             } else {

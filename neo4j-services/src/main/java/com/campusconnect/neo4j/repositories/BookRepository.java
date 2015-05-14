@@ -10,5 +10,5 @@ import java.util.List;
  * Created by I308260 on 2/17/2015.
  */
 public interface BookRepository extends GraphRepository<Book> {
-   // match (users:User {id: "2cb59107-8d45-4e23-b023-3bffacc08798"})-[:OWNS]->(books:Book) return books
-}
+    @Query(value = "match (users:User {id: {0}})-[:READ]->(books:Book) return books")
+    public List<Book> getBooks(String userId);}

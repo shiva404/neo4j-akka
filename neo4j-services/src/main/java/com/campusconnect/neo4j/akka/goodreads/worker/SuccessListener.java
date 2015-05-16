@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SuccessListener extends UntypedActor {
     @Autowired
     private GoodreadsAsynchHandler goodreadsAsynchHandler;
-    
+
     @Override
     public void onReceive(Object message) throws Exception {
-        if(message instanceof SaveBookTask) {
-            goodreadsAsynchHandler.getSaveBooksToDbRouter().tell(message, getSelf());    
-        } else if(message instanceof AddGoodreadsBookToUserTask) {
+        if (message instanceof SaveBookTask) {
+            goodreadsAsynchHandler.getSaveBooksToDbRouter().tell(message, getSelf());
+        } else if (message instanceof AddGoodreadsBookToUserTask) {
             goodreadsAsynchHandler.getAddGoodreadsBookToUserRouter().tell(message, getSelf());
         }
     }

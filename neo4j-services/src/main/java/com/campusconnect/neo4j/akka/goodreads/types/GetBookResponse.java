@@ -1,21 +1,17 @@
-
 package com.campusconnect.neo4j.akka.goodreads.types;
 
+import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.annotation.Generated;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "Request",
-    "book"
+        "Request",
+        "book"
 })
 public class GetBookResponse {
 
@@ -27,9 +23,7 @@ public class GetBookResponse {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The Request
+     * @return The Request
      */
     @JsonProperty("Request")
     public com.campusconnect.neo4j.akka.goodreads.types.Request getRequest() {
@@ -37,9 +31,7 @@ public class GetBookResponse {
     }
 
     /**
-     * 
-     * @param Request
-     *     The Request
+     * @param Request The Request
      */
     @JsonProperty("Request")
     public void setRequest(com.campusconnect.neo4j.akka.goodreads.types.Request Request) {
@@ -47,9 +39,7 @@ public class GetBookResponse {
     }
 
     /**
-     * 
-     * @return
-     *     The book
+     * @return The book
      */
     @JsonProperty("book")
     public Book getBook() {
@@ -57,9 +47,7 @@ public class GetBookResponse {
     }
 
     /**
-     * 
-     * @param book
-     *     The book
+     * @param book The book
      */
     @JsonProperty("book")
     public void setBook(Book book) {

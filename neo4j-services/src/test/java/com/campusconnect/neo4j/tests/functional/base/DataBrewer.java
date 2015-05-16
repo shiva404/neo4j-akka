@@ -11,7 +11,9 @@ import java.util.*;
 public class DataBrewer {
     public static final Faker faker = new Faker();
     public static User getFakeUser(){
-        return new User(faker.name().name(), faker.internet().emailAddress());
+        User user = new User(faker.name().name(), faker.internet().emailAddress());
+        user.setProfileImageUrl("https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg");
+        return user;
     }
 
     public static Book getFakeBook()
@@ -29,6 +31,7 @@ public class DataBrewer {
         Set<Address> addresses = new HashSet<>();
         addresses.add(getFakeAddress(AddressType.HOME.toString()));
         user.setAddresses(addresses);
+        user.setProfileImageUrl("https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg");
         return user;
     }
     
@@ -38,6 +41,7 @@ public class DataBrewer {
         addresses.add(getFakeAddress(AddressType.HOME.toString()));
         user.setAddresses(addresses);
         user.setGoogleId(googleId);
+        user.setProfileImageUrl("https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg");
         return user;
     }
     
@@ -47,6 +51,7 @@ public class DataBrewer {
         addresses.add(getFakeAddress(AddressType.HOME.toString()));
         user.setAddresses(addresses);
         user.setFbId(fbId);
+        user.setProfileImageUrl("https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg");
         return user;
     }
     
@@ -76,16 +81,11 @@ public class DataBrewer {
         return new BorrowRequest(ownerId, borrwerId, 25, System.currentTimeMillis(), "message");
     }
 
-    public static Reminder getFakeReminder()
+    public static Reminder getFakeReminder(String subject)
     {
     	
     	Long currentTime = System.currentTimeMillis(); 
-    	return new Reminder(currentTime, currentTime,"Collect the Book", currentTime);
+    	return new Reminder(currentTime, currentTime, subject, "Collect the Book", "desc", currentTime);
     }
 
-	public static Object getFakeReminder(String reminderMessage) {
-		Long currentTime = System.currentTimeMillis(); 
-    	return new Reminder(currentTime, currentTime,reminderMessage, currentTime);
-
-	}
 }

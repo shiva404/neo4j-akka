@@ -2,6 +2,7 @@ package com.campusconnect.neo4j.resources;
 
 import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
+import com.campusconnect.neo4j.da.GroupDao;
 import com.campusconnect.neo4j.da.iface.AddressDao;
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.da.iface.BookDao;
@@ -43,11 +44,12 @@ public class UserResource {
     private ReminderDao reminderDao;
     private AuditEventDao auditEventDao;
     private NotificationDao notificationDao;
+    private GroupDao groupDao;
     
     public UserResource() {
     }
 
-    public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao, AddressDao addressDao,ReminderDao reminderDao,AuditEventDao auditEventDao,NotificationDao notificationDao) {
+    public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao, AddressDao addressDao,ReminderDao reminderDao,AuditEventDao auditEventDao,NotificationDao notificationDao,GroupDao groupDao) {
         this.userDao = userDao;
         this.bookDao = bookDao;
         this.fbDao = fbDao;
@@ -56,6 +58,7 @@ public class UserResource {
         this.reminderDao = reminderDao;
         this.auditEventDao = auditEventDao;
         this.notificationDao = notificationDao;
+        this.groupDao = groupDao;
     }
 
     @POST
@@ -155,7 +158,7 @@ public class UserResource {
     	String targetUserName = objectMapper.writeValueAsString(fields);
     	String targetUrl = null;
     	Target target = new Target(IdType.USER_ID.toString(), targetUserName, targetUrl);
-     	Event followedUSerEvent = new Event(AuditEventType.USER_UPDATED.toString(), target,currentTime);
+     	Event followedUSerEvent = new Event(AuditEventType.USER_UPDATED.toString(), target,currentTime, false);
     	auditEventDao.addEvent(targetUserId, followedUSerEvent);
   
     }
@@ -486,7 +489,15 @@ public class UserResource {
     	NotificationPage notificationPage = new NotificationPage(0, notifications.size(), notifications); 
     	return Response.ok().entity(notificationPage).build();
     }
-    
+
+    @GET
+    @Path("{userId}/groups")
+    public Response getGroups(@PathParam("userId")final String userId)
+    {
+    	List<Group> groups = groupDao.getGroups(userId);
+    	GroupPage groupPage = new GroupPage(groups, 0,groups.size());
+    	return Response.ok().entity(groupPage).build();
+    }
     
     @DELETE
     @Path("{userId}/notifications")

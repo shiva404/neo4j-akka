@@ -8,10 +8,7 @@ import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.OwnsRelationshipRepository;
 import com.campusconnect.neo4j.repositories.UserRecRepository;
 import com.campusconnect.neo4j.types.*;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
-import com.googlecode.ehcache.annotations.Property;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
 import org.slf4j.Logger;
@@ -29,21 +26,17 @@ import java.util.*;
  */
 public class BookDaoImpl implements BookDao {
     private static final Logger LOGGER = LoggerFactory.getLogger(BookDaoImpl.class);
-
+    @Autowired
+    BookRepository bookRepository;
+    @Autowired
+    OwnsRelationshipRepository ownsRelationshipRepository;
+    @Autowired
+    UserRecRepository userRecRepository;
     private Neo4jTemplate neo4jTemplate;
     private GoodreadsDao goodreadsDao;
     private GoodreadsAsynchHandler goodreadsAsynchHandler;
     private EmailDao emailDao;
     private UserDao userDao;
-
-    @Autowired
-    BookRepository bookRepository;
-
-    @Autowired
-    OwnsRelationshipRepository ownsRelationshipRepository;
-    
-    @Autowired
-    UserRecRepository userRecRepository;
 
     public BookDaoImpl(Neo4jTemplate neo4jTemplate, GoodreadsDao goodreadsDao, GoodreadsAsynchHandler goodreadsAsynchHandler, EmailDao emailDao, UserDao userDao) {
         this.neo4jTemplate = neo4jTemplate;
@@ -67,11 +60,11 @@ public class BookDaoImpl implements BookDao {
     public void listBookAsOwns(OwnsRelationship ownsRelationship) {
         neo4jTemplate.save(ownsRelationship);
     }
-    
+
     @Override
     public void listBookAsRead(ReadRelation readRelation) {
-        try{
-            neo4jTemplate.save(readRelation);    
+        try {
+            neo4jTemplate.save(readRelation);
         } catch (Exception e) {
             LOGGER.error("Error while saving read relation bookId" + readRelation.getBook().getId() + " UserId:" + readRelation.getUser().getId());
             e.printStackTrace();
@@ -137,15 +130,15 @@ public class BookDaoImpl implements BookDao {
     public Book getBookByGoodreadsId(String goodreadsId) throws IOException {
         try {
             Book book = bookRepository.findBySchemaPropertyValue("goodreadsId", goodreadsId);
-            if(book == null) {
+            if (book == null) {
                 LOGGER.info("Goodreads book is not in there datsbase fetching from goodreads. Id: " + Integer.parseInt(goodreadsId));
                 final Book bookByGoodreadId = goodreadsDao.getBookById(goodreadsId);
                 bookByGoodreadId.setId(UUID.randomUUID().toString());
                 goodreadsAsynchHandler.saveBook(bookByGoodreadId);
-                return bookByGoodreadId;     
+                return bookByGoodreadId;
             }
         } catch (Exception e) {
-           //Todo : if exception is not found search in goodreads
+            //Todo : if exception is not found search in goodreads
             return goodreadsDao.getBookById(goodreadsId);
         }
         return null;
@@ -154,7 +147,7 @@ public class BookDaoImpl implements BookDao {
     @Override
     public Book getBookByGoodreadsIdAndSaveIfNotExists(@PartialCacheKey String goodreadsId, Book book) {
         Book bookByGoodreadsId = bookRepository.findBySchemaPropertyValue("goodreadsId", Integer.parseInt(goodreadsId));
-        if(bookByGoodreadsId == null) {
+        if (bookByGoodreadsId == null) {
             book.setId(UUID.randomUUID().toString());
             return createBook(book);
         }
@@ -165,7 +158,7 @@ public class BookDaoImpl implements BookDao {
     public void addWishBookToUser(WishListRelationship wishListRelationship) {
         neo4jTemplate.save(wishListRelationship);
     }
-    
+
     @Override
     public void createGoodreadsFriendBookRec(GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation) {
         neo4jTemplate.save(goodreadsFriendBookRecRelation);
@@ -177,7 +170,7 @@ public class BookDaoImpl implements BookDao {
         Book goodreadsBook = getBookByGoodreadsIdAndSaveIfNotExists(book.getGoodreadsAuthorId(), book);
         return goodreadsBook;
     }
-    
+
     @Override
     public List<UserRecommendation> getRecommendationsForUserAndBook(String bookId, String userId) {
         List<GoodreadsFriendBookRecRelation> friendBookRecRelations = userRecRepository.getGoodreadsFriendBookRecRelations(userId, bookId);
@@ -187,13 +180,13 @@ public class BookDaoImpl implements BookDao {
 
     private List<UserRecommendation> convertToUserRec(List<GoodreadsFriendBookRecRelation> friendBookRecRelations) {
         List<UserRecommendation> userRecommendations = new ArrayList<>();
-        for(GoodreadsFriendBookRecRelation friendBookRecRelation : friendBookRecRelations) {
+        for (GoodreadsFriendBookRecRelation friendBookRecRelation : friendBookRecRelations) {
             UserRecommendation userRecommendation = new UserRecommendation();
             userRecommendation.setFriendGoodreadsId(friendBookRecRelation.getFriendGoodreadsId());
             userRecommendation.setFriendImageUrl(friendBookRecRelation.getFriendImageUrl());
             userRecommendation.setFriendName(friendBookRecRelation.getFriendName());
             userRecommendation.setFriendId(friendBookRecRelation.getFriendId());
-            
+
             userRecommendations.add(userRecommendation);
         }
         return userRecommendations;
@@ -226,26 +219,26 @@ public class BookDaoImpl implements BookDao {
             RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
 
             book = neo4jTemplate.convert(bookNode, Book.class);
-            if(rawWishRelationship.getType().name().equals("OWNS")){
+            if (rawWishRelationship.getType().name().equals("OWNS")) {
                 book.setBookType("OWNS");
                 OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawWishRelationship, OwnsRelationship.class);
                 book.getAdditionalProperties().putAll(ownsRelationship.getFieldsAsMap());
                 return book;
             }
-            if(rawWishRelationship.getType().name().equals("BORROWED")) {
+            if (rawWishRelationship.getType().name().equals("BORROWED")) {
                 book.setBookType("BORROWED");
                 BorrowRelation borrowRelation = neo4jTemplate.convert(rawWishRelationship, BorrowRelation.class);
                 book.getAdditionalProperties().putAll(borrowRelation.getFieldsAsMap());
                 return book;
             }
-            if(rawWishRelationship.getType().name().equals("WISH")) {
+            if (rawWishRelationship.getType().name().equals("WISH")) {
                 book.setBookType("WISH");
                 //find if there are any recommendations
                 List<UserRecommendation> userRecommendations = getRecommendationsForUserAndBook(book.getId(), userId);
                 book.getAdditionalProperties().put("recommendations", userRecommendations);
                 return book;
             }
-            if(rawWishRelationship.getType().name().equals("READ")) {
+            if (rawWishRelationship.getType().name().equals("READ")) {
                 book.setBookType("READ");
                 //find if there are any recommendations
                 return book;

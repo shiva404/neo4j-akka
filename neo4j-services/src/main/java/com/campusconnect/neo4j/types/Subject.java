@@ -5,17 +5,28 @@ public class Subject {
 	private String displayString;
 	private String idType;
 	private String url;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    private String imageUrl;
 	
 	public Subject()
 	{
 		
 	}
 	
-	public Subject(String idType, String displayString, String url) {
+	public Subject(String idType, String displayString, String url, String imageUrl) {
 		super();
 		this.idType = idType;
 		this.displayString = displayString;
 		this.url = url;
+        this.imageUrl = imageUrl;
 	}
 	
 	

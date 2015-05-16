@@ -2,21 +2,25 @@ package com.campusconnect.neo4j.types;
 
 import java.util.List;
 
-public class EventPage {
-
-    List<Event> userEvent;
+public class GroupPage {
+    List<Group> group;
     private int offset;
+
     private int size;
 
-    public EventPage() {
-        // TODO Auto-generated constructor stub
-    }
-
-    public EventPage(int offset, int size, List<Event> userEvent) {
+    public GroupPage(List<Group> group, int offset, int size) {
         super();
+        this.group = group;
         this.offset = offset;
         this.size = size;
-        this.userEvent = userEvent;
+    }
+
+    public List<Group> getGroup() {
+        return group;
+    }
+
+    public void setGroup(List<Group> group) {
+        this.group = group;
     }
 
     public int getOffset() {
@@ -35,12 +39,5 @@ public class EventPage {
         this.size = size;
     }
 
-    public List<Event> getUserEvent() {
-        return userEvent;
-    }
-
-    public void setUserEvent(List<Event> userEvent) {
-        this.userEvent = userEvent;
-    }
 
 }

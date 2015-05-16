@@ -16,6 +16,7 @@ public class CollegeDao {
 
     @Autowired
     private CollegeRepository collegeRepository;
+    private Neo4jTemplate neo4jTemplate;
 
     public CollegeDao() {
     }
@@ -24,14 +25,12 @@ public class CollegeDao {
         this.neo4jTemplate = neo4jTemplate;
     }
 
-    private Neo4jTemplate neo4jTemplate;
-
-    public College createCollege(College college){
+    public College createCollege(College college) {
         college.setId(UUID.randomUUID().toString());
         return neo4jTemplate.save(college);
     }
 
-    public College getCollege(String collegeId){
+    public College getCollege(String collegeId) {
         return collegeRepository.findBySchemaPropertyValue("id", collegeId);
     }
 

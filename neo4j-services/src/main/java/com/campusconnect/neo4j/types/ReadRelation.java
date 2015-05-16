@@ -7,6 +7,8 @@ import org.springframework.data.neo4j.annotation.RelationshipEntity;
  */
 @RelationshipEntity(type = "READ")
 public class ReadRelation extends BookRelation {
+    String goodreadsStatus;
+
     public ReadRelation(String goodreadsStatus) {
         this.goodreadsStatus = goodreadsStatus;
     }
@@ -21,11 +23,9 @@ public class ReadRelation extends BookRelation {
         this.goodreadsStatus = goodreadsStatus;
     }
 
-    String goodreadsStatus;
-
     public ReadRelation() {
     }
-    
+
     @Override
     public String toString() {
         return "ReadRelation{" +

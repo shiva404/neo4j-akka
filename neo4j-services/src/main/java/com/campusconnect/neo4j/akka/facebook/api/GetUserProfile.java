@@ -1,13 +1,11 @@
 package com.campusconnect.neo4j.akka.facebook.api;
 
 import com.campusconnect.neo4j.akka.facebook.client.FacebookClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
-
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +29,7 @@ public class GetUserProfile {
         headers.put("accept", "application/json");
         return headers;
     }
-    
+
     public void getUserProfile(String userId, String accessToken) {
         Connection<Facebook> facebook = facebookConnectionFactory.createConnection(new AccessGrant(accessToken));
         UserProfile userProfile = facebook.fetchUserProfile();

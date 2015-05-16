@@ -13,13 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SaveBooksToDbWorker extends UntypedActor {
     private static Logger logger = LoggerFactory.getLogger(SaveBooksToDbWorker.class);
-    
+
     @Autowired
     private BookDao bookDao;
-    
+
     @Override
     public void onReceive(Object message) throws Exception {
-        if(message instanceof SaveBookTask) {
+        if (message instanceof SaveBookTask) {
             logger.debug("Saving book triggered");
             SaveBookTask saveBookTask = (SaveBookTask) message;
             Book createdBook = bookDao.createBook(saveBookTask.getBook());

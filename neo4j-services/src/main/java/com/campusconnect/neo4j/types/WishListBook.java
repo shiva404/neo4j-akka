@@ -9,6 +9,8 @@ import java.util.List;
  */
 public class WishListBook extends Book implements Serializable {
 
+    private List<UserRecommendation> userRecommendations;
+
     public WishListBook(Integer goodreadsId, String authorName, String goodreadsAuthorId, String name, String isbn, String isbn13, int publishedYear, String description, String publisher, Integer numberOfPages, String imageUrl) {
         super(goodreadsId, authorName, goodreadsAuthorId, name, isbn, isbn13, publishedYear, description, publisher, numberOfPages, imageUrl);
     }
@@ -23,11 +25,9 @@ public class WishListBook extends Book implements Serializable {
 
     public WishListBook() {
     }
-    
-    private List<UserRecommendation> userRecommendations;
 
     public List<UserRecommendation> getUserRecommendations() {
-        if(userRecommendations == null)
+        if (userRecommendations == null)
             userRecommendations = new ArrayList<>();
         return userRecommendations;
     }

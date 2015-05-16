@@ -1,30 +1,26 @@
-
 package com.campusconnect.neo4j.akka.goodreads.types;
 
+import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Generated;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "id",
-    "title",
-    "isbn",
-    "isbn13",
-    "small_image_url",
-    "image_url",
-    "average_rating",
-    "ratings_count",
-    "authors"
+        "id",
+        "title",
+        "isbn",
+        "isbn13",
+        "small_image_url",
+        "image_url",
+        "average_rating",
+        "ratings_count",
+        "authors"
 })
 public class SimilarBook {
 
@@ -50,9 +46,7 @@ public class SimilarBook {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The id
+     * @return The id
      */
     @JsonProperty("id")
     public String getId() {
@@ -60,9 +54,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @param id
-     *     The id
+     * @param id The id
      */
     @JsonProperty("id")
     public void setId(String id) {
@@ -70,9 +62,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @return
-     *     The title
+     * @return The title
      */
     @JsonProperty("title")
     public String getTitle() {
@@ -80,9 +70,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @param title
-     *     The title
+     * @param title The title
      */
     @JsonProperty("title")
     public void setTitle(String title) {
@@ -90,9 +78,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @return
-     *     The isbn
+     * @return The isbn
      */
     @JsonProperty("isbn")
     public String getIsbn() {
@@ -100,9 +86,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @param isbn
-     *     The isbn
+     * @param isbn The isbn
      */
     @JsonProperty("isbn")
     public void setIsbn(String isbn) {
@@ -110,9 +94,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @return
-     *     The isbn13
+     * @return The isbn13
      */
     @JsonProperty("isbn13")
     public String getIsbn13() {
@@ -120,9 +102,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @param isbn13
-     *     The isbn13
+     * @param isbn13 The isbn13
      */
     @JsonProperty("isbn13")
     public void setIsbn13(String isbn13) {
@@ -130,9 +110,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @return
-     *     The smallImageUrl
+     * @return The smallImageUrl
      */
     @JsonProperty("small_image_url")
     public String getSmallImageUrl() {
@@ -140,9 +118,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @param smallImageUrl
-     *     The small_image_url
+     * @param smallImageUrl The small_image_url
      */
     @JsonProperty("small_image_url")
     public void setSmallImageUrl(String smallImageUrl) {
@@ -150,9 +126,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @return
-     *     The imageUrl
+     * @return The imageUrl
      */
     @JsonProperty("image_url")
     public String getImageUrl() {
@@ -160,9 +134,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @param imageUrl
-     *     The image_url
+     * @param imageUrl The image_url
      */
     @JsonProperty("image_url")
     public void setImageUrl(String imageUrl) {
@@ -170,9 +142,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @return
-     *     The averageRating
+     * @return The averageRating
      */
     @JsonProperty("average_rating")
     public String getAverageRating() {
@@ -180,9 +150,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @param averageRating
-     *     The average_rating
+     * @param averageRating The average_rating
      */
     @JsonProperty("average_rating")
     public void setAverageRating(String averageRating) {
@@ -190,9 +158,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @return
-     *     The ratingsCount
+     * @return The ratingsCount
      */
     @JsonProperty("ratings_count")
     public String getRatingsCount() {
@@ -200,9 +166,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @param ratingsCount
-     *     The ratings_count
+     * @param ratingsCount The ratings_count
      */
     @JsonProperty("ratings_count")
     public void setRatingsCount(String ratingsCount) {
@@ -210,9 +174,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @return
-     *     The authors
+     * @return The authors
      */
     @JsonProperty("authors")
     public List<Author_> getAuthors() {
@@ -220,9 +182,7 @@ public class SimilarBook {
     }
 
     /**
-     * 
-     * @param authors
-     *     The authors
+     * @param authors The authors
      */
     @JsonProperty("authors")
     public void setAuthors(List<Author_> authors) {

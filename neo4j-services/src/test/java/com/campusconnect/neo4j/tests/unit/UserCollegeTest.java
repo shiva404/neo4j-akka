@@ -24,12 +24,12 @@ public class UserCollegeTest extends TestBase {
     @Autowired
     private UserDaoImpl userDaoImpl;
     @Autowired
-    private UserResource  userResource;
+    private UserResource userResource;
 
     @Test
-    public void addUserToCollege(){
+    public void addUserToCollege() {
         final String collegeFirstName = faker.name().firstName();
-        College college = new College(collegeFirstName + " College", collegeFirstName.charAt(0) + "."+"C");
+        College college = new College(collegeFirstName + " College", collegeFirstName.charAt(0) + "." + "C");
         createdCollege = collegeDao.createCollege(college);
 
         User user = getFakeUser();
@@ -42,7 +42,7 @@ public class UserCollegeTest extends TestBase {
     }
 
     @Test(dependsOnMethods = "addUserToCollege")
-    public void getUsersOfCollege(){
+    public void getUsersOfCollege() {
         List<User> userList = collegeDao.getUsersForCollege(createdCollege.getId());
         System.out.println(userList);
     }

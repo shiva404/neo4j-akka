@@ -1,24 +1,20 @@
-
 package com.campusconnect.neo4j.akka.goodreads.types;
 
+import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.annotation.Generated;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "id",
-    "title",
-    "author",
-    "image_url",
-    "small_image_url"
+        "id",
+        "title",
+        "author",
+        "image_url",
+        "small_image_url"
 })
 public class BestBook {
 
@@ -36,9 +32,7 @@ public class BestBook {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The id
+     * @return The id
      */
     @JsonProperty("id")
     public Integer getId() {
@@ -46,9 +40,7 @@ public class BestBook {
     }
 
     /**
-     * 
-     * @param id
-     *     The id
+     * @param id The id
      */
     @JsonProperty("id")
     public void setId(Integer id) {
@@ -56,9 +48,7 @@ public class BestBook {
     }
 
     /**
-     * 
-     * @return
-     *     The title
+     * @return The title
      */
     @JsonProperty("title")
     public String getTitle() {
@@ -66,9 +56,7 @@ public class BestBook {
     }
 
     /**
-     * 
-     * @param title
-     *     The title
+     * @param title The title
      */
     @JsonProperty("title")
     public void setTitle(String title) {
@@ -76,9 +64,7 @@ public class BestBook {
     }
 
     /**
-     * 
-     * @return
-     *     The author
+     * @return The author
      */
     @JsonProperty("author")
     public Author getAuthor() {
@@ -86,9 +72,7 @@ public class BestBook {
     }
 
     /**
-     * 
-     * @param author
-     *     The author
+     * @param author The author
      */
     @JsonProperty("author")
     public void setAuthor(Author author) {
@@ -96,9 +80,7 @@ public class BestBook {
     }
 
     /**
-     * 
-     * @return
-     *     The imageUrl
+     * @return The imageUrl
      */
     @JsonProperty("image_url")
     public String getImageUrl() {
@@ -106,9 +88,7 @@ public class BestBook {
     }
 
     /**
-     * 
-     * @param imageUrl
-     *     The image_url
+     * @param imageUrl The image_url
      */
     @JsonProperty("image_url")
     public void setImageUrl(String imageUrl) {
@@ -116,9 +96,7 @@ public class BestBook {
     }
 
     /**
-     * 
-     * @return
-     *     The smallImageUrl
+     * @return The smallImageUrl
      */
     @JsonProperty("small_image_url")
     public String getSmallImageUrl() {
@@ -126,9 +104,7 @@ public class BestBook {
     }
 
     /**
-     * 
-     * @param smallImageUrl
-     *     The small_image_url
+     * @param smallImageUrl The small_image_url
      */
     @JsonProperty("small_image_url")
     public void setSmallImageUrl(String smallImageUrl) {

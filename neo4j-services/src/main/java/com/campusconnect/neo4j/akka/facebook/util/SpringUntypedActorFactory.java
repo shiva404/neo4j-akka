@@ -26,6 +26,15 @@ public class SpringUntypedActorFactory implements UntypedActorFactory {
         this.applicationContext = applicationContext;
     }
 
+    @Override
+    public Actor create() throws Exception {
+        return dependencyInjectionFactory.createAndInject();
+    }
+
+    private interface DependencyInjectionFactory {
+        UntypedActor createAndInject();
+    }
+
     private abstract class AbstractUntypedActorFactory implements DependencyInjectionFactory {
 
         @Override
@@ -99,16 +108,5 @@ public class SpringUntypedActorFactory implements UntypedActorFactory {
         protected UntypedActor create() throws InstantiationException, IllegalAccessException {
             return (UntypedActor) actorClass.newInstance();
         }
-    }
-    
-    
-    
-    private interface DependencyInjectionFactory {
-        UntypedActor createAndInject();
-    }
-    
-    @Override
-    public Actor create() throws Exception {
-        return dependencyInjectionFactory.createAndInject();
     }
 }

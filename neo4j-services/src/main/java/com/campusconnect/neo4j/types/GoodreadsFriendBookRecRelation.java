@@ -1,6 +1,5 @@
 package com.campusconnect.neo4j.types;
 
-import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 
 /**
@@ -8,6 +7,12 @@ import org.springframework.data.neo4j.annotation.RelationshipEntity;
  */
 @RelationshipEntity(type = "GR_REC")
 public class GoodreadsFriendBookRecRelation extends BookRelation {
+
+    private String friendGoodreadsId;
+    private String friendImageUrl;
+    private String friendName;
+    private String friendId;
+
 
     public GoodreadsFriendBookRecRelation() {
     }
@@ -30,7 +35,6 @@ public class GoodreadsFriendBookRecRelation extends BookRelation {
         this.friendGoodreadsId = friendGoodreadsId;
     }
 
-
     public String getFriendImageUrl() {
         return friendImageUrl;
     }
@@ -46,11 +50,6 @@ public class GoodreadsFriendBookRecRelation extends BookRelation {
     public void setFriendName(String friendName) {
         this.friendName = friendName;
     }
-
-    private String friendGoodreadsId;
-    private String friendImageUrl;
-    private String friendName;
-    private String friendId;
 
     public String getFriendId() {
         return friendId;

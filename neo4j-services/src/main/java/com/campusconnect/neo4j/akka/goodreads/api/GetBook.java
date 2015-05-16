@@ -16,27 +16,13 @@ import static com.campusconnect.neo4j.akka.goodreads.client.GoodReadsClient.getD
  * Created by sn1 on 3/10/15.
  */
 public class GetBook {
-    
+
     private static Logger logger = LoggerFactory.getLogger(GetBook.class);
-    
+
     private GoodReadsClient goodReadsClient;
 
     public GetBook(GoodReadsClient goodReadsClient) {
         this.goodReadsClient = goodReadsClient;
-    }
-
-    public GetBookResponse getBookById(String goodreadsId) throws IOException {
-        ClientResponse clientResponse = goodReadsClient.path("book/show").path(goodreadsId).addAppKeyQueryParam().queryParam("format","xml").header(getDefaultHeaders()).get(ClientResponse.class);
-        String theString = IOUtils.toString(clientResponse.getEntityInputStream());
-        GetBookResponse getBookResponse = ResponseUtils.getEntity(theString, GetBookResponse.class);
-        return getBookResponse;
-    }
-    
-    public GetBookResponse getBookByISBN(String isbn) throws IOException {
-        ClientResponse clientResponse = goodReadsClient.path("book/isbn").addAppKeyQueryParam().queryParam("isbn", isbn).header(getDefaultHeaders()).get(ClientResponse.class);
-        String theString = IOUtils.toString(clientResponse.getEntityInputStream());
-        GetBookResponse getBookResponse = ResponseUtils.getEntity(theString, GetBookResponse.class);
-        return getBookResponse;
     }
 
     public static void main(String[] args) throws IOException {
@@ -44,8 +30,22 @@ public class GetBook {
         getBook.getBookById("1768603");
 
         getBook.getBookByISBN("1416562591");
-        
-        
+
+
     }
-    
+
+    public GetBookResponse getBookById(String goodreadsId) throws IOException {
+        ClientResponse clientResponse = goodReadsClient.path("book/show").path(goodreadsId).addAppKeyQueryParam().queryParam("format", "xml").header(getDefaultHeaders()).get(ClientResponse.class);
+        String theString = IOUtils.toString(clientResponse.getEntityInputStream());
+        GetBookResponse getBookResponse = ResponseUtils.getEntity(theString, GetBookResponse.class);
+        return getBookResponse;
+    }
+
+    public GetBookResponse getBookByISBN(String isbn) throws IOException {
+        ClientResponse clientResponse = goodReadsClient.path("book/isbn").addAppKeyQueryParam().queryParam("isbn", isbn).header(getDefaultHeaders()).get(ClientResponse.class);
+        String theString = IOUtils.toString(clientResponse.getEntityInputStream());
+        GetBookResponse getBookResponse = ResponseUtils.getEntity(theString, GetBookResponse.class);
+        return getBookResponse;
+    }
+
 }

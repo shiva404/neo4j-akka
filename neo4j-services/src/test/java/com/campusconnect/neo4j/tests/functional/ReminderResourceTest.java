@@ -14,7 +14,7 @@ public class ReminderResourceTest extends TestBase {
     public void testRemindersSetByUser() {
         String userId = UserResourceTest.createUser();
         String createdBy = UserResourceTest.createUser();
-        Reminder reminder = DataBrewer.getFakeReminder();
+        Reminder reminder = DataBrewer.getFakeReminder("Subject");
         ClientResponse clientResponseForReminderCreation = resource.path("users").path(userId).path("reminders").queryParam("reminderAbout", ReminderAbout.COLLECT.toString()).queryParam("createdBy", createdBy).type("application/json").entity(reminder).post(ClientResponse.class);
         assert clientResponseForReminderCreation.getStatus() == 201;
         Reminder reminderCreated = clientResponseForReminderCreation.getEntity(Reminder.class);

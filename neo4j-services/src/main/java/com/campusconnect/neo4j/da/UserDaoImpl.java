@@ -62,32 +62,29 @@ public class UserDaoImpl implements UserDao {
         }
       
         User createdUser = neo4jTemplate.save(user);
-        try
-        {
-        Long currentTime = System.currentTimeMillis();
-        Event userCreatedEvent = new Event(AuditEventType.CREATED.toString(), null,currentTime,false);
-        String serializedEvent = objectMapper.writeValueAsString(userCreatedEvent);
-    	AuditEvent auditEvent = new AuditEvent();
-    	Set<String> events = auditEvent.getEvents();
-        auditEvent.setUserId(createdUser.getId());
-        auditEvent.setUserName(createdUser.getName());
-    	NotificationEntity notificationEntityFresh = new NotificationEntity();
-    	NotificationEntity notificationEntityPast = new NotificationEntity();
-    	events.add(serializedEvent);
-    	auditEvent = auditEventDao.saveEvent(auditEvent);
-    	notificationEntityFresh = notificationDao.savenotification(notificationEntityFresh);
-    	notificationEntityPast = notificationDao.savenotification(notificationEntityPast);
-    		UserEventRelationship userEventRelationship = new UserEventRelationship(auditEvent , createdUser);
-    		UserNotificationRelationship userFreshNotificationRelationship = new UserNotificationRelationship(createdUser, notificationEntityFresh,NotificationType.FRESH.toString());
-    		UserNotificationRelationship userPastNotificationRelationship =  new UserNotificationRelationship(createdUser, notificationEntityPast, NotificationType.PAST.toString());
-    		neo4jTemplate.save(userFreshNotificationRelationship);
-    		neo4jTemplate.save(userPastNotificationRelationship);
-    		neo4jTemplate.save(userEventRelationship);
-    	
-        }
-        catch(Exception e)
-        {
-        	e.printStackTrace();
+        try {
+            Long currentTime = System.currentTimeMillis();
+            Event userCreatedEvent = new Event(AuditEventType.CREATED.toString(), null, currentTime, false);
+            String serializedEvent = objectMapper.writeValueAsString(userCreatedEvent);
+            AuditEvent auditEvent = new AuditEvent();
+            Set<String> events = auditEvent.getEvents();
+            auditEvent.setUserId(createdUser.getId());
+            auditEvent.setUserName(createdUser.getName());
+            NotificationEntity notificationEntityFresh = new NotificationEntity();
+            NotificationEntity notificationEntityPast = new NotificationEntity();
+            events.add(serializedEvent);
+            auditEvent = auditEventDao.saveEvent(auditEvent);
+            notificationEntityFresh = notificationDao.savenotification(notificationEntityFresh);
+            notificationEntityPast = notificationDao.savenotification(notificationEntityPast);
+            UserEventRelationship userEventRelationship = new UserEventRelationship(auditEvent, createdUser);
+            UserNotificationRelationship userFreshNotificationRelationship = new UserNotificationRelationship(createdUser, notificationEntityFresh, NotificationType.FRESH.toString());
+            UserNotificationRelationship userPastNotificationRelationship = new UserNotificationRelationship(createdUser, notificationEntityPast, NotificationType.PAST.toString());
+            neo4jTemplate.save(userFreshNotificationRelationship);
+            neo4jTemplate.save(userPastNotificationRelationship);
+            neo4jTemplate.save(userEventRelationship);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return createdUser;
     }
@@ -128,19 +125,18 @@ public class UserDaoImpl implements UserDao {
     	try
     	{
     	Long currentTime = System.currentTimeMillis();
-  	
-    	Target followedUserAsTarget = createTargetToUser(follower);
-    	Target notificationAndPrivateTarget = createTargetToUser(user);
-    	
-    	Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), followedUserAsTarget,currentTime,true);
-    	Event beingFollowedEvent = new Event(AuditEventType.FOLLOWED.toString(),notificationAndPrivateTarget,currentTime,false);
-    	
-    	Notification followedNotification = new Notification(notificationAndPrivateTarget, currentTime);
-    	
-    	auditEventDao.addEvent(user.getId(), followedUSerEvent);
-    	auditEventDao.addEvent(follower.getId(), beingFollowedEvent);
-    	
-    	notificationDao.addNotification(follower.getId(), followedNotification);	
+    	String targetEventUserId = follower.getId();
+    	String targetEventUserName = follower.getName();
+    	String targetEventUrl = "users/" + targetEventUserId;
+    	String targetNotificationUserId = user.getId();
+    	String targetNoitficationUrl = "users/" + targetNotificationUserId;
+    	String targetNotificationstring = user.getName();
+    	Target targetEvent = new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);	
+    	Target targetNotification = new Target(IdType.USER_ID.toString(), "is following you",targetNoitficationUrl);
+    	Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetEvent,currentTime, false);
+    	Notification followedNotification = new Notification(targetNotification, currentTime);
+    	auditEventDao.addEvent(targetEventUserId, followedUSerEvent);
+    	notificationDao.addNotification(targetNotificationUserId, followedNotification);	
     	}
     	catch(Exception e)
     	{
@@ -163,8 +159,8 @@ public class UserDaoImpl implements UserDao {
     	String targetNotificationstring = user.getName();
     	Target targetEventUser = createTargetToUser(friend);
     	Target targetEventFriend = createTargetToUser(user);
-    	Event beFriendUserEvent1 =  new Event(AuditEventType.FRIEND.toString(), targetEventUser,System.currentTimeMillis(),true);
-    	Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend,System.currentTimeMillis(),true);
+    	Event beFriendUserEvent1 =  new Event(AuditEventType.FRIEND.toString(), targetEventUser,System.currentTimeMillis(), true);
+    	Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend,System.currentTimeMillis(), true);
     	Target targetNotification = new Target(IdType.USER_ID.toString(), "is friends with you",targetNoitficationUrl);
     //	Event beFriendUserEvent1 = createEventToUser(friend);
     	
@@ -255,22 +251,20 @@ public class UserDaoImpl implements UserDao {
             address = neo4jTemplate.save(address);
         AddressRelation addressRelation = new AddressRelation(user, address);
         neo4jTemplate.save(addressRelation);
-        
-        try
-        {
-        	Long currentTime = System.currentTimeMillis();
-        	
-        	String targetEvent = objectMapper.writeValueAsString(address);
-        	
-        	Target target = new Target(IdType.USER_ID.toString(), targetEvent, null);	
-        	Event addAddressToUserEvent = new Event(AuditEventType.ADDED_ADDRESS.toString(), target,currentTime,false);
-        	auditEventDao.addEvent(user.getId(), addAddressToUserEvent);
 
+        try {
+            Long currentTime = System.currentTimeMillis();
+
+            String targetEvent = objectMapper.writeValueAsString(address);
+
+            Target target = new Target(IdType.USER_ID.toString(), targetEvent, null);
+            Event addAddressToUserEvent = new Event(AuditEventType.ADDED_ADDRESS.toString(), target, currentTime, false);
+            auditEventDao.addEvent(user.getId(), addAddressToUserEvent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch(Exception e)
-        {
-        	e.printStackTrace();
-        }
+       
     } 
     
     

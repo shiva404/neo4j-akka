@@ -1,31 +1,27 @@
-
 package com.campusconnect.neo4j.akka.goodreads.types;
 
+import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.annotation.Generated;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "best_book_id",
-    "books_count",
-    "desc_user_id",
-    "id",
-    "media_type",
-    "original_publication_year",
-    "original_title",
-    "rating_dist",
-    "ratings_count",
-    "ratings_sum",
-    "reviews_count",
-    "text_reviews_count"
+        "best_book_id",
+        "books_count",
+        "desc_user_id",
+        "id",
+        "media_type",
+        "original_publication_year",
+        "original_title",
+        "rating_dist",
+        "ratings_count",
+        "ratings_sum",
+        "reviews_count",
+        "text_reviews_count"
 })
 public class Work {
 
@@ -57,9 +53,7 @@ public class Work {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The bestBookId
+     * @return The bestBookId
      */
     @JsonProperty("best_book_id")
     public Integer getBestBookId() {
@@ -67,9 +61,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param bestBookId
-     *     The best_book_id
+     * @param bestBookId The best_book_id
      */
     @JsonProperty("best_book_id")
     public void setBestBookId(Integer bestBookId) {
@@ -77,9 +69,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The booksCount
+     * @return The booksCount
      */
     @JsonProperty("books_count")
     public Integer getBooksCount() {
@@ -87,9 +77,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param booksCount
-     *     The books_count
+     * @param booksCount The books_count
      */
     @JsonProperty("books_count")
     public void setBooksCount(Integer booksCount) {
@@ -97,9 +85,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The descUserId
+     * @return The descUserId
      */
     @JsonProperty("desc_user_id")
     public Integer getDescUserId() {
@@ -107,9 +93,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param descUserId
-     *     The desc_user_id
+     * @param descUserId The desc_user_id
      */
     @JsonProperty("desc_user_id")
     public void setDescUserId(Integer descUserId) {
@@ -117,9 +101,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The id
+     * @return The id
      */
     @JsonProperty("id")
     public Integer getId() {
@@ -127,9 +109,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param id
-     *     The id
+     * @param id The id
      */
     @JsonProperty("id")
     public void setId(Integer id) {
@@ -137,9 +117,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The mediaType
+     * @return The mediaType
      */
     @JsonProperty("media_type")
     public String getMediaType() {
@@ -147,9 +125,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param mediaType
-     *     The media_type
+     * @param mediaType The media_type
      */
     @JsonProperty("media_type")
     public void setMediaType(String mediaType) {
@@ -157,9 +133,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The originalPublicationYear
+     * @return The originalPublicationYear
      */
     @JsonProperty("original_publication_year")
     public Integer getOriginalPublicationYear() {
@@ -167,9 +141,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param originalPublicationYear
-     *     The original_publication_year
+     * @param originalPublicationYear The original_publication_year
      */
     @JsonProperty("original_publication_year")
     public void setOriginalPublicationYear(Integer originalPublicationYear) {
@@ -177,9 +149,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The originalTitle
+     * @return The originalTitle
      */
     @JsonProperty("original_title")
     public String getOriginalTitle() {
@@ -187,9 +157,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param originalTitle
-     *     The original_title
+     * @param originalTitle The original_title
      */
     @JsonProperty("original_title")
     public void setOriginalTitle(String originalTitle) {
@@ -197,9 +165,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The ratingDist
+     * @return The ratingDist
      */
     @JsonProperty("rating_dist")
     public String getRatingDist() {
@@ -207,9 +173,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param ratingDist
-     *     The rating_dist
+     * @param ratingDist The rating_dist
      */
     @JsonProperty("rating_dist")
     public void setRatingDist(String ratingDist) {
@@ -217,9 +181,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The ratingsCount
+     * @return The ratingsCount
      */
     @JsonProperty("ratings_count")
     public Integer getRatingsCount() {
@@ -227,9 +189,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param ratingsCount
-     *     The ratings_count
+     * @param ratingsCount The ratings_count
      */
     @JsonProperty("ratings_count")
     public void setRatingsCount(Integer ratingsCount) {
@@ -237,9 +197,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The ratingsSum
+     * @return The ratingsSum
      */
     @JsonProperty("ratings_sum")
     public Integer getRatingsSum() {
@@ -247,9 +205,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param ratingsSum
-     *     The ratings_sum
+     * @param ratingsSum The ratings_sum
      */
     @JsonProperty("ratings_sum")
     public void setRatingsSum(Integer ratingsSum) {
@@ -257,9 +213,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The reviewsCount
+     * @return The reviewsCount
      */
     @JsonProperty("reviews_count")
     public Integer getReviewsCount() {
@@ -267,9 +221,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param reviewsCount
-     *     The reviews_count
+     * @param reviewsCount The reviews_count
      */
     @JsonProperty("reviews_count")
     public void setReviewsCount(Integer reviewsCount) {
@@ -277,9 +229,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @return
-     *     The textReviewsCount
+     * @return The textReviewsCount
      */
     @JsonProperty("text_reviews_count")
     public Integer getTextReviewsCount() {
@@ -287,9 +237,7 @@ public class Work {
     }
 
     /**
-     * 
-     * @param textReviewsCount
-     *     The text_reviews_count
+     * @param textReviewsCount The text_reviews_count
      */
     @JsonProperty("text_reviews_count")
     public void setTextReviewsCount(Integer textReviewsCount) {

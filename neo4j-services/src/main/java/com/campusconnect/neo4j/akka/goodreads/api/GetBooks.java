@@ -1,8 +1,6 @@
 package com.campusconnect.neo4j.akka.goodreads.api;
 
 import com.campusconnect.neo4j.akka.goodreads.client.GoodReadsClient;
-import com.campusconnect.neo4j.akka.goodreads.types.Book;
-import com.campusconnect.neo4j.akka.goodreads.types.GetBookResponse;
 import com.campusconnect.neo4j.akka.goodreads.types.GetBooksResponse;
 import com.campusconnect.neo4j.akka.goodreads.util.ResponseUtils;
 import com.campusconnect.neo4j.util.StringUtils;
@@ -12,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 
 import static com.campusconnect.neo4j.akka.goodreads.client.GoodReadsClient.getDefaultHeaders;
 
@@ -27,10 +24,10 @@ public class GetBooks {
     public GetBooks(GoodReadsClient goodReadsClient) {
         this.goodReadsClient = goodReadsClient;
     }
-    
+
     public GetBooksResponse getBooksForUser(String goodreadsId, int page) throws IOException {
-        ClientResponse clientResponse = goodReadsClient.path("review/list").path(goodreadsId).addAppKeyQueryParam().addV2Param().queryParam("format","xml").queryParam("page", String.valueOf(page)).header(getDefaultHeaders()).get(ClientResponse.class);
-        if(clientResponse.getStatus() == 200){
+        ClientResponse clientResponse = goodReadsClient.path("review/list").path(goodreadsId).addAppKeyQueryParam().addV2Param().queryParam("format", "xml").queryParam("page", String.valueOf(page)).header(getDefaultHeaders()).get(ClientResponse.class);
+        if (clientResponse.getStatus() == 200) {
             String theString = IOUtils.toString(clientResponse.getEntityInputStream());
             return ResponseUtils.getEntity(StringUtils.cleanEmptyTags(theString), GetBooksResponse.class);
         }

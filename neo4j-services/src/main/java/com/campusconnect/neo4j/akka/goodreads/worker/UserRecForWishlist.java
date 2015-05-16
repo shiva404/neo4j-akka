@@ -24,31 +24,31 @@ public class UserRecForWishlist extends UntypedActor {
     public static Logger logger = LoggerFactory.getLogger(UserRecForWishlist.class);
     @Autowired
     GetBooks getBooks;
-    
+
     @Autowired
     BookDao bookDao;
-    
+
     @Autowired
     UserDao userDao;
-    
+
     @Override
     public void onReceive(Object message) throws Exception {
-        if(message instanceof UserRecForWishListTask) {
+        if (message instanceof UserRecForWishListTask) {
             UserRecForWishListTask userRecForWishListTask = (UserRecForWishListTask) message;
             GetBooksResponse getBooksResponse = getBooks.getBooksForUser(userRecForWishListTask.getFriend().getId(), userRecForWishListTask.getPage());
-            if(getBooksResponse != null) {
-                
+            if (getBooksResponse != null) {
+
                 final Reviews reviews = getBooksResponse.getReviews();
                 List<Book> books = new ArrayList<>();
-                if(reviews!= null && reviews.getReview() != null){
+                if (reviews != null && reviews.getReview() != null) {
 
-                    if(Integer.parseInt(reviews.getEnd()) != Integer.parseInt(reviews.getTotal())){
-                        getSelf().tell(new UserRecForWishListTask(userRecForWishListTask.getAccessToken(),userRecForWishListTask.getAccessSecret(), 
+                    if (Integer.parseInt(reviews.getEnd()) != Integer.parseInt(reviews.getTotal())) {
+                        getSelf().tell(new UserRecForWishListTask(userRecForWishListTask.getAccessToken(), userRecForWishListTask.getAccessSecret(),
                                 userRecForWishListTask.getUserId(), userRecForWishListTask.getGoodreadsId(), userRecForWishListTask.getFriend(), userRecForWishListTask.getWishListBooks(),
                                 userRecForWishListTask.getPage() + 1, userRecForWishListTask.getUserRecommendations()), getSender());
                     }
                     for (Review review : reviews.getReview()) {
-                        if(review.getShelves() != null && !review.getShelves().isEmpty() && !review.getShelves().get(0).getName().equals(GoodreadsStatus.TO_READ.toString())){
+                        if (review.getShelves() != null && !review.getShelves().isEmpty() && !review.getShelves().get(0).getName().equals(GoodreadsStatus.TO_READ.toString())) {
                             com.campusconnect.neo4j.types.Book book = BookMapper.getBookFromGoodreadsBook(review.getBook());
                             books.add(book);
                         }
@@ -56,29 +56,28 @@ public class UserRecForWishlist extends UntypedActor {
                 }
 
                 List<WishListBook> wishListBooks = userRecForWishListTask.getWishListBooks();
-                if(wishListBooks != null)
-                for (Book wishListBook : wishListBooks) {
-                    for(Book friendBook : books) {
-                        if(wishListBook.getGoodreadsId().equals(friendBook.getGoodreadsId())) {
-                            if(recExists(wishListBook.getGoodreadsId(), userRecForWishListTask.getFriend().getId(), userRecForWishListTask.getUserRecommendations())){
-                                logger.info("User Recommendation already exists:");
+                if (wishListBooks != null)
+                    for (Book wishListBook : wishListBooks) {
+                        for (Book friendBook : books) {
+                            if (wishListBook.getGoodreadsId().equals(friendBook.getGoodreadsId())) {
+                                if (recExists(wishListBook.getGoodreadsId(), userRecForWishListTask.getFriend().getId(), userRecForWishListTask.getUserRecommendations())) {
+                                    logger.info("User Recommendation already exists:");
+                                } else {
+                                    User user = userDao.getUser(userRecForWishListTask.getUserId());
+                                    final String goodreadsId = userRecForWishListTask.getFriend().getId();
+                                    User friend = userDao.getUserByGoodreadsId(goodreadsId);
+                                    bookDao.createGoodreadsFriendBookRec(new GoodreadsFriendBookRecRelation(user, wishListBook, "rec", friend != null ? friend.getId() : null, goodreadsId, userRecForWishListTask.getFriend().getImageUrl(), userRecForWishListTask.getFriend().getName()));
+                                }
                             }
-                            else {
-                                User user = userDao.getUser(userRecForWishListTask.getUserId());
-                                final String goodreadsId = userRecForWishListTask.getFriend().getId();
-                                User friend = userDao.getUserByGoodreadsId(goodreadsId);
-                                bookDao.createGoodreadsFriendBookRec(new GoodreadsFriendBookRecRelation(user, wishListBook, "rec", friend != null ? friend.getId() : null, goodreadsId, userRecForWishListTask.getFriend().getImageUrl(), userRecForWishListTask.getFriend().getName()));
-                            }
-                         }
+                        }
                     }
-                }
             }
         }
     }
 
     private boolean recExists(Integer goodreadsBookId, String friendId, List<UserRecommendation> userRecommendations) {
         for (UserRecommendation userRecommendation : userRecommendations) {
-            if(userRecommendation.getBook().getGoodreadsId().equals(goodreadsBookId) && userRecommendation.getFriendGoodreadsId().equals(friendId)){
+            if (userRecommendation.getBook().getGoodreadsId().equals(goodreadsBookId) && userRecommendation.getFriendGoodreadsId().equals(friendId)) {
                 return true;
             }
         }

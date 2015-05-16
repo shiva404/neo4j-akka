@@ -9,7 +9,7 @@ import com.campusconnect.neo4j.types.User;
  * Created by sn1 on 5/1/15.
  */
 public class EmailDaoImpl implements EmailDao {
-    
+
     private Neo4jAsynchHandler neo4jAsynchHandler;
 
     public EmailDaoImpl(Neo4jAsynchHandler neo4jAsynchHandler) {
@@ -21,8 +21,8 @@ public class EmailDaoImpl implements EmailDao {
         neo4jAsynchHandler.sendBorrowInitEmail(fromUser, toUser, book);
     }
 
-	@Override
-	public void sendAcceptedToLendBookEmail(User owner, User borrower, Book book) {
-		 neo4jAsynchHandler.sendAcceptToLendBookEmail(owner, borrower, book);
-	}
+    @Override
+    public void sendAcceptedToLendBookEmail(User owner, User borrower, Book book) {
+        neo4jAsynchHandler.sendAcceptToLendBookEmail(owner, borrower, book);
+    }
 }

@@ -17,10 +17,9 @@ public class DataSetUp extends TestBase {
     @Test
     public void dataSetUp() {
         //create User1
-        
+
     	String userId1 = UserResourceTest.createKnowUserWithGoogleId("Shiva Kumar", "shiva.n404@gmail.com","105609898189858031660");
-    	
-    	
+
         //createUser2
     	String userId2 = UserResourceTest.createUser();
     	

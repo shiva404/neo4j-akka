@@ -8,11 +8,11 @@ import com.campusconnect.neo4j.types.Book;
 public class SaveBookTask {
     final private Book book;
 
-    public Book getBook() {
-        return book;
-    }
-
     public SaveBookTask(Book book) {
         this.book = book;
+    }
+
+    public Book getBook() {
+        return book;
     }
 }

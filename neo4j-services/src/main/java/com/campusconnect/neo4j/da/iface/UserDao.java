@@ -11,10 +11,10 @@ public interface UserDao {
     void addAddressToUser(Address address, User user);
 
     void createFollowingRelation(User user, User follower);
-    
-    UserRelation getUsersRelationShip(User user,User fellowUser);
-    
-    void  createFriendRelation(User user, User friend);
+
+    UserRelation getUsersRelationShip(User user, User fellowUser);
+
+    void createFriendRelation(User user, User friend);
 
     User createUser(User user, String accessToken);
 
@@ -22,7 +22,7 @@ public interface UserDao {
 
     List<OwnedBook> getAvailableBooks(String userId);
 
-	List<BorrowedBook> getBorrowedBooks(String userId);
+    List<BorrowedBook> getBorrowedBooks(String userId);
 
     List<User> getFollowers(String userId);
 
@@ -44,11 +44,11 @@ public interface UserDao {
 
     User updateUser(String userId, User user);
 
-	void setReminder(ReminderRelationShip reminderRelationShip);
+    void setReminder(ReminderRelationShip reminderRelationShip);
 
     User getUserByGoodreadsId(String goodreadsId);
 
     User getUserByGoogleId(String googleId);
-    
+
     User getUserByEmail(String email);
 }

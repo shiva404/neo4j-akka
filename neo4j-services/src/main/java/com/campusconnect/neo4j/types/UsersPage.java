@@ -4,42 +4,41 @@ import java.util.List;
 
 public class UsersPage {
 
-	private int offset;
-	private int size;
+    List<User> users;
+    private int offset;
+    private int size;
 
-	List<User> users;
+    public UsersPage() {
+    }
 
-	public UsersPage() {
-	}
+    public UsersPage(int offset, int size, List<User> Users) {
+        this.offset = offset;
+        this.size = size;
+        this.users = Users;
+    }
 
-	public UsersPage(int offset, int size, List<User> Users) {
-		this.offset = offset;
-		this.size = size;
-		this.users = Users;
-	}
+    public int getOffset() {
+        return offset;
+    }
 
-	public int getOffset() {
-		return offset;
-	}
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
 
-	public int getSize() {
-		return size;
-	}
+    public int getSize() {
+        return size;
+    }
 
-	public List<User> getUsers() {
-		return users;
-	}
+    public void setSize(int size) {
+        this.size = size;
+    }
 
-	public void setOffset(int offset) {
-		this.offset = offset;
-	}
+    public List<User> getUsers() {
+        return users;
+    }
 
-	public void setSize(int size) {
-		this.size = size;
-	}
-
-	public void setUsers(List<User> Users) {
-		this.users = Users;
-	}
+    public void setUsers(List<User> Users) {
+        this.users = Users;
+    }
 
 }

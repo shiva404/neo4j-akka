@@ -39,8 +39,7 @@ public class GroupResource {
 	}
 
 	@POST
-	public Response createGroup(Group group,
-			@QueryParam("userId") final String userId) {
+	public Response createGroup(Group group, @QueryParam("userId") final String userId) {
 		group.setId(UUID.randomUUID().toString());
 		setGroupCreateProperties(group, userId);
 		Long currentTime = System.currentTimeMillis();
@@ -110,9 +109,7 @@ public class GroupResource {
 
 		// Todo validate user exist
 		// Todo CreatedBy is of Admin or Write USER_ACCESS
-
 		Long currentTime = System.currentTimeMillis();
-
 		for (String userId : userIdsPage.getUserIds()) {
 			
 			User user = userDao.getUser(userId);

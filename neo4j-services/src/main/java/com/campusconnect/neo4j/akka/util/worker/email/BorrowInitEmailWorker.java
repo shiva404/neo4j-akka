@@ -5,30 +5,30 @@ import com.campusconnect.neo4j.akka.util.task.BorrowBookInitEmailTask;
 import com.campusconnect.neo4j.types.Book;
 import com.campusconnect.neo4j.types.User;
 
-import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Properties;
 
 /**
  * Created by sn1 on 5/1/15.
  */
 public class BorrowInitEmailWorker extends UntypedActor {
-    
+
     public final static String SUBJECT_TITLE = "%1$s, wants to borrow %2$s from you";
     public final static String URL = "http://localhost:3000/process/books/%1$s/owner/%2$s/borrower/%3$s/borrowBookInit";
 
     @Override
     public void onReceive(Object message) throws Exception {
-        if(message instanceof BorrowBookInitEmailTask) {
+        if (message instanceof BorrowBookInitEmailTask) {
             Properties mailServerProperties;
             Session getMailSession;
             MimeMessage generateMailMessage;
-            
+
             BorrowBookInitEmailTask emailTask = (BorrowBookInitEmailTask) message;
-            
+
             mailServerProperties = System.getProperties();
             mailServerProperties.put("mail.smtp.port", "587");
             mailServerProperties.put("mail.smtp.auth", "true");
@@ -59,7 +59,7 @@ public class BorrowInitEmailWorker extends UntypedActor {
     private String getSubjectLine(User fromUser, Book book) {
         return String.format(SUBJECT_TITLE, fromUser.getName(), book.getName());
     }
-    
+
     private String getUrlForRedirection(User fromUser, Book book, User toUser) {
         return String.format(URL, book.getId(), toUser.getId(), fromUser.getId());
     }

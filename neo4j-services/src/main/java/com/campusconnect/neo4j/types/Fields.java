@@ -10,7 +10,7 @@ public class Fields {
     private List<Field> fields;
 
     public List<Field> getFields() {
-        if (fields == null){
+        if (fields == null) {
             fields = new ArrayList<>();
         }
         return fields;

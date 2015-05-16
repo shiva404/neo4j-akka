@@ -1,28 +1,24 @@
-
 package com.campusconnect.neo4j.akka.goodreads.types;
 
+import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.annotation.Generated;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "books_count",
-    "id",
-    "original_publication_day",
-    "original_publication_month",
-    "original_publication_year",
-    "ratings_count",
-    "text_reviews_count",
-    "average_rating",
-    "best_book"
+        "books_count",
+        "id",
+        "original_publication_day",
+        "original_publication_month",
+        "original_publication_year",
+        "ratings_count",
+        "text_reviews_count",
+        "average_rating",
+        "best_book"
 })
 public class Result {
 
@@ -48,9 +44,7 @@ public class Result {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The booksCount
+     * @return The booksCount
      */
     @JsonProperty("books_count")
     public Integer getBooksCount() {
@@ -58,9 +52,7 @@ public class Result {
     }
 
     /**
-     * 
-     * @param booksCount
-     *     The books_count
+     * @param booksCount The books_count
      */
     @JsonProperty("books_count")
     public void setBooksCount(Integer booksCount) {
@@ -68,9 +60,7 @@ public class Result {
     }
 
     /**
-     * 
-     * @return
-     *     The id
+     * @return The id
      */
     @JsonProperty("id")
     public Integer getId() {
@@ -78,9 +68,7 @@ public class Result {
     }
 
     /**
-     * 
-     * @param id
-     *     The id
+     * @param id The id
      */
     @JsonProperty("id")
     public void setId(Integer id) {
@@ -88,9 +76,7 @@ public class Result {
     }
 
     /**
-     *
-     * @return
-     *     The originalPublicationDay
+     * @return The originalPublicationDay
      */
     @JsonProperty("original_publication_day")
     public Integer getOriginalPublicationDay() {
@@ -98,9 +84,7 @@ public class Result {
     }
 
     /**
-     *
-     * @param originalPublicationDay
-     *     The original_publication_day
+     * @param originalPublicationDay The original_publication_day
      */
     @JsonProperty("original_publication_day")
     public void setOriginalPublicationDay(Integer originalPublicationDay) {
@@ -108,9 +92,7 @@ public class Result {
     }
 
     /**
-     *
-     * @return
-     *     The originalPublicationMonth
+     * @return The originalPublicationMonth
      */
     @JsonProperty("original_publication_month")
     public Integer getOriginalPublicationMonth() {
@@ -118,9 +100,7 @@ public class Result {
     }
 
     /**
-     *
-     * @param originalPublicationMonth
-     *     The original_publication_month
+     * @param originalPublicationMonth The original_publication_month
      */
     @JsonProperty("original_publication_month")
     public void setOriginalPublicationMonth(Integer originalPublicationMonth) {
@@ -128,9 +108,7 @@ public class Result {
     }
 
     /**
-     *
-     * @return
-     *     The originalPublicationYear
+     * @return The originalPublicationYear
      */
     @JsonProperty("original_publication_year")
     public Integer getOriginalPublicationYear() {
@@ -138,9 +116,7 @@ public class Result {
     }
 
     /**
-     *
-     * @param originalPublicationYear
-     *     The original_publication_year
+     * @param originalPublicationYear The original_publication_year
      */
     @JsonProperty("original_publication_year")
     public void setOriginalPublicationYear(Integer originalPublicationYear) {
@@ -148,9 +124,7 @@ public class Result {
     }
 
     /**
-     *
-     * @return
-     *     The ratingsCount
+     * @return The ratingsCount
      */
     @JsonProperty("ratings_count")
     public Integer getRatingsCount() {
@@ -158,9 +132,7 @@ public class Result {
     }
 
     /**
-     *
-     * @param ratingsCount
-     *     The ratings_count
+     * @param ratingsCount The ratings_count
      */
     @JsonProperty("ratings_count")
     public void setRatingsCount(Integer ratingsCount) {
@@ -168,9 +140,7 @@ public class Result {
     }
 
     /**
-     *
-     * @return
-     *     The textReviewsCount
+     * @return The textReviewsCount
      */
     @JsonProperty("text_reviews_count")
     public Integer getTextReviewsCount() {
@@ -178,9 +148,7 @@ public class Result {
     }
 
     /**
-     *
-     * @param textReviewsCount
-     *     The text_reviews_count
+     * @param textReviewsCount The text_reviews_count
      */
     @JsonProperty("text_reviews_count")
     public void setTextReviewsCount(Integer textReviewsCount) {
@@ -188,9 +156,7 @@ public class Result {
     }
 
     /**
-     *
-     * @return
-     *     The averageRating
+     * @return The averageRating
      */
     @JsonProperty("average_rating")
     public String getAverageRating() {
@@ -198,9 +164,7 @@ public class Result {
     }
 
     /**
-     *
-     * @param averageRating
-     *     The average_rating
+     * @param averageRating The average_rating
      */
     @JsonProperty("average_rating")
     public void setAverageRating(String averageRating) {
@@ -208,9 +172,7 @@ public class Result {
     }
 
     /**
-     * 
-     * @return
-     *     The bestBook
+     * @return The bestBook
      */
     @JsonProperty("best_book")
     public BestBook getBestBook() {
@@ -218,9 +180,7 @@ public class Result {
     }
 
     /**
-     * 
-     * @param bestBook
-     *     The best_book
+     * @param bestBook The best_book
      */
     @JsonProperty("best_book")
     public void setBestBook(BestBook bestBook) {

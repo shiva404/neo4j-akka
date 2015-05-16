@@ -13,25 +13,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AddGoodreadsBookToUserWorker extends UntypedActor {
     @Autowired
     private BookDao bookDao;
-    
+
     @Autowired
     private UserDao userDao;
-    
+
     @Override
     public void onReceive(Object message) throws Exception {
-        if(message instanceof AddGoodreadsBookToUserTask) {
+        if (message instanceof AddGoodreadsBookToUserTask) {
             AddGoodreadsBookToUserTask addGoodreadsBookToUserTask = (AddGoodreadsBookToUserTask) message;
-           // Book book = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(addGoodreadsBookToUserTask.getBook().getGoodreadsId().toString(), addGoodreadsBookToUserTask.getBook());
+            // Book book = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(addGoodreadsBookToUserTask.getBook().getGoodreadsId().toString(), addGoodreadsBookToUserTask.getBook());
             Book book = bookDao.getBookByGoodreadsId(addGoodreadsBookToUserTask.getBook().getGoodreadsId().toString());
             User user = userDao.getUser(addGoodreadsBookToUserTask.getUserId());
 
             //todo: dont create a relation if already exists
-            
+
             final long now = System.currentTimeMillis();
-             if(addGoodreadsBookToUserTask.getShelfName().equals(GoodreadsStatus.TO_READ.toString())){
+            if (addGoodreadsBookToUserTask.getShelfName().equals(GoodreadsStatus.TO_READ.toString())) {
                 bookDao.addWishBookToUser(new WishListRelationship(user, book, "wish", now, now));
-             } else
-                 bookDao.listBookAsRead(new ReadRelation(user, book, null, now, now, addGoodreadsBookToUserTask.getShelfName()));
+            } else
+                bookDao.listBookAsRead(new ReadRelation(user, book, null, now, now, addGoodreadsBookToUserTask.getShelfName()));
         }
     }
 }

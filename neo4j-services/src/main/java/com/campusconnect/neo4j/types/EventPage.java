@@ -4,45 +4,43 @@ import java.util.List;
 
 public class EventPage {
 
-	private int offset;
+    List<Event> userEvent;
+    private int offset;
+    private int size;
 
-	private int size;
+    public EventPage() {
+        // TODO Auto-generated constructor stub
+    }
 
-	List<Event> userEvent;
-	
-	public EventPage() {
-		// TODO Auto-generated constructor stub
-	}
+    public EventPage(int offset, int size, List<Event> userEvent) {
+        super();
+        this.offset = offset;
+        this.size = size;
+        this.userEvent = userEvent;
+    }
 
-	public EventPage(int offset, int size, List<Event> userEvent) {
-		super();
-		this.offset = offset;
-		this.size = size;
-		this.userEvent = userEvent;
-	}
+    public int getOffset() {
+        return offset;
+    }
 
-	public int getOffset() {
-		return offset;
-	}
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
 
-	public int getSize() {
-		return size;
-	}
+    public int getSize() {
+        return size;
+    }
 
-	public List<Event> getUserEvent() {
-		return userEvent;
-	}
+    public void setSize(int size) {
+        this.size = size;
+    }
 
-	public void setOffset(int offset) {
-		this.offset = offset;
-	}
+    public List<Event> getUserEvent() {
+        return userEvent;
+    }
 
-	public void setSize(int size) {
-		this.size = size;
-	}
+    public void setUserEvent(List<Event> userEvent) {
+        this.userEvent = userEvent;
+    }
 
-	public void setUserEvent(List<Event> userEvent) {
-		this.userEvent = userEvent;
-	}
-	
 }

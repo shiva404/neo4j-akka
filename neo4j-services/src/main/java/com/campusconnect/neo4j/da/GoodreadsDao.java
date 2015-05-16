@@ -31,11 +31,12 @@ public class GoodreadsDao {
     public void setSearch(Search search) {
         this.search = search;
     }
+
     public void setGetBook(GetBook getBook) {
         this.getBook = getBook;
     }
 
-    
+
     public SearchResult search(String queryString) {
         try {
             SearchResponse searchResponse = search.search(queryString);
@@ -48,14 +49,14 @@ public class GoodreadsDao {
 
     private SearchResult formSearchResult(SearchResponse searchResponse) {
         List<Book> searchBooks = new ArrayList<>();
-        if(searchResponse.getSearch() != null)
+        if (searchResponse.getSearch() != null)
 
             for (Result result : searchResponse.getSearch().getResults()) {
                 final BestBook bestBook = result.getBestBook();
-                if(bestBook != null) {
+                if (bestBook != null) {
                     Book book = new Book();
                     final Author author = bestBook.getAuthor();
-                    if(author != null){
+                    if (author != null) {
                         book.setAuthorName(author.getName());
                         book.setGoodreadsAuthorId(author.getId());
                     }
@@ -74,7 +75,7 @@ public class GoodreadsDao {
         GetBookResponse getBookResponse = getBook.getBookById(goodreadsId);
         return BookMapper.getBookFromGoodreadsBook(getBookResponse.getBook());
     }
-    
+
     public Book getBookByISBN(String isbn) throws IOException {
         GetBookResponse getBookResponse = getBook.getBookByISBN(isbn);
         return BookMapper.getBookFromGoodreadsBook(getBookResponse.getBook());

@@ -1,22 +1,18 @@
-
 package com.campusconnect.neo4j.akka.goodreads.types;
 
+import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.annotation.Generated;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "authentication",
-    "key",
-    "method"
+        "authentication",
+        "key",
+        "method"
 })
 public class Request {
 
@@ -30,9 +26,7 @@ public class Request {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The authentication
+     * @return The authentication
      */
     @JsonProperty("authentication")
     public String getAuthentication() {
@@ -40,9 +34,7 @@ public class Request {
     }
 
     /**
-     * 
-     * @param authentication
-     *     The authentication
+     * @param authentication The authentication
      */
     @JsonProperty("authentication")
     public void setAuthentication(String authentication) {
@@ -50,9 +42,7 @@ public class Request {
     }
 
     /**
-     * 
-     * @return
-     *     The key
+     * @return The key
      */
     @JsonProperty("key")
     public String getKey() {
@@ -60,9 +50,7 @@ public class Request {
     }
 
     /**
-     * 
-     * @param key
-     *     The key
+     * @param key The key
      */
     @JsonProperty("key")
     public void setKey(String key) {
@@ -70,9 +58,7 @@ public class Request {
     }
 
     /**
-     * 
-     * @return
-     *     The method
+     * @return The method
      */
     @JsonProperty("method")
     public String getMethod() {
@@ -80,9 +66,7 @@ public class Request {
     }
 
     /**
-     * 
-     * @param method
-     *     The method
+     * @param method The method
      */
     @JsonProperty("method")
     public void setMethod(String method) {

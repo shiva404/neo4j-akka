@@ -41,31 +41,31 @@ public class BookResource {
         Book book = bookDao.getBook(bookId);
         return Response.ok().entity(book).build();
     }
-    
+
     @GET
     @Path("{bookId}/users/{userId}")
     public Response getBookWithRespectToUser(@PathParam("bookId") String bookId, @PathParam("userId") final String userId, @QueryParam("expectedType") final String expectedType) {
         Book book = bookDao.getBook(bookId, userId);
         return Response.ok().entity(book).build();
     }
-    
+
     @GET
     @Path("goodreadsId/{goodreadsId}")
-    public Response getBookByGoodreadsId(@PathParam("goodreadsId") final String goodreadsId ) throws IOException {
+    public Response getBookByGoodreadsId(@PathParam("goodreadsId") final String goodreadsId) throws IOException {
         Book book = bookDao.getBookByGoodreadsId(goodreadsId);
         return Response.ok().entity(book).build();
     }
-    
+
     @GET
     @Path("isbn/{isbn}")
     public Response getBookByISBN(@PathParam("isbn") final String isbn) throws IOException {
         Book book = bookDao.getBookByIsbn(isbn);
         return Response.ok().entity(book).build();
     }
-    
+
     @POST
     @Path("{bookId}/borrow")
-    public Response borrowBook(@PathParam("bookId") String bookId, BorrowRequest borrowRequest){
+    public Response borrowBook(@PathParam("bookId") String bookId, BorrowRequest borrowRequest) {
         //create a link to the user - pendingBorrow
         Book book = bookDao.getBook(bookId);
         User borrower = userDao.getUser(borrowRequest.getBorrowerUserId());
@@ -73,30 +73,29 @@ public class BookResource {
         //generate notification
         return Response.ok().build();
     }
-    
+
     @PUT
     @Path("{bookId}/users/{userId}/borrow")
-    public Response updateStatus(@PathParam("bookId") String bookId, @PathParam("userId") String userId, 
+    public Response updateStatus(@PathParam("bookId") String bookId, @PathParam("userId") String userId,
                                  @QueryParam("borrowerId") String borrowerId, @QueryParam("status") String status, @QueryParam("sharePh ") String phoneSharing, BorrowRequest borrowRequest) {
         //locked - for user
         //agreed - for borrower
         Book book = bookDao.getBook(bookId);
         User user = userDao.getUser(userId);
-        if(status.equals("agreed")){
-           if(borrowerId != null){
-               User borrower = userDao.getUser(borrowerId);
-               if(borrower != null)
-               bookDao.updateBookStatusOnAgreement(user, book, borrower, borrowRequest.getAdditionalMessage());
-               
-                   //todo: throw error userNot found
-           } else {
-               //todo throw exception
-           }
-        }
-        else if(status.equals("success"))
-            if(borrowerId != null){
+        if (status.equals("agreed")) {
+            if (borrowerId != null) {
                 User borrower = userDao.getUser(borrowerId);
-                if(borrower != null)
+                if (borrower != null)
+                    bookDao.updateBookStatusOnAgreement(user, book, borrower, borrowRequest.getAdditionalMessage());
+
+                //todo: throw error userNot found
+            } else {
+                //todo throw exception
+            }
+        } else if (status.equals("success"))
+            if (borrowerId != null) {
+                User borrower = userDao.getUser(borrowerId);
+                if (borrower != null)
                     bookDao.updateBookStatusOnSuccess(user, book, borrower, borrowRequest.getAdditionalMessage());
 
                 //todo: throw error userNot found
@@ -105,12 +104,12 @@ public class BookResource {
             }
         return Response.ok().build();
     }
-    
+
     @GET
     @Path("search")
     public Response search(@QueryParam("q") final String queryString) {
         SearchResult searchResult = bookDao.search(queryString);
         return Response.ok().entity(searchResult).build();
     }
-    
+
 }

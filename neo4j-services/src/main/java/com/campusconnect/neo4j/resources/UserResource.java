@@ -3,7 +3,6 @@ package com.campusconnect.neo4j.resources;
 import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.GroupDao;
-import com.campusconnect.neo4j.da.NotificationDaoImpl;
 import com.campusconnect.neo4j.da.iface.AddressDao;
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.da.iface.BookDao;
@@ -18,9 +17,7 @@ import com.campusconnect.neo4j.util.Validator;
 import static com.campusconnect.neo4j.util.ErrorCodes.*;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.list.TreeList;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.data.annotation.CreatedBy;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -28,14 +25,9 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Created by sn1 on 1/22/15.
@@ -137,13 +129,23 @@ public class UserResource {
     private void checkWhetherSynchIsNeeded(User user, Fields fields) {
         for (Field field : fields.getFields()) {
             if(field.getName().contains("goodreadsAccessTokenSecret")) {
-                goodreadsDao.getAndSaveBooksFromGoodreads(user.getId(), user.getGoodreadsId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret());
-                goodreadsDao.replaceGoodreadsRecWithUserId(user.getId(), Integer.parseInt(user.getGoodreadsId()), user.getProfileImageUrl());
+                initiateGoodreadsSynch(user);    
             }
             else if(field.getName().contains("fbId")) {
                 //todo kick off fb stuff
             }
         }
+    }
+    
+    private void initiateGoodreadsSynch(User user) {
+        updateUserGoodReadsSynchToInprogress(user);
+        goodreadsDao.getAndSaveBooksFromGoodreads(user.getId(), user.getGoodreadsId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret());
+        goodreadsDao.replaceGoodreadsRecWithUserId(user.getId(), Integer.parseInt(user.getGoodreadsId()), user.getProfileImageUrl());      
+    }
+
+    private void updateUserGoodReadsSynchToInprogress(User user) {
+        user.setGoodReadsSynchStatus("inProgress");
+        userDao.updateUser(user.getId(), user);
     }
 
     private void setUpdatedFields(User user, Fields fields) throws Exception {
@@ -156,7 +158,7 @@ public class UserResource {
     	String targetUserName = objectMapper.writeValueAsString(fields);
     	String targetUrl = null;
     	Target target = new Target(IdType.USER_ID.toString(), targetUserName, targetUrl);
-     	Event followedUSerEvent = new Event(AuditEventType.USER_UPDATED.toString(), target,currentTime,false);
+     	Event followedUSerEvent = new Event(AuditEventType.USER_UPDATED.toString(), target,currentTime, false);
     	auditEventDao.addEvent(targetUserId, followedUSerEvent);
   
     }
@@ -258,7 +260,6 @@ public class UserResource {
         
         User user = userDao.getUser(userId);
         Book book = bookDao.getBook(bookId);
-        
         bookDao.updateOwnedBookStatus(user, book, status, null);
         return Response.ok().build();
     }
@@ -488,7 +489,7 @@ public class UserResource {
     	NotificationPage notificationPage = new NotificationPage(0, notifications.size(), notifications); 
     	return Response.ok().entity(notificationPage).build();
     }
-    
+
     @GET
     @Path("{userId}/groups")
     public Response getGroups(@PathParam("userId")final String userId)

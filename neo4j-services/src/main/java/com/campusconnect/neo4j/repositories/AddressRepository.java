@@ -1,7 +1,6 @@
 package com.campusconnect.neo4j.repositories;
 
 import com.campusconnect.neo4j.types.Address;
-import com.campusconnect.neo4j.types.Book;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 

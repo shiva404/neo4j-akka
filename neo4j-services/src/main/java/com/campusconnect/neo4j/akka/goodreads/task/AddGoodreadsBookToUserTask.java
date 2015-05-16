@@ -9,7 +9,15 @@ public class AddGoodreadsBookToUserTask {
     private Book book;
     private String userId;
     private String shelfName;
-    
+
+    public AddGoodreadsBookToUserTask(Book book, String userId, String shelfName) {
+
+        this.book = book;
+        this.userId = userId;
+        this.shelfName = shelfName;
+
+    }
+
     public Book getBook() {
         return book;
     }
@@ -20,13 +28,5 @@ public class AddGoodreadsBookToUserTask {
 
     public String getShelfName() {
         return shelfName;
-    }
-
-    public AddGoodreadsBookToUserTask(Book book, String userId, String shelfName) {
-
-        this.book = book;
-        this.userId = userId;
-        this.shelfName = shelfName;
-
     }
 }

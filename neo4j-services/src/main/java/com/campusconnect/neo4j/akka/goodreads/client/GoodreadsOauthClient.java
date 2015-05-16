@@ -1,14 +1,7 @@
 package com.campusconnect.neo4j.akka.goodreads.client;
 
-import com.campusconnect.neo4j.akka.goodreads.task.GetBooksTask;
-import com.sun.jersey.api.uri.UriBuilderImpl;
 import org.scribe.builder.ServiceBuilder;
-import org.scribe.model.OAuthRequest;
-import org.scribe.model.Response;
-import org.scribe.model.Token;
-import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * Created by sn1 on 3/11/15.
@@ -18,23 +11,23 @@ public class GoodreadsOauthClient {
 
     private String sApiKey;
     private String sApiSecret;
+    private OAuthService sService;
+
+    public GoodreadsOauthClient(String appKey, String appSecret) {
+        sApiKey = appKey;
+        sApiSecret = appSecret;
+    }
 
     public String getsApiKey() {
         return sApiKey;
     }
-    
+
     public String getsApiSecret() {
         return sApiSecret;
     }
 
     public OAuthService getsService() {
         return sService;
-    }
-    private OAuthService sService;
-
-    public GoodreadsOauthClient(String appKey, String appSecret) {
-        sApiKey = appKey;
-        sApiSecret = appSecret;
     }
 
     public void init() {
@@ -43,10 +36,9 @@ public class GoodreadsOauthClient {
                 .apiKey(sApiKey)
                 .apiSecret(sApiSecret)
                 .callback(CALLBACK)
-                .debug()
                 .build();
     }
-    
+
 //    public  void getShelvesForUser(String goodreadsId) {
 //        UriBuilder uriBuilder = new UriBuilderImpl();
 //        uriBuilder.path("https://www.goodreads.com");
@@ -62,7 +54,7 @@ public class GoodreadsOauthClient {
 //        Response response = getShelvesRequest.send();
 //        System.out.println(response.getBody());
 //    }
-    
+
 //
 //    public void getFriendsForUser(String userId, String accessToken, String secret) {
 //
@@ -78,7 +70,7 @@ public class GoodreadsOauthClient {
 ////        System.out.printf(response.getBody());
 ////
 //    }
-    
+
 
 //    public static void main(String[] args) {
 //        GoodreadsOauthClient goodreadsOauthClient = new GoodreadsOauthClient("QLM3lL2nqXe4LujHQt12A", "Aegcm52QdTinBh6g5fZe81S5cVYdKk9P6IDVS38pDOw");

@@ -10,13 +10,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class CountingService {
 
-	private final AtomicInteger counter = new AtomicInteger();
+    private final AtomicInteger counter = new AtomicInteger();
 
-	public void increment() {
-		counter.incrementAndGet();
-	}
+    public void increment() {
+        counter.incrementAndGet();
+    }
 
-	public int currentValue() {
-		return counter.intValue();
-	}
+    public int currentValue() {
+        return counter.intValue();
+    }
 }

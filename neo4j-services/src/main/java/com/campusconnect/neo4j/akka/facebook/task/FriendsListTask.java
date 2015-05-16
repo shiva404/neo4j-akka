@@ -5,6 +5,8 @@ package com.campusconnect.neo4j.akka.facebook.task;
  */
 public class FriendsListTask {
 
+    private String accessToken;
+
     public FriendsListTask() {
     }
 
@@ -20,6 +22,4 @@ public class FriendsListTask {
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
-    
-    private String accessToken;
 }

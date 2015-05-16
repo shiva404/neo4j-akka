@@ -9,6 +9,14 @@ public abstract class GoodreadsTask {
     private String userId;
     private String goodreadsId;
 
+    protected GoodreadsTask(String accessToken, String accessSecret, String userId, String goodreadsId) {
+
+        this.accessToken = accessToken;
+        this.accessSecret = accessSecret;
+        this.userId = userId;
+        this.goodreadsId = goodreadsId;
+    }
+
     public String getAccessToken() {
         return accessToken;
     }
@@ -23,13 +31,5 @@ public abstract class GoodreadsTask {
 
     public String getGoodreadsId() {
         return goodreadsId;
-    }
-
-    protected GoodreadsTask(String accessToken, String accessSecret, String userId, String goodreadsId) {
-
-        this.accessToken = accessToken;
-        this.accessSecret = accessSecret;
-        this.userId = userId;
-        this.goodreadsId = goodreadsId;
     }
 }

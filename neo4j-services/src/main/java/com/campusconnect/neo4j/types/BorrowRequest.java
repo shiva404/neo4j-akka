@@ -1,12 +1,11 @@
 package com.campusconnect.neo4j.types;
 
 
-
 /**
  * Created by sn1 on 2/26/15.
  */
 public class BorrowRequest {
-    
+
     private String ownerUserId;
     private String borrowerUserId;
     private int contractPeriodInDays;
@@ -24,7 +23,6 @@ public class BorrowRequest {
         this.borrowDate = borrowDate;
         this.additionalMessage = additionalMessage;
     }
-
 
 
     public String getOwnerUserId() {

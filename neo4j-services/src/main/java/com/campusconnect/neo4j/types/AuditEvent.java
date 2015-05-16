@@ -12,6 +12,10 @@ public class AuditEvent {
 
     @GraphId
     private Long nodeId;
+    private String userName;
+    private String imageUrl;
+    private String userId;
+	private Set<String> events;
 
     public String getUserName() {
         return userName;
@@ -21,7 +25,13 @@ public class AuditEvent {
         this.userName = userName;
     }
 
-    private String userName;
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public String getUserId() {
         return userId;
@@ -30,10 +40,6 @@ public class AuditEvent {
     public void setUserId(String userId) {
         this.userId = userId;
     }
-
-    private String userId;
-   
-	private Set<String> events;
     
 	public Set<String> getEvents() {
 		

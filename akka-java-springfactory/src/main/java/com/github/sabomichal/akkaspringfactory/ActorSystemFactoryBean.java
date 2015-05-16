@@ -16,51 +16,51 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class ActorSystemFactoryBean implements FactoryBean<ActorSystem>, ApplicationContextAware, InitializingBean {
 
-	private ApplicationContext ctx;
-	private String name;
-	private Config config;
-	private ActorSystem actorSystem;
+    private ApplicationContext ctx;
+    private String name;
+    private Config config;
+    private ActorSystem actorSystem;
 
-	@Override
-	public ActorSystem getObject() throws Exception {
-		return actorSystem;
-	}
+    @Override
+    public ActorSystem getObject() throws Exception {
+        return actorSystem;
+    }
 
-	@Override
-	public Class<?> getObjectType() {
-		return ActorSystem.class;
-	}
+    @Override
+    public Class<?> getObjectType() {
+        return ActorSystem.class;
+    }
 
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setConfig(Config config) {
-		this.config = config;
-	}
+    public void setConfig(Config config) {
+        this.config = config;
+    }
 
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		ctx = applicationContext;
-	}
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        ctx = applicationContext;
+    }
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		ActorSystem system;
-		if (name != null && config != null) {
-			system = ActorSystem.create(name, config);
-		} else if (name != null) {
-			system = ActorSystem.create(name);
-		} else {
-			system = ActorSystem.create();
-		}
-		// init extensions
-		SpringExtension.instance().get(system).setApplicationContext(ctx);
-		actorSystem = system;
-	}
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        ActorSystem system;
+        if (name != null && config != null) {
+            system = ActorSystem.create(name, config);
+        } else if (name != null) {
+            system = ActorSystem.create(name);
+        } else {
+            system = ActorSystem.create();
+        }
+        // init extensions
+        SpringExtension.instance().get(system).setApplicationContext(ctx);
+        actorSystem = system;
+    }
 }

@@ -16,13 +16,13 @@ public class DepartmentTest extends TestBase {
     private Department createdDept;
 
     @Test
-    public void createDepartment(){
+    public void createDepartment() {
         Department department = new Department("Test Dept", "college_id");
         createdDept = departmentDao.createDepartment(department);
     }
 
     @Test(dependsOnMethods = "createDepartment")
-    public void getDepartment(){
+    public void getDepartment() {
         Department departmentResult = departmentDao.getDepartment(createdDept.getId());
         assert departmentResult != null;
     }

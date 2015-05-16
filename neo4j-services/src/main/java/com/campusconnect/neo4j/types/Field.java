@@ -6,8 +6,17 @@ package com.campusconnect.neo4j.types;
 public class Field {
     private String name;
     private String value;
-    
-	public String getName() {
+
+    public Field() {
+
+    }
+
+    public Field(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public String getName() {
         return name;
     }
 
@@ -20,15 +29,6 @@ public class Field {
     }
 
     public void setValue(String value) {
-        this.value = value;
-    }
-
-    public Field() {
-
-    }
-
-    public Field(String name, String value) {
-        this.name = name;
         this.value = value;
     }
 }

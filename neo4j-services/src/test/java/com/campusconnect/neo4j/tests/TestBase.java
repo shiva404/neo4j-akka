@@ -12,12 +12,13 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 @ContextConfiguration(locations = "classpath*:beans-ws-tests.xml")
 public class TestBase extends AbstractTestNGSpringContextTests {
     public static final Faker faker = new Faker();
-    
+
     public static WebResource resource;
-    static{
+
+    static {
         ResourceProvider provider = new ResourceProvider();
         resource = provider.getResource();
     }
-    
+
 }
 

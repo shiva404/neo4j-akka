@@ -10,6 +10,17 @@ public class AddressesPage {
     private int offset;
     private List<Address> addresses;
 
+    public AddressesPage() {
+
+    }
+
+    public AddressesPage(int size, int offset, List<Address> addresses) {
+
+        this.size = size;
+        this.offset = offset;
+        this.addresses = addresses;
+    }
+
     public int getSize() {
         return size;
     }
@@ -31,17 +42,6 @@ public class AddressesPage {
     }
 
     public void setAddresses(List<Address> addresses) {
-        this.addresses = addresses;
-    }
-
-    public AddressesPage() {
-
-    }
-
-    public AddressesPage(int size, int offset, List<Address> addresses) {
-
-        this.size = size;
-        this.offset = offset;
         this.addresses = addresses;
     }
 }

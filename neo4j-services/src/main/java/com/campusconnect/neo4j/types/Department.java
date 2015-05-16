@@ -1,8 +1,10 @@
 package com.campusconnect.neo4j.types;
 
 
-import org.springframework.data.annotation.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
@@ -16,7 +18,7 @@ public class Department {
     @GraphId
     private Long nodeId;
 
-    @Indexed(unique=true)
+    @Indexed(unique = true)
     private String id;
     private String name;
 
@@ -48,16 +50,16 @@ public class Department {
     public Department() {
     }
 
+    public Department(String name) {
+        this.name = name;
+    }
+
     public String getCollegeId() {
         return collegeId;
     }
 
     public void setCollegeId(String collegeId) {
         this.collegeId = collegeId;
-    }
-
-    public Department(String name) {
-        this.name = name;
     }
 
     public Long getNodeId() {

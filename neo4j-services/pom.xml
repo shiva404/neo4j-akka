@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
         <groupId>com.campusconnect</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    
+
     <properties>
         <springframework.version>4.0.7.RELEASE</springframework.version>
         <jersey.version>1.17</jersey.version>
@@ -149,27 +149,27 @@
         </dependency>
 
         <!--<dependency>-->
-            <!--<groupId>org.springframework</groupId>-->
-            <!--<artifactId>spring-aspects</artifactId>-->
-            <!--<version>${springframework.version}</version>-->
+        <!--<groupId>org.springframework</groupId>-->
+        <!--<artifactId>spring-aspects</artifactId>-->
+        <!--<version>${springframework.version}</version>-->
         <!--</dependency>-->
 
         <!--<dependency>-->
-            <!--<groupId>org.springframework</groupId>-->
-            <!--<artifactId>spring-aop</artifactId>-->
-            <!--<version>${springframework.version}</version>-->
+        <!--<groupId>org.springframework</groupId>-->
+        <!--<artifactId>spring-aop</artifactId>-->
+        <!--<version>${springframework.version}</version>-->
         <!--</dependency>-->
 
         <!--<dependency>-->
-            <!--<groupId>org.springframework</groupId>-->
-            <!--<artifactId>spring-orm</artifactId>-->
-            <!--<version>${springframework.version}</version>-->
+        <!--<groupId>org.springframework</groupId>-->
+        <!--<artifactId>spring-orm</artifactId>-->
+        <!--<version>${springframework.version}</version>-->
         <!--</dependency>-->
 
         <!--<dependency>-->
-            <!--<groupId>org.springframework</groupId>-->
-            <!--<artifactId>spring-jdbc</artifactId>-->
-            <!--<version>${springframework.version}</version>-->
+        <!--<groupId>org.springframework</groupId>-->
+        <!--<artifactId>spring-jdbc</artifactId>-->
+        <!--<version>${springframework.version}</version>-->
         <!--</dependency>-->
 
 
@@ -218,7 +218,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
@@ -242,7 +242,7 @@
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.9.13</version>
         </dependency>
-        
+
 
         <dependency>
             <groupId>com.googlecode.ehcache-spring-annotations</groupId>
@@ -277,10 +277,10 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-context</artifactId>
                 </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-asm</artifactId>
-                    </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-asm</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -296,9 +296,9 @@
         </dependency>
 
         <!--<dependency>-->
-            <!--<groupId>org.springframework.data</groupId>-->
-            <!--<artifactId>spring-data-neo4j</artifactId>-->
-            <!--<version>2.1.0.RELEASE</version>-->
+        <!--<groupId>org.springframework.data</groupId>-->
+        <!--<artifactId>spring-data-neo4j</artifactId>-->
+        <!--<version>2.1.0.RELEASE</version>-->
         <!--</dependency>-->
 
         <dependency>
@@ -319,11 +319,11 @@
             <version>1.0.0.GA</version>
         </dependency>
 
-            <dependency>
-                <groupId>com.eaio.uuid</groupId>
-                <artifactId>uuid</artifactId>
-                <version>3.4</version>
-            </dependency>
+        <dependency>
+            <groupId>com.eaio.uuid</groupId>
+            <artifactId>uuid</artifactId>
+            <version>3.4</version>
+        </dependency>
 
         <dependency>
             <groupId>joda-time</groupId>
@@ -336,7 +336,7 @@
             <artifactId>spring-social-web</artifactId>
             <version>1.1.0.RELEASE</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.social</groupId>
             <artifactId>spring-social-facebook</artifactId>
@@ -354,7 +354,6 @@
             <artifactId>ehcache-core</artifactId>
             <version>2.6.10</version>
         </dependency>
-
 
 
         <!--akka-->
@@ -390,9 +389,9 @@
         </dependency>
 
         <!--<dependency>-->
-            <!--<groupId>org.springframework.security.oauth</groupId>-->
-            <!--<artifactId>spring-security-oauth</artifactId>-->
-            <!--<version>1.0.5.RELEASE</version>-->
+        <!--<groupId>org.springframework.security.oauth</groupId>-->
+        <!--<artifactId>spring-security-oauth</artifactId>-->
+        <!--<version>1.0.5.RELEASE</version>-->
         <!--</dependency>-->
 
         <dependency>
@@ -406,7 +405,7 @@
             <artifactId>mailapi</artifactId>
             <version>1.4.3</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.scribe</groupId>
             <artifactId>scribe</artifactId>
@@ -470,14 +469,14 @@
             <version>${jersey.version}</version>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.8.13</version>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
@@ -492,19 +491,19 @@
             <name>maven</name>
             <url>http://repo1.maven.org/maven2/</url>
         </repository>
-            <repository>
-                <id>spring-milestones</id>
-                <name>Spring Milestones</name>
-                <url>http://repo.spring.io/milestone</url>
-                <snapshots>
-                    <enabled>false</enabled>
-                </snapshots>
-            </repository>
-            <repository>
-                <id>typesafe</id>
-                <name>Typesafe Repository</name>
-                <url>http://repo.typesafe.com/typesafe/releases/</url>
-            </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>http://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>typesafe</id>
+            <name>Typesafe Repository</name>
+            <url>http://repo.typesafe.com/typesafe/releases/</url>
+        </repository>
         <repository>
             <id>eaio.com</id>
             <url>http://eaio.com/maven2</url>

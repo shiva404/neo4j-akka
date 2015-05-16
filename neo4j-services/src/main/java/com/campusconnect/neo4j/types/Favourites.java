@@ -4,17 +4,15 @@ import java.util.Set;
 
 public class Favourites {
 
-	Set<String> favourites;
+    Set<String> favourites;
 
-	public Set<String> getFavourites() {
-		return favourites;
-	}
+    public Set<String> getFavourites() {
+        return favourites;
+    }
 
-	public void setFavourites(Set<String> favourites) {
-		this.favourites = favourites;
-	}
-	
-	
-	
-	
+    public void setFavourites(Set<String> favourites) {
+        this.favourites = favourites;
+    }
+
+
 }

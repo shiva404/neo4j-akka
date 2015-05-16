@@ -1,28 +1,24 @@
-
 package com.campusconnect.neo4j.akka.goodreads.types;
 
+import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Generated;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "query",
-    "results-start",
-    "results-end",
-    "total-results",
-    "source",
-    "query-time-seconds",
-    "results"
+        "query",
+        "results-start",
+        "results-end",
+        "total-results",
+        "source",
+        "query-time-seconds",
+        "results"
 })
 public class Search {
 
@@ -44,9 +40,7 @@ public class Search {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The query
+     * @return The query
      */
     @JsonProperty("query")
     public String getQuery() {
@@ -54,9 +48,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @param query
-     *     The query
+     * @param query The query
      */
     @JsonProperty("query")
     public void setQuery(String query) {
@@ -64,9 +56,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @return
-     *     The resultsStart
+     * @return The resultsStart
      */
     @JsonProperty("results-start")
     public String getResultsStart() {
@@ -74,9 +64,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @param resultsStart
-     *     The results-start
+     * @param resultsStart The results-start
      */
     @JsonProperty("results-start")
     public void setResultsStart(String resultsStart) {
@@ -84,9 +72,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @return
-     *     The resultsEnd
+     * @return The resultsEnd
      */
     @JsonProperty("results-end")
     public String getResultsEnd() {
@@ -94,9 +80,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @param resultsEnd
-     *     The results-end
+     * @param resultsEnd The results-end
      */
     @JsonProperty("results-end")
     public void setResultsEnd(String resultsEnd) {
@@ -104,9 +88,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @return
-     *     The totalResults
+     * @return The totalResults
      */
     @JsonProperty("total-results")
     public String getTotalResults() {
@@ -114,9 +96,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @param totalResults
-     *     The total-results
+     * @param totalResults The total-results
      */
     @JsonProperty("total-results")
     public void setTotalResults(String totalResults) {
@@ -124,9 +104,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @return
-     *     The source
+     * @return The source
      */
     @JsonProperty("source")
     public String getSource() {
@@ -134,9 +112,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @param source
-     *     The source
+     * @param source The source
      */
     @JsonProperty("source")
     public void setSource(String source) {
@@ -144,9 +120,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @return
-     *     The queryTimeSeconds
+     * @return The queryTimeSeconds
      */
     @JsonProperty("query-time-seconds")
     public String getQueryTimeSeconds() {
@@ -154,9 +128,7 @@ public class Search {
     }
 
     /**
-     * 
-     * @param queryTimeSeconds
-     *     The query-time-seconds
+     * @param queryTimeSeconds The query-time-seconds
      */
     @JsonProperty("query-time-seconds")
     public void setQueryTimeSeconds(String queryTimeSeconds) {
@@ -164,21 +136,17 @@ public class Search {
     }
 
     /**
-     * 
-     * @return
-     *     The results
+     * @return The results
      */
     @JsonProperty("results")
     public List<Result> getResults() {
-        if(results == null)
+        if (results == null)
             results = new ArrayList<>();
         return results;
     }
 
     /**
-     * 
-     * @param results
-     *     The results
+     * @param results The results
      */
     @JsonProperty("results")
     public void setResults(List<Result> results) {

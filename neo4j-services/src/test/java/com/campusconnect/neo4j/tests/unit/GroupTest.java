@@ -12,17 +12,17 @@ import org.testng.annotations.Test;
 public class GroupTest extends TestBase {
     @Autowired
     private GroupDao groupDao;
-    
+
     private Group createdGroup;
-    
+
     @Test
-    public void createTest(){
+    public void createTest() {
         Group group = new Group("groupName");
         createdGroup = groupDao.createGroup(group);
     }
-    
+
     @Test(dependsOnMethods = "createTest")
-    public void getGroup(){
+    public void getGroup() {
         Group resultGroup = groupDao.getGroup(createdGroup.getId());
         assert resultGroup != null;
     }

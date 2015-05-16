@@ -1,9 +1,6 @@
 package com.campusconnect.neo4j.types;
 
-import org.springframework.data.neo4j.annotation.EndNode;
-import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
-import org.springframework.data.neo4j.annotation.StartNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,15 +11,30 @@ import java.util.Map;
 @RelationshipEntity(type = "OWNS")
 public class OwnsRelationship extends BookRelation {
 
-	private String borrowerId;
+    private String borrowerId;
 
-	private Integer contractPeriodInDays;
+    private Integer contractPeriodInDays;
 
-	private String dueDate;
+    private String dueDate;
 
-	private String goodreadsStatus;
-    
+    private String goodreadsStatus;
+
     private String userComment;
+
+    public OwnsRelationship() {
+        super();
+    }
+
+    public OwnsRelationship(User user, Book book, long createdDate,
+                            String status, long lastModifiedDate) {
+        super(user, book, status, createdDate, lastModifiedDate);
+    }
+
+    public OwnsRelationship(User user, Book book, long createdDate,
+                            String status, long lastModifiedDate, String goodreadsStatus) {
+        super(user, book, status, createdDate, lastModifiedDate);
+        this.goodreadsStatus = goodreadsStatus;
+    }
 
     public String getUserComment() {
         return userComment;
@@ -37,53 +49,38 @@ public class OwnsRelationship extends BookRelation {
         this.contractPeriodInDays = contractPeriodInDays;
     }
 
-    public OwnsRelationship() {
-		super();
-	}
+    public String getBorrowerId() {
+        return borrowerId;
+    }
 
-	public OwnsRelationship(User user, Book book, long createdDate,
-			String status, long lastModifiedDate) {
-		super(user, book, status, createdDate, lastModifiedDate);
-	}
+    public void setBorrowerId(String borrowerId) {
 
-	public OwnsRelationship(User user, Book book, long createdDate,
-			String status, long lastModifiedDate, String goodreadsStatus) {
-		super(user, book, status, createdDate, lastModifiedDate);
-		this.goodreadsStatus = goodreadsStatus;
-	}
+        this.borrowerId = borrowerId;
+    }
 
-	public String getBorrowerId() {
-		return borrowerId;
-	}
+    public int getContractPeriodInDays() {
+        return contractPeriodInDays;
+    }
 
-	public int getContractPeriodInDays() {
-		return contractPeriodInDays;
-	}
+    public void setContractPeriodInDays(int contractPeriodInDays) {
+        this.contractPeriodInDays = contractPeriodInDays;
+    }
 
-	public String getDueDate() {
-		return dueDate;
-	}
+    public String getDueDate() {
+        return dueDate;
+    }
 
-	public String getGoodreadsStatus() {
-		return goodreadsStatus;
-	}
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
 
-	public void setBorrowerId(String borrowerId) {
+    public String getGoodreadsStatus() {
+        return goodreadsStatus;
+    }
 
-		this.borrowerId = borrowerId;
-	}
-
-	public void setContractPeriodInDays(int contractPeriodInDays) {
-		this.contractPeriodInDays = contractPeriodInDays;
-	}
-
-	public void setDueDate(String dueDate) {
-		this.dueDate = dueDate;
-	}
-
-	public void setGoodreadsStatus(String goodreadsStatus) {
-		this.goodreadsStatus = goodreadsStatus;
-	}
+    public void setGoodreadsStatus(String goodreadsStatus) {
+        this.goodreadsStatus = goodreadsStatus;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -112,9 +109,9 @@ public class OwnsRelationship extends BookRelation {
 
     public Map<String, String> getFieldsAsMap() {
         Map<String, String> fields = new HashMap<>();
-        if(contractPeriodInDays != null)
+        if (contractPeriodInDays != null)
             fields.put("contractPeriodInDays", String.valueOf(contractPeriodInDays));
-        if (borrowerId != null )
+        if (borrowerId != null)
             fields.put("borrowerId", borrowerId);
         if (dueDate != null)
             fields.put("dueDate", dueDate);

@@ -11,10 +11,10 @@ import org.testng.annotations.Test;
 public class GoodreadsTest extends TestBase {
     @Autowired
     GetUser getUser;
-    
+
     @Test
     public void getUserTest() {
         getUser.getUser("22748455", "KztlD3JKfZ1qJfeqQCEqfg", "nlcbU0zMdDUWs0QB032JfdUGOGWAJXCgy7GvEnoQ");
-        
+
     }
 }

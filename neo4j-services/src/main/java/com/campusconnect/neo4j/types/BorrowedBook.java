@@ -14,11 +14,11 @@ public class BorrowedBook extends Book implements Serializable {
     private long borrowDate;
     private int contractPeriodInDays;
     private long lastModifiedDate;
-    
+
 
     public BorrowedBook() {
     }
-    
+
     public BorrowedBook(Book book, BorrowRelation borrowRelation) {
         setId(book.getId());
         setName(book.getName());

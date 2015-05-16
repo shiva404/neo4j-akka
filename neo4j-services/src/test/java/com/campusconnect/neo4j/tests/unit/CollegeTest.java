@@ -17,17 +17,17 @@ public class CollegeTest extends TestBase {
     private College createdCollege;
 
     @Test
-    public void createCollege(){
+    public void createCollege() {
         final String collegeFirstName = faker.name().firstName();
-        College college = new College(collegeFirstName + " College", collegeFirstName.charAt(0) + "."+"C");
+        College college = new College(collegeFirstName + " College", collegeFirstName.charAt(0) + "." + "C");
         createdCollege = collegeDao.createCollege(college);
         assert createdCollege != null;
     }
 
     @Test(dependsOnMethods = "createCollege")
-    public void getCollege(){
+    public void getCollege() {
         College resultCollege = collegeDao.getCollege(createdCollege.getId());
         assert resultCollege != null;
     }
-    
+
 }

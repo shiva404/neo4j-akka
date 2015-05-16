@@ -1,50 +1,46 @@
-
 package com.campusconnect.neo4j.akka.goodreads.types;
 
+import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Generated;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "id",
-    "title",
-    "isbn",
-    "isbn13",
-    "asin",
-    "image_url",
-    "small_image_url",
-    "publication_year",
-    "publication_month",
-    "publication_day",
-    "publisher",
-    "language_code",
-    "is_ebook",
-    "description",
-    "work",
-    "average_rating",
-    "num_pages",
-    "format",
-    "edition_information",
-    "ratings_count",
-    "text_reviews_count",
-    "url",
-    "link",
-    "authors",
-    "reviews_widget",
-    "popular_shelves",
-    "book_links",
-    "series_works",
-    "similar_books"
+        "id",
+        "title",
+        "isbn",
+        "isbn13",
+        "asin",
+        "image_url",
+        "small_image_url",
+        "publication_year",
+        "publication_month",
+        "publication_day",
+        "publisher",
+        "language_code",
+        "is_ebook",
+        "description",
+        "work",
+        "average_rating",
+        "num_pages",
+        "format",
+        "edition_information",
+        "ratings_count",
+        "text_reviews_count",
+        "url",
+        "link",
+        "authors",
+        "reviews_widget",
+        "popular_shelves",
+        "book_links",
+        "series_works",
+        "similar_books"
 })
 public class Book {
 
@@ -110,9 +106,7 @@ public class Book {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The id
+     * @return The id
      */
     @JsonProperty("id")
     public String getId() {
@@ -120,9 +114,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param id
-     *     The id
+     * @param id The id
      */
     @JsonProperty("id")
     public void setId(String id) {
@@ -130,9 +122,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The title
+     * @return The title
      */
     @JsonProperty("title")
     public String getTitle() {
@@ -140,9 +130,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param title
-     *     The title
+     * @param title The title
      */
     @JsonProperty("title")
     public void setTitle(String title) {
@@ -150,9 +138,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The isbn
+     * @return The isbn
      */
     @JsonProperty("isbn")
     public String getIsbn() {
@@ -160,9 +146,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param isbn
-     *     The isbn
+     * @param isbn The isbn
      */
     @JsonProperty("isbn")
     public void setIsbn(String isbn) {
@@ -170,9 +154,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The isbn13
+     * @return The isbn13
      */
     @JsonProperty("isbn13")
     public String getIsbn13() {
@@ -180,9 +162,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param isbn13
-     *     The isbn13
+     * @param isbn13 The isbn13
      */
     @JsonProperty("isbn13")
     public void setIsbn13(String isbn13) {
@@ -190,9 +170,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The asin
+     * @return The asin
      */
     @JsonProperty("asin")
     public String getAsin() {
@@ -200,9 +178,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param asin
-     *     The asin
+     * @param asin The asin
      */
     @JsonProperty("asin")
     public void setAsin(String asin) {
@@ -210,9 +186,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The imageUrl
+     * @return The imageUrl
      */
     @JsonProperty("image_url")
     public String getImageUrl() {
@@ -220,9 +194,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param imageUrl
-     *     The image_url
+     * @param imageUrl The image_url
      */
     @JsonProperty("image_url")
     public void setImageUrl(String imageUrl) {
@@ -230,9 +202,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The smallImageUrl
+     * @return The smallImageUrl
      */
     @JsonProperty("small_image_url")
     public String getSmallImageUrl() {
@@ -240,9 +210,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param smallImageUrl
-     *     The small_image_url
+     * @param smallImageUrl The small_image_url
      */
     @JsonProperty("small_image_url")
     public void setSmallImageUrl(String smallImageUrl) {
@@ -250,9 +218,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The publicationYear
+     * @return The publicationYear
      */
     @JsonProperty("publication_year")
     public String getPublicationYear() {
@@ -260,9 +226,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param publicationYear
-     *     The publication_year
+     * @param publicationYear The publication_year
      */
     @JsonProperty("publication_year")
     public void setPublicationYear(String publicationYear) {
@@ -270,9 +234,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The publicationMonth
+     * @return The publicationMonth
      */
     @JsonProperty("publication_month")
     public String getPublicationMonth() {
@@ -280,9 +242,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param publicationMonth
-     *     The publication_month
+     * @param publicationMonth The publication_month
      */
     @JsonProperty("publication_month")
     public void setPublicationMonth(String publicationMonth) {
@@ -290,9 +250,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The publicationDay
+     * @return The publicationDay
      */
     @JsonProperty("publication_day")
     public String getPublicationDay() {
@@ -300,9 +258,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param publicationDay
-     *     The publication_day
+     * @param publicationDay The publication_day
      */
     @JsonProperty("publication_day")
     public void setPublicationDay(String publicationDay) {
@@ -310,9 +266,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The publisher
+     * @return The publisher
      */
     @JsonProperty("publisher")
     public String getPublisher() {
@@ -320,9 +274,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param publisher
-     *     The publisher
+     * @param publisher The publisher
      */
     @JsonProperty("publisher")
     public void setPublisher(String publisher) {
@@ -330,9 +282,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The languageCode
+     * @return The languageCode
      */
     @JsonProperty("language_code")
     public String getLanguageCode() {
@@ -340,9 +290,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param languageCode
-     *     The language_code
+     * @param languageCode The language_code
      */
     @JsonProperty("language_code")
     public void setLanguageCode(String languageCode) {
@@ -350,9 +298,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The isEbook
+     * @return The isEbook
      */
     @JsonProperty("is_ebook")
     public String getIsEbook() {
@@ -360,9 +306,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param isEbook
-     *     The is_ebook
+     * @param isEbook The is_ebook
      */
     @JsonProperty("is_ebook")
     public void setIsEbook(String isEbook) {
@@ -370,9 +314,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The description
+     * @return The description
      */
     @JsonProperty("description")
     public String getDescription() {
@@ -380,9 +322,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param description
-     *     The description
+     * @param description The description
      */
     @JsonProperty("description")
     public void setDescription(String description) {
@@ -390,9 +330,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The work
+     * @return The work
      */
     @JsonProperty("work")
     public Work getWork() {
@@ -400,9 +338,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param work
-     *     The work
+     * @param work The work
      */
     @JsonProperty("work")
     public void setWork(Work work) {
@@ -410,9 +346,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The averageRating
+     * @return The averageRating
      */
     @JsonProperty("average_rating")
     public String getAverageRating() {
@@ -420,9 +354,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param averageRating
-     *     The average_rating
+     * @param averageRating The average_rating
      */
     @JsonProperty("average_rating")
     public void setAverageRating(String averageRating) {
@@ -430,9 +362,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The numPages
+     * @return The numPages
      */
     @JsonProperty("num_pages")
     public String getNumPages() {
@@ -440,9 +370,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param numPages
-     *     The num_pages
+     * @param numPages The num_pages
      */
     @JsonProperty("num_pages")
     public void setNumPages(String numPages) {
@@ -450,9 +378,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The format
+     * @return The format
      */
     @JsonProperty("format")
     public String getFormat() {
@@ -460,9 +386,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param format
-     *     The format
+     * @param format The format
      */
     @JsonProperty("format")
     public void setFormat(String format) {
@@ -470,9 +394,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The editionInformation
+     * @return The editionInformation
      */
     @JsonProperty("edition_information")
     public String getEditionInformation() {
@@ -480,9 +402,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param editionInformation
-     *     The edition_information
+     * @param editionInformation The edition_information
      */
     @JsonProperty("edition_information")
     public void setEditionInformation(String editionInformation) {
@@ -490,9 +410,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The ratingsCount
+     * @return The ratingsCount
      */
     @JsonProperty("ratings_count")
     public String getRatingsCount() {
@@ -500,9 +418,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param ratingsCount
-     *     The ratings_count
+     * @param ratingsCount The ratings_count
      */
     @JsonProperty("ratings_count")
     public void setRatingsCount(String ratingsCount) {
@@ -510,9 +426,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The textReviewsCount
+     * @return The textReviewsCount
      */
     @JsonProperty("text_reviews_count")
     public String getTextReviewsCount() {
@@ -520,9 +434,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param textReviewsCount
-     *     The text_reviews_count
+     * @param textReviewsCount The text_reviews_count
      */
     @JsonProperty("text_reviews_count")
     public void setTextReviewsCount(String textReviewsCount) {
@@ -530,9 +442,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The url
+     * @return The url
      */
     @JsonProperty("url")
     public String getUrl() {
@@ -540,9 +450,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param url
-     *     The url
+     * @param url The url
      */
     @JsonProperty("url")
     public void setUrl(String url) {
@@ -550,9 +458,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The link
+     * @return The link
      */
     @JsonProperty("link")
     public String getLink() {
@@ -560,9 +466,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param link
-     *     The link
+     * @param link The link
      */
     @JsonProperty("link")
     public void setLink(String link) {
@@ -570,21 +474,17 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The authors
+     * @return The authors
      */
     @JsonProperty("authors")
     public List<Author> getAuthors() {
-        if(authors == null)
+        if (authors == null)
             authors = new ArrayList<>();
         return authors;
     }
 
     /**
-     * 
-     * @param authors
-     *     The authors
+     * @param authors The authors
      */
     @JsonProperty("authors")
     public void setAuthors(List<Author> authors) {
@@ -592,9 +492,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The reviewsWidget
+     * @return The reviewsWidget
      */
     @JsonProperty("reviews_widget")
     public String getReviewsWidget() {
@@ -602,9 +500,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param reviewsWidget
-     *     The reviews_widget
+     * @param reviewsWidget The reviews_widget
      */
     @JsonProperty("reviews_widget")
     public void setReviewsWidget(String reviewsWidget) {
@@ -612,9 +508,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The popularShelves
+     * @return The popularShelves
      */
     @JsonProperty("popular_shelves")
     public List<PopularShelf> getPopularShelves() {
@@ -622,9 +516,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param popularShelves
-     *     The popular_shelves
+     * @param popularShelves The popular_shelves
      */
     @JsonProperty("popular_shelves")
     public void setPopularShelves(List<PopularShelf> popularShelves) {
@@ -632,9 +524,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The bookLinks
+     * @return The bookLinks
      */
     @JsonProperty("book_links")
     public List<Object> getBookLinks() {
@@ -642,9 +532,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param bookLinks
-     *     The book_links
+     * @param bookLinks The book_links
      */
     @JsonProperty("book_links")
     public void setBookLinks(List<Object> bookLinks) {
@@ -652,9 +540,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The seriesWorks
+     * @return The seriesWorks
      */
     @JsonProperty("series_works")
     public List<Object> getSeriesWorks() {
@@ -662,9 +548,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param seriesWorks
-     *     The series_works
+     * @param seriesWorks The series_works
      */
     @JsonProperty("series_works")
     public void setSeriesWorks(List<Object> seriesWorks) {
@@ -672,9 +556,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @return
-     *     The similarBooks
+     * @return The similarBooks
      */
     @JsonProperty("similar_books")
     public List<SimilarBook> getSimilarBooks() {
@@ -682,9 +564,7 @@ public class Book {
     }
 
     /**
-     * 
-     * @param similarBooks
-     *     The similar_books
+     * @param similarBooks The similar_books
      */
     @JsonProperty("similar_books")
     public void setSimilarBooks(List<SimilarBook> similarBooks) {

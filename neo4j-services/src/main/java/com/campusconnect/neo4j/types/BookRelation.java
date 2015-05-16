@@ -13,19 +13,20 @@ public abstract class BookRelation {
 
     @StartNode
     private User user;
+    @EndNode
+    private Book book;
+    private String status;
+    private long createdDate;
+    private long lastModifiedDate;
 
     protected BookRelation() {
     }
-
-    @EndNode
-    private Book book;
 
     protected BookRelation(User user, Book book, String status) {
         this.user = user;
         this.book = book;
         this.status = status;
     }
-
     protected BookRelation(User user, Book book, String status, long createdDate, long lastModifiedDate) {
         this.user = user;
         this.book = book;
@@ -33,11 +34,6 @@ public abstract class BookRelation {
         this.createdDate = createdDate;
         this.lastModifiedDate = lastModifiedDate;
     }
-
-    private String status;
-
-    private long createdDate;
-    private long lastModifiedDate;
 
     public Long getId() {
         return id;

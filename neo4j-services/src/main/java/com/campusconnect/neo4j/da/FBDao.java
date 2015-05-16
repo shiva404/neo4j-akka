@@ -11,7 +11,7 @@ import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 /**
  * Created by sn1 on 2/27/15.
  */
-public class FBDao{
+public class FBDao {
 
     @Autowired
     GetUserProfileImage getUserProfileImage;
@@ -34,7 +34,7 @@ public class FBDao{
     public String getUserProfileImage(String fbId, String accessToken) {
         return getUserProfileImage.getImageUrlForUser(fbId, accessToken);
     }
-    
+
     public void setFacebookConnectionFactory(FacebookConnectionFactory facebookConnectionFactory) {
         this.facebookConnectionFactory = facebookConnectionFactory;
     }

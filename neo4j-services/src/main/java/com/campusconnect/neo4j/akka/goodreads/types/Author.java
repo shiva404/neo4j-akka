@@ -1,30 +1,24 @@
-
 package com.campusconnect.neo4j.akka.goodreads.types;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Generated;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
+import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.annotation.Generated;
+import java.util.HashMap;
+import java.util.Map;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "id",
-    "name",
-    "role",
-    "image_url",
-    "small_image_url",
-    "link",
-    "average_rating",
-    "ratings_count",
-    "text_reviews_count"
+        "id",
+        "name",
+        "role",
+        "image_url",
+        "small_image_url",
+        "link",
+        "average_rating",
+        "ratings_count",
+        "text_reviews_count"
 })
 public class Author {
 
@@ -48,9 +42,7 @@ public class Author {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The id
+     * @return The id
      */
     @JsonProperty("id")
     public String getId() {
@@ -58,9 +50,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @param id
-     *     The id
+     * @param id The id
      */
     @JsonProperty("id")
     public void setId(String id) {
@@ -68,9 +58,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @return
-     *     The name
+     * @return The name
      */
     @JsonProperty("name")
     public String getName() {
@@ -78,9 +66,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @param name
-     *     The name
+     * @param name The name
      */
     @JsonProperty("name")
     public void setName(String name) {
@@ -88,9 +74,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @return
-     *     The imageUrl
+     * @return The imageUrl
      */
     @JsonProperty("image_url")
     public String getImageUrl() {
@@ -98,9 +82,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @param imageUrl
-     *     The image_url
+     * @param imageUrl The image_url
      */
     @JsonProperty("image_url")
     public void setImageUrl(String imageUrl) {
@@ -108,9 +90,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @return
-     *     The smallImageUrl
+     * @return The smallImageUrl
      */
     @JsonProperty("small_image_url")
     public String getSmallImageUrl() {
@@ -118,9 +98,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @param smallImageUrl
-     *     The small_image_url
+     * @param smallImageUrl The small_image_url
      */
     @JsonProperty("small_image_url")
     public void setSmallImageUrl(String smallImageUrl) {
@@ -128,9 +106,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @return
-     *     The link
+     * @return The link
      */
     @JsonProperty("link")
     public String getLink() {
@@ -138,9 +114,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @param link
-     *     The link
+     * @param link The link
      */
     @JsonProperty("link")
     public void setLink(String link) {
@@ -148,9 +122,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @return
-     *     The averageRating
+     * @return The averageRating
      */
     @JsonProperty("average_rating")
     public String getAverageRating() {
@@ -158,9 +130,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @param averageRating
-     *     The average_rating
+     * @param averageRating The average_rating
      */
     @JsonProperty("average_rating")
     public void setAverageRating(String averageRating) {
@@ -168,9 +138,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @return
-     *     The ratingsCount
+     * @return The ratingsCount
      */
     @JsonProperty("ratings_count")
     public String getRatingsCount() {
@@ -178,9 +146,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @param ratingsCount
-     *     The ratings_count
+     * @param ratingsCount The ratings_count
      */
     @JsonProperty("ratings_count")
     public void setRatingsCount(String ratingsCount) {
@@ -188,9 +154,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @return
-     *     The textReviewsCount
+     * @return The textReviewsCount
      */
     @JsonProperty("text_reviews_count")
     public String getTextReviewsCount() {
@@ -198,9 +162,7 @@ public class Author {
     }
 
     /**
-     * 
-     * @param textReviewsCount
-     *     The text_reviews_count
+     * @param textReviewsCount The text_reviews_count
      */
     @JsonProperty("text_reviews_count")
     public void setTextReviewsCount(String textReviewsCount) {

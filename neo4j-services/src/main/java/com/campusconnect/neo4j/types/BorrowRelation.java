@@ -1,10 +1,7 @@
 package com.campusconnect.neo4j.types;
 
 
-import org.springframework.data.neo4j.annotation.EndNode;
-import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
-import org.springframework.data.neo4j.annotation.StartNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +10,8 @@ import java.util.Map;
  * Created by sn1 on 2/26/15.
  */
 @RelationshipEntity(type = "BORROWED")
-public class BorrowRelation extends BookRelation{
-    
+public class BorrowRelation extends BookRelation {
+
     private Long dueDate;
     private String ownerUserId;
     private String additionalComments;
@@ -29,7 +26,7 @@ public class BorrowRelation extends BookRelation{
         this.borrowDate = borrowDate;
         this.contractPeriodInDays = contractPeriodInDays;
     }
-    
+
     public BorrowRelation() {
 
     }
@@ -104,22 +101,22 @@ public class BorrowRelation extends BookRelation{
         result = 31 * result + contractPeriodInDays;
         return result;
     }
-    
+
     public Map<String, String> getFieldsAsMap() {
-            Map<String, String> fields = new HashMap<>();
-            if(contractPeriodInDays != 0)
-                fields.put("contractPeriodInDays", String.valueOf(contractPeriodInDays));
-            if (dueDate != null )
-                fields.put("dueDate", String.valueOf(dueDate));
-            if (ownerUserId != null)
-                fields.put("ownerUserId", ownerUserId);
-            if (additionalComments != null)
-                fields.put("additionalComments", additionalComments);
-            if (borrowDate != null)
-                fields.put("borrowDate", String.valueOf(borrowDate));
-        
-            return fields;   
-        
+        Map<String, String> fields = new HashMap<>();
+        if (contractPeriodInDays != 0)
+            fields.put("contractPeriodInDays", String.valueOf(contractPeriodInDays));
+        if (dueDate != null)
+            fields.put("dueDate", String.valueOf(dueDate));
+        if (ownerUserId != null)
+            fields.put("ownerUserId", ownerUserId);
+        if (additionalComments != null)
+            fields.put("additionalComments", additionalComments);
+        if (borrowDate != null)
+            fields.put("borrowDate", String.valueOf(borrowDate));
+
+        return fields;
+
     }
-    
+
 }

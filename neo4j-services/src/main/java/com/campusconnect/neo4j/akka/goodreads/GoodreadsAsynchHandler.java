@@ -5,7 +5,6 @@ import com.campusconnect.neo4j.akka.goodreads.task.*;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.types.Book;
-import com.campusconnect.neo4j.types.UserRecommendation;
 import com.campusconnect.neo4j.types.WishListBook;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,6 +28,7 @@ public class GoodreadsAsynchHandler {
     private ActorRef getFriendsRouter;
     private ActorRef userRecForWishListRouter;
     private ActorRef addGoodReadsFriendsRouter;
+    private ActorRef replaceGRIdWithUserIdRouter;
 
     public ActorRef getReplaceGRIdWithUserIdRouter() {
         return replaceGRIdWithUserIdRouter;
@@ -38,17 +38,15 @@ public class GoodreadsAsynchHandler {
         this.replaceGRIdWithUserIdRouter = replaceGRIdWithUserIdRouter;
     }
 
-    private ActorRef replaceGRIdWithUserIdRouter;
-
     public ActorRef getAddGoodReadsFriendsRouter() {
-		return addGoodReadsFriendsRouter;
-	}
+        return addGoodReadsFriendsRouter;
+    }
 
-	public void setAddGoodReadsFriendsRouter(ActorRef addGoodReadsFriendsRouter) {
-		this.addGoodReadsFriendsRouter = addGoodReadsFriendsRouter;
-	}
+    public void setAddGoodReadsFriendsRouter(ActorRef addGoodReadsFriendsRouter) {
+        this.addGoodReadsFriendsRouter = addGoodReadsFriendsRouter;
+    }
 
-	public ActorRef getUserRecForWishListRouter() {
+    public ActorRef getUserRecForWishListRouter() {
         return userRecForWishListRouter;
     }
 
@@ -79,7 +77,7 @@ public class GoodreadsAsynchHandler {
     public void setSaveBooksToDbRouter(ActorRef saveBooksToDbRouter) {
         this.saveBooksToDbRouter = saveBooksToDbRouter;
     }
-    
+
     public ActorRef getGetAndSaveBooksRouter() {
         return getAndSaveBooksRouter;
     }
@@ -111,11 +109,11 @@ public class GoodreadsAsynchHandler {
     public void getAndSaveBooks(String userId, String goodreadsUserId, String accessToken, String accessTokenSecret) {
         getAndSaveBooksRouter.tell(new GetBooksTask(userId, goodreadsUserId, 1, accessToken, accessTokenSecret), successListener);
     }
-    
-    public void addGoodreadsBookToUser(String userId, Book book, String shelfName){
+
+    public void addGoodreadsBookToUser(String userId, Book book, String shelfName) {
         addGoodreadsBookToUserRouter.tell(new AddGoodreadsBookToUserTask(book, userId, shelfName), successListener);
     }
-    
+
     public void getFriendRecForUser(String userId, String goodreadsUserId, String accessToken, String accessTokenSecret) {
         List<WishListBook> wishListBooks = userDao.getWishListBooks(userId);
         friendsBookSearchForWishListRouter.tell(new FriendsBookSearchForWishListTask(accessToken, accessTokenSecret, userId, goodreadsUserId, 1, wishListBooks), successListener);

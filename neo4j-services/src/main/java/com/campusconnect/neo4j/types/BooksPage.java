@@ -11,6 +11,16 @@ public class BooksPage {
     int offset;
     List<Book> books;
 
+    public BooksPage() {
+
+    }
+
+    public BooksPage(int size, int offset, List<Book> books) {
+        this.size = size;
+        this.offset = offset;
+        this.books = books;
+    }
+
     public int getSize() {
         return size;
     }
@@ -28,18 +38,8 @@ public class BooksPage {
     }
 
     public List<Book> getBooks() {
-        if(books == null)
+        if (books == null)
             books = new ArrayList<>();
         return books;
-    }
-
-    public BooksPage() {
-    
-    }
-
-    public BooksPage(int size, int offset, List<Book> books) {
-        this.size = size;
-        this.offset = offset;
-        this.books = books;
     }
 }

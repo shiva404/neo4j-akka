@@ -14,20 +14,19 @@ import java.util.UUID;
  */
 public class DepartmentDao {
     private Neo4jTemplate neo4jTemplate;
+    @Autowired
+    private DepartmentRepository departmentRepository;
 
     public DepartmentDao(Neo4jTemplate neo4jTemplate) {
         this.neo4jTemplate = neo4jTemplate;
     }
 
-    @Autowired
-    private DepartmentRepository departmentRepository;
-
-    public Department createDepartment(Department department){
+    public Department createDepartment(Department department) {
         department.setId(UUID.randomUUID().toString());
         return departmentRepository.save(department);
     }
 
-    public Department getDepartment(String departmentId){
+    public Department getDepartment(String departmentId) {
         return departmentRepository.findBySchemaPropertyValue("id", departmentId);
     }
 

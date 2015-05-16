@@ -1,8 +1,9 @@
 package com.campusconnect.neo4j.types;
 
 
-import org.springframework.data.annotation.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
@@ -16,7 +17,7 @@ public class Group {
     @GraphId
     private Long nodeId;
 
-    @Indexed(unique=true)
+    @Indexed(unique = true)
     private String id;
     private String name;
 
@@ -33,8 +34,8 @@ public class Group {
         this.name = name;
     }
 
-    public Group(String name,long createdDate) {
-    	
+    public Group(String name, long createdDate) {
+
         this.name = name;
         this.createdDate = createdDate;
     }
@@ -42,7 +43,7 @@ public class Group {
     public Group() {
     }
 
-      public Long getNodeId() {
+    public Long getNodeId() {
 
         return nodeId;
     }
@@ -91,11 +92,11 @@ public class Group {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-	@Override
-	public String toString() {
-		return "Group [nodeId=" + nodeId + ", id=" + id + ", name=" + name
-				+ ", createdDate=" + createdDate + ", lastModifiedTime="
-				+ lastModifiedTime + ", lastModifiedBy=" + lastModifiedBy + "]";
-	}
+    @Override
+    public String toString() {
+        return "Group [nodeId=" + nodeId + ", id=" + id + ", name=" + name
+                + ", createdDate=" + createdDate + ", lastModifiedTime="
+                + lastModifiedTime + ", lastModifiedBy=" + lastModifiedBy + "]";
+    }
 
 }

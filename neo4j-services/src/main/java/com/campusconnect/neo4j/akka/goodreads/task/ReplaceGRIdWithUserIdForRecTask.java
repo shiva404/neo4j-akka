@@ -8,6 +8,12 @@ public class ReplaceGRIdWithUserIdForRecTask {
     private Integer goodreadsId;
     private String imageUrl;
 
+    public ReplaceGRIdWithUserIdForRecTask(String userId, Integer goodreadsId, String imageUrl) {
+        this.userId = userId;
+        this.goodreadsId = goodreadsId;
+        this.imageUrl = imageUrl;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -18,11 +24,5 @@ public class ReplaceGRIdWithUserIdForRecTask {
 
     public String getImageUrl() {
         return imageUrl;
-    }
-
-    public ReplaceGRIdWithUserIdForRecTask(String userId, Integer goodreadsId, String imageUrl) {
-        this.userId = userId;
-        this.goodreadsId = goodreadsId;
-        this.imageUrl = imageUrl;
     }
 }

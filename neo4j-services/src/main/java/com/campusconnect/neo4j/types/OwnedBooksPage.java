@@ -24,20 +24,20 @@ public class OwnedBooksPage {
         return offset;
     }
 
-    public List<OwnedBook> getOwnedBooks() {
-        return ownedBooks;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
     public void setOffset(int offset) {
         this.offset = offset;
     }
 
+    public List<OwnedBook> getOwnedBooks() {
+        return ownedBooks;
+    }
+
     public void setOwnedBooks(List<OwnedBook> ownedBooks) {
         this.ownedBooks = ownedBooks;
+    }
+
+    public int getSize() {
+        return size;
     }
 
     public void setSize(int size) {

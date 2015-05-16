@@ -172,9 +172,9 @@ public class XmlToJson {
                 "</GoodreadsResponse>";
 
 
-                XMLSerializer xmlSerializer = new XMLSerializer();
-                JSON json = xmlSerializer.read(StringUtils.cleanEmptyTags(data));
-                System.out.println( json.toString(2) );
+        XMLSerializer xmlSerializer = new XMLSerializer();
+        JSON json = xmlSerializer.read(StringUtils.cleanEmptyTags(data));
+        System.out.println(json.toString(2));
 
 
     }

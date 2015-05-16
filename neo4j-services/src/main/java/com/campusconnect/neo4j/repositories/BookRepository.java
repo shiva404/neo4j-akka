@@ -11,4 +11,5 @@ import java.util.List;
  */
 public interface BookRepository extends GraphRepository<Book> {
     @Query(value = "match (users:User {id: {0}})-[:READ]->(books:Book) return books")
-    public List<Book> getBooks(String userId);}
+    public List<Book> getBooks(String userId);
+}

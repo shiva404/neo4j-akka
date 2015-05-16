@@ -110,6 +110,7 @@
         <constructor-arg index="5" ref="reminderDao"/>
         <constructor-arg index="6" ref="auditEventDao"/>
         <constructor-arg index="7" ref="notificationDao"/>
+        <constructor-arg index="8" ref="groupDao"/>
     </bean>
     
 

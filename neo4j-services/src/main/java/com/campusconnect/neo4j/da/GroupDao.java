@@ -39,6 +39,11 @@ public class GroupDao {
        return groupRepository.findBySchemaPropertyValue("id", groupId);
     }
     
+    public List<Group> getGroups(String userId)
+    {
+    	return groupRepository.getGroups(userId);
+    }
+    
     public List<User> getUsers(String groupId){
        return groupRepository.getUsers(groupId);
     }

@@ -13,4 +13,7 @@ import java.util.List;
 public interface GroupRepository extends GraphRepository<Group> {
         @Query("match (users:User)-[:USER_ACCESS]->(group:Group {id: {0}}) return users")
         public List<User> getUsers(String groupId);
+        
+        @Query("match (user:User {id:{0}})-[:USER_ACCESS]-(groups:Group) return groups")
+        public List<Group> getGroups(String userId);
 }

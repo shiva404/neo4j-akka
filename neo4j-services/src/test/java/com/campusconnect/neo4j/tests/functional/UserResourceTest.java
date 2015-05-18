@@ -139,7 +139,7 @@ public class UserResourceTest extends TestBase {
         ClientResponse addBookCR2 = resource.path("users").path(createdUser.getId()).path("books").path(createdBook2.getId()).path("own").queryParam("status", "available").type("application/json").put(ClientResponse.class);
         assert addBookCR2.getStatus() == 200;
 
-        ClientResponse updateBookStatusCR = resource.path("users").path(createdUser.getId()).path("books").path(createdBook.getId()).queryParam("status", "lent").type("application/json").put(ClientResponse.class);
+        ClientResponse updateBookStatusCR = resource.path("users").path(createdUser.getId()).path("books").path(createdBook.getId()).path("own").queryParam("status", "lent").type("application/json").put(ClientResponse.class);
         assert updateBookStatusCR.getStatus() == 200;
 
         ClientResponse ownedBooks = resource.path("users").path(createdUser.getId()).path("books").queryParam("filter", "owned").accept("application/json").get(ClientResponse.class);

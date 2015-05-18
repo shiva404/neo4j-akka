@@ -1,9 +1,11 @@
 package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.repositories.GroupRepository;
+import com.campusconnect.neo4j.types.Book;
 import com.campusconnect.neo4j.types.Group;
 import com.campusconnect.neo4j.types.User;
 import com.campusconnect.neo4j.types.UserGroupRelationship;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 
@@ -55,5 +57,12 @@ public class GroupDao {
         return groupRepository.save(groupToBeUpdated);
     }
 
+	public List<Book> getavailableBooks(String groupId) {
+		return groupRepository.getAvailableBooks(groupId);
+	}
+	
+	public List<Book> getWishListBooks(String groupId) {
+		return groupRepository.getWishListBooks(groupId);
+	}
 
 }

@@ -74,7 +74,7 @@ public class AddEventTest extends TestBase {
     @Test(dependsOnMethods = "TestUserAddressUpdateEvent")
     public void TestGetUserEvents() {
         ClientResponse clientResponseForReturningUserEvent = resource
-                .path("users").path(userId).path("events").type("application/json").get(ClientResponse.class);
+                .path("users").path(userId).path("timeline").path("events").type("application/json").get(ClientResponse.class);
         assert clientResponseForReturningUserEvent.getStatus() == 200;
     }
 

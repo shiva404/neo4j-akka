@@ -507,7 +507,6 @@ public class UserResource {
     	return Response.ok().build();
     }
     
-    
 	private void setReminderCreateProperties(Reminder reminder) {
 		Long currentTime = System.currentTimeMillis();
 		reminder.setCreatedDate(currentTime);

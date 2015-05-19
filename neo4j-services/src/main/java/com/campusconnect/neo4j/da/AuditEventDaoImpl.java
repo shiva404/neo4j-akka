@@ -40,6 +40,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
             try {
                 System.out.println("each event" + eachEvent);
                 Event eventDeserialised = objectMapper.readValue(eachEvent, Event.class);
+                 eventDeserialised.setSubject(new Subject(IdType.USER_ID.toString(), auditEvent.getUserName(), "/users/" + auditEvent.getUserId(), auditEvent.getImageUrl()));
                 events.add(eventDeserialised);
             } catch (Exception e) {
                 e.printStackTrace();

@@ -70,6 +70,7 @@ public class UserDaoImpl implements UserDao {
             Set<String> events = auditEvent.getEvents();
             auditEvent.setUserId(createdUser.getId());
             auditEvent.setUserName(createdUser.getName());
+        auditEvent.setImageUrl(createdUser.getProfileImageUrl());
             NotificationEntity notificationEntityFresh = new NotificationEntity();
             NotificationEntity notificationEntityPast = new NotificationEntity();
             events.add(serializedEvent);

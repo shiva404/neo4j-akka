@@ -68,8 +68,7 @@ public class GroupResource {
 	@Path("{groupId}")
 	public Response getGroup(@PathParam("groupId") final String groupId) {
 		Group group = groupDao.getGroup(groupId);
-		return Response.created(null).entity(group).build();
-
+		return Response.ok().entity(group).build();
 	}
 
 	@PUT

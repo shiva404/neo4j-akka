@@ -451,8 +451,8 @@ public class UserResource {
         return Response.ok().entity(user).build();
 
     }
-    
-    
+
+
     @GET
     @Path("{userId}/reminders")
     public Response getAllReminders(@PathParam("userId") final String userId)
@@ -512,4 +512,11 @@ public class UserResource {
 		reminder.setCreatedDate(currentTime);
 		reminder.setLastModifiedTime(currentTime);
 	}
+    
+    @GET
+    @Path("search")
+    public Response getUsers() {
+        return null;
+        
+    }
 }

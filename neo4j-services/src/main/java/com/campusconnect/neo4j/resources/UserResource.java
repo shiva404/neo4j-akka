@@ -118,6 +118,13 @@ public class UserResource {
         return Response.ok().entity(updatedUser).build();
     }
 
+    @POST
+    @Path("{userId}/goodreads/synch")
+    public Response synchGoodreads(@PathParam("userId") final String userId) throws Exception {
+        initiateGoodreadsSynch(userDao.getUser(userId));
+        return Response.ok().build();
+    }
+
     private void checkWhetherSynchIsNeeded(User user, Fields fields) {
         for (Field field : fields.getFields()) {
             if(field.getName().contains("goodreadsAccessTokenSecret")) {

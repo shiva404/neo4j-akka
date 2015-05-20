@@ -3,31 +3,23 @@ package com.campusconnect.neo4j.resources;
 import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.GroupDao;
-import com.campusconnect.neo4j.da.iface.AddressDao;
-import com.campusconnect.neo4j.da.iface.AuditEventDao;
-import com.campusconnect.neo4j.da.iface.BookDao;
-import com.campusconnect.neo4j.da.iface.NotificationDao;
-import com.campusconnect.neo4j.da.iface.ReminderDao;
-import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.exceptions.DataDuplicateException;
+import com.campusconnect.neo4j.da.iface.*;
 import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
 import com.campusconnect.neo4j.types.*;
 import com.campusconnect.neo4j.util.Validator;
-
-import static com.campusconnect.neo4j.util.ErrorCodes.*;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.campusconnect.neo4j.util.ErrorCodes.INVALId_ARGMENTS;
 
 /**
  * Created by sn1 on 1/22/15.
@@ -515,8 +507,15 @@ public class UserResource {
     
     @GET
     @Path("search")
-    public Response getUsers() {
-        return null;
-        
+    public Response searchUsers(@QueryParam("q") String searchString) {
+        List<User> users = userDao.search(searchString);
+        return Response.ok().entity(new UsersPage(0, users.size(), users)).build();
+    }
+
+    @GET
+    @Path("{userId}/search")
+    public Response searchFriends(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
+        List<User> users = userDao.searchFriends(userId, searchString);
+        return Response.ok().entity(new UsersPage(0, users.size(), users)).build();
     }
 }

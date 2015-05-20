@@ -513,14 +513,14 @@ public class UserResource {
 	}
     
     @GET
-    @Path("search")
-    public Response searchUsers(@QueryParam("q") String searchString) {
+    @Path("{userId}/search")
+    public Response searchUsers(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
         List<User> users = userDao.search(searchString);
         return Response.ok().entity(new UsersPage(0, users.size(), users)).build();
     }
 
     @GET
-    @Path("{userId}/search")
+    @Path("{userId}/search/friends")
     public Response searchFriends(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
         List<User> users = userDao.searchFriends(userId, searchString);
         return Response.ok().entity(new UsersPage(0, users.size(), users)).build();

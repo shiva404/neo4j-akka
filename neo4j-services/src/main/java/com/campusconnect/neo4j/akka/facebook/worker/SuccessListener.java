@@ -11,7 +11,7 @@ import com.github.sabomichal.akkaspringfactory.Actor;
 public class SuccessListener extends UntypedActor {
     @Override
     public void onReceive(Object message) throws Exception {
-        if(message instanceof String){
+        if (message instanceof String) {
 
         }
     }

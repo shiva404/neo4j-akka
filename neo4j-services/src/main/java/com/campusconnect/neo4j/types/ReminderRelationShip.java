@@ -9,97 +9,96 @@ import org.springframework.data.neo4j.annotation.StartNode;
 
 @RelationshipEntity(type = "REMINDER_ABOUT")
 public class ReminderRelationShip {
-	
-	@CreatedBy
-	private String createdBy;
 
-	@CreatedDate
-	private long createdDate;
+    @CreatedBy
+    private String createdBy;
 
-	@GraphId
-	private Long id;
+    @CreatedDate
+    private long createdDate;
 
-	private long lastModified;
+    @GraphId
+    private Long id;
 
-	@EndNode
-	private Reminder reminder;
+    private long lastModified;
 
-	@StartNode
-	private User reminderFor;
+    @EndNode
+    private Reminder reminder;
 
-	private String type;
-	
-	public ReminderRelationShip() {
-		
-	}
+    @StartNode
+    private User reminderFor;
 
-	public ReminderRelationShip(String createdBy, long createdDate, User reminderFor,
-			long lastModified, String type, Reminder reminder) {
-		super();
-		this.createdBy = createdBy;
-		this.createdDate = createdDate;
-		this.reminderFor = reminderFor;
-		this.lastModified = lastModified;
-		this.type = type;
-		this.reminder = reminder;
-	}
+    private String type;
 
-	public String getCreatedBy() {
-		return createdBy;
-	}
+    public ReminderRelationShip() {
 
-	public long getCreatedDate() {
-		return createdDate;
-	}
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public ReminderRelationShip(String createdBy, long createdDate, User reminderFor,
+                                long lastModified, String type, Reminder reminder) {
+        super();
+        this.createdBy = createdBy;
+        this.createdDate = createdDate;
+        this.reminderFor = reminderFor;
+        this.lastModified = lastModified;
+        this.type = type;
+        this.reminder = reminder;
+    }
 
-	public long getLastModified() {
-		return lastModified;
-	}
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-	public Reminder getReminder() {
-		return reminder;
-	}
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-	public User getReminderFor() {
-		return reminderFor;
-	}
+    public long getCreatedDate() {
+        return createdDate;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public void setCreatedDate(long createdDate) {
+        this.createdDate = createdDate;
+    }
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setCreatedDate(long createdDate) {
-		this.createdDate = createdDate;
-	}
+    public long getLastModified() {
+        return lastModified;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public void setLastModified(long lastModified) {
-		this.lastModified = lastModified;
-	}
+    public void setLastModified(long lastModified) {
+        this.lastModified = lastModified;
+    }
 
-	public void setReminder(Reminder reminder) {
-		this.reminder = reminder;
-	}
+    public Reminder getReminder() {
+        return reminder;
+    }
 
-	public void setReminderFor(User reminderFor) {
-		this.reminderFor = reminderFor;
-	}
-	
-	public void setType(String type) {
-		this.type = type;
-	}
-	
+    public void setReminder(Reminder reminder) {
+        this.reminder = reminder;
+    }
+
+    public User getReminderFor() {
+        return reminderFor;
+    }
+
+    public void setReminderFor(User reminderFor) {
+        this.reminderFor = reminderFor;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
 
 }

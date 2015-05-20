@@ -1,8 +1,5 @@
 package com.campusconnect.neo4j.types;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
@@ -35,29 +32,10 @@ public class Book implements Serializable {
     private String description;
     private String publisher;
     private Integer numberOfPages;
-    
+
     private String bookType;  //Owned, borrowed, wishlist
-
-    public String getBookType() {
-        return bookType;
-    }
-
-    public void setBookType(String bookType) {
-        this.bookType = bookType;
-    }
-
-    public Map<String, Object> getAdditionalProperties() {
-        if(additionalProperties == null)
-            additionalProperties = new HashMap<>();
-        return additionalProperties;
-    }
-
-    public void setAdditionalProperties(Map<String, Object> additionalProperties) {
-        this.additionalProperties = additionalProperties;
-    }
-
-
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private String imageUrl;
 
     public Book(Integer goodreadsId, String authorName, String goodreadsAuthorId, String name, String isbn, String isbn13, int publishedYear, String description, String publisher, Integer numberOfPages, String imageUrl) {
         this.goodreadsId = goodreadsId;
@@ -89,6 +67,39 @@ public class Book implements Serializable {
         this.imageUrl = imageUrl;
     }
 
+
+    public Book() {
+    }
+
+    public Book(String name, String isbn) {
+        this.name = name;
+        this.isbn = isbn;
+    }
+
+    public Book(String id, String name, String isbn) {
+        this.id = id;
+        this.name = name;
+        this.isbn = isbn;
+    }
+
+    public String getBookType() {
+        return bookType;
+    }
+
+    public void setBookType(String bookType) {
+        this.bookType = bookType;
+    }
+
+    public Map<String, Object> getAdditionalProperties() {
+        if (additionalProperties == null)
+            additionalProperties = new HashMap<>();
+        return additionalProperties;
+    }
+
+    public void setAdditionalProperties(Map<String, Object> additionalProperties) {
+        this.additionalProperties = additionalProperties;
+    }
+
     public String getPublisher() {
         return publisher;
     }
@@ -103,22 +114,6 @@ public class Book implements Serializable {
 
     public void setNumberOfPages(Integer numberOfPages) {
         this.numberOfPages = numberOfPages;
-    }
-
-    private String imageUrl;
-
-    public Book() {
-    }
-
-    public Book(String name, String isbn) {
-        this.name = name;
-        this.isbn = isbn;
-    }
-
-    public Book(String id, String name, String isbn) {
-        this.id = id;
-        this.name = name;
-        this.isbn = isbn;
     }
 
     public int getPublishedYear() {

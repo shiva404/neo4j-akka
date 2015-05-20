@@ -8,5 +8,6 @@ import com.campusconnect.neo4j.types.User;
  */
 public interface EmailDao {
     public void sendBorrowBookInitEmail(User borrower, User owner, Book book);
-    public void sendAcceptedToLendBookEmail(User owner,User borrower,Book book);
+
+    public void sendAcceptedToLendBookEmail(User owner, User borrower, Book book);
 }

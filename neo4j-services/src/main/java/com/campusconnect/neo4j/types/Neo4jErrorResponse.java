@@ -10,6 +10,23 @@ public class Neo4jErrorResponse {
     protected String detail;
     protected String moreInfo;
 
+    public Neo4jErrorResponse(String code, String type, String message) {
+        this.code = code;
+        this.type = type;
+        this.message = message;
+    }
+
+    public Neo4jErrorResponse() {
+    }
+
+    public Neo4jErrorResponse(String code, String type, String message, String detail, String moreInfo) {
+        this.code = code;
+        this.type = type;
+        this.message = message;
+        this.detail = detail;
+        this.moreInfo = moreInfo;
+    }
+
     public String getCode() {
         return code;
     }
@@ -47,23 +64,6 @@ public class Neo4jErrorResponse {
     }
 
     public void setMoreInfo(String moreInfo) {
-        this.moreInfo = moreInfo;
-    }
-
-    public Neo4jErrorResponse(String code, String type, String message) {
-        this.code = code;
-        this.type = type;
-        this.message = message;
-    }
-
-    public Neo4jErrorResponse() {
-    }
-
-    public Neo4jErrorResponse(String code, String type, String message, String detail, String moreInfo) {
-        this.code = code;
-        this.type = type;
-        this.message = message;
-        this.detail = detail;
         this.moreInfo = moreInfo;
     }
 }

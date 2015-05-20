@@ -14,11 +14,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.springframework.context.annotation.ComponentScan.Filter;
+
 import com.campusconnect.neo4j.da.GroupDao;
 import com.campusconnect.neo4j.da.UserDaoImpl;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
 import com.campusconnect.neo4j.types.AccessRoles;
+import com.campusconnect.neo4j.types.Book;
+import com.campusconnect.neo4j.types.BooksPage;
 import com.campusconnect.neo4j.types.Group;
 import com.campusconnect.neo4j.types.User;
 import com.campusconnect.neo4j.types.UserGroupRelationship;
@@ -39,8 +43,7 @@ public class GroupResource {
 	}
 
 	@POST
-	public Response createGroup(Group group,
-			@QueryParam("userId") final String userId) {
+	public Response createGroup(Group group, @QueryParam("userId") final String userId) {
 		group.setId(UUID.randomUUID().toString());
 		setGroupCreateProperties(group, userId);
 		Long currentTime = System.currentTimeMillis();
@@ -65,8 +68,7 @@ public class GroupResource {
 	@Path("{groupId}")
 	public Response getGroup(@PathParam("groupId") final String groupId) {
 		Group group = groupDao.getGroup(groupId);
-		return Response.created(null).entity(group).build();
-
+		return Response.ok().entity(group).build();
 	}
 
 	@PUT
@@ -110,9 +112,7 @@ public class GroupResource {
 
 		// Todo validate user exist
 		// Todo CreatedBy is of Admin or Write USER_ACCESS
-
 		Long currentTime = System.currentTimeMillis();
-
 		for (String userId : userIdsPage.getUserIds()) {
 			
 			User user = userDao.getUser(userId);
@@ -131,5 +131,24 @@ public class GroupResource {
 		List<User> users = groupDao.getUsers(groupId);
 		UsersPage usersListPage = new UsersPage(0, users.size(), users);
 		return Response.ok().entity(usersListPage).build();
+	}
+	
+	@GET
+	@Path("{groupId}/books")
+	public Response getBooks(@PathParam("groupId")final String groupId,@QueryParam("filter")String filterParam)
+	{
+		if(null==filterParam || filterParam.equals("") || filterParam.toLowerCase().equals("available"))
+		{		 
+			List<Book> books = groupDao.getavailableBooks(groupId);
+			BooksPage booksPage = new BooksPage(0,books.size(),books);
+			return Response.ok().entity(booksPage).build();
+		}
+		else if(filterParam.toLowerCase().equals("lookingfor"))
+		{
+			List<Book> books = groupDao.getWishListBooks(groupId);
+			BooksPage booksPage = new BooksPage(0,books.size(),books);
+			return Response.ok().entity(booksPage).build();
+		}
+		return Response.ok().entity(new BooksPage()).build();
 	}
 }

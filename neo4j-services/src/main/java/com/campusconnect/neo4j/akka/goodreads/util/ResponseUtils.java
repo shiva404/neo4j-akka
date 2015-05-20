@@ -1,43 +1,38 @@
 package com.campusconnect.neo4j.akka.goodreads.util;
 
-import com.campusconnect.neo4j.akka.goodreads.types.GetBookResponse;
-import com.campusconnect.neo4j.akka.goodreads.types.Shelf;
-import com.campusconnect.neo4j.types.GoodreadsStatus;
 import com.campusconnect.neo4j.util.StringUtils;
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
-import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by sn1 on 3/10/15.
  */
 public class ResponseUtils {
     public static Logger logger = LoggerFactory.getLogger(ResponseUtils.class);
+
     public static <T> T getEntity(String xmlData, Class<T> clazz) throws IOException {
-    try{
-        XMLSerializer xmlSerializer = new XMLSerializer();
-        final String cleanedUpXML = StringUtils.cleanEmptyTags(xmlData);
+        try {
+            XMLSerializer xmlSerializer = new XMLSerializer();
+            final String cleanedUpXML = StringUtils.cleanEmptyTags(xmlData);
 //        logger.debug("Cleaned up data \n" + cleanedUpXML);
-        JSON json = xmlSerializer.read(cleanedUpXML);
+            JSON json = xmlSerializer.read(cleanedUpXML);
 //        logger.debug("Converted Json \n" + json);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        T response = objectMapper.readValue(json.toString(), clazz);
-        return response;
-    } catch (Exception e){
-        logger.error("Failed to deserialize:\n" + "XML:" + xmlData, e);
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            T response = objectMapper.readValue(json.toString(), clazz);
+            return response;
+        } catch (Exception e) {
+            logger.error("Failed to deserialize:\n" + "XML:" + xmlData, e);
+        }
+        return null;
     }
-    return null;
-    }
-    
+
 //    public static String getStandardShelfName(List<Shelf> shelfList) {
 //        if (shelfList != null)
 //        for (Shelf shelf : shelfList) {
@@ -52,5 +47,5 @@ public class ResponseUtils {
 //        }
 //        return GoodreadsStatus.READ.toString();
 //    }
-    
+
 }

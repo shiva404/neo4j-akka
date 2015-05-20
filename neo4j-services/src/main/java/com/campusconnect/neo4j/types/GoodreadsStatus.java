@@ -14,12 +14,12 @@ public enum GoodreadsStatus {
         name = s;
     }
 
-    public boolean equalsName(String otherName){
+    public boolean equalsName(String otherName) {
         return (otherName != null) && name.equals(otherName);
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return name;
     }
 }

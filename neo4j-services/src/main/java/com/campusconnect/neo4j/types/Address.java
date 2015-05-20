@@ -32,6 +32,7 @@ public class Address implements Serializable {
     private String state;
     private String type; //HOME, WORK, OTHER
     private String zipCode;
+
     public Address() {
 
     }
@@ -41,7 +42,7 @@ public class Address implements Serializable {
         this.line1 = line1;
         this.zipCode = zipCode;
     }
-    
+
     public Address(String latitude, String longitude, String type, long createdDate, long lastModifiedTime) {
         this.latitude = latitude;
         this.longitude = longitude;
@@ -65,101 +66,100 @@ public class Address implements Serializable {
         return city;
     }
 
-    public String getCountry() {
-        return country;
-    }
-
-    public long getCreatedDate() {
-        return createdDate;
-    }
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getLandmark() {
-        return landmark;
-    }
-
-    public long getLastModifiedTime() {
-        return lastModifiedTime;
-    }
-
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public String getLine1() {
-        return line1;
-    }
-    
-    public String getLine2() {
-        return line2;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getZipCode() {
-        return zipCode;
-    }
-
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public String getCountry() {
+        return country;
     }
 
     public void setCountry(String country) {
         this.country = country;
     }
 
+    public long getCreatedDate() {
+        return createdDate;
+    }
+
     public void setCreatedDate(long createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public String getLandmark() {
+        return landmark;
+    }
+
     public void setLandmark(String landmark) {
         this.landmark = landmark;
+    }
+
+    public long getLastModifiedTime() {
+        return lastModifiedTime;
     }
 
     public void setLastModifiedTime(long lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
     }
 
+    public String getLatitude() {
+        return latitude;
+    }
+
     public void setLatitude(String latitude) {
         this.latitude = latitude;
+    }
+
+    public String getLine1() {
+        return line1;
     }
 
     public void setLine1(String line1) {
         this.line1 = line1;
     }
 
+    public String getLine2() {
+        return line2;
+    }
+
     public void setLine2(String line2) {
         this.line2 = line2;
+    }
+
+    public String getLongitude() {
+        return longitude;
     }
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
     }
 
+    public String getState() {
+        return state;
+    }
+
     public void setState(String state) {
         this.state = state;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getZipCode() {
+        return zipCode;
     }
 
     public void setZipCode(String zipCode) {

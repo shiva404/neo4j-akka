@@ -2,7 +2,10 @@ package com.campusconnect.neo4j.types;
 
 
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.neo4j.annotation.*;
+import org.springframework.data.neo4j.annotation.EndNode;
+import org.springframework.data.neo4j.annotation.GraphId;
+import org.springframework.data.neo4j.annotation.RelationshipEntity;
+import org.springframework.data.neo4j.annotation.StartNode;
 
 /**
  * Created by sn1 on 1/19/15.
@@ -15,6 +18,19 @@ public class UserRelation {
     private User user1;
     @EndNode
     private User user2;
+    private String type;
+    @CreatedDate
+    private long createdDate;
+
+    public UserRelation(User user1, User user2, long createdDate, String type) {
+        this.type = type;
+        this.user1 = user1;
+        this.user2 = user2;
+        this.createdDate = createdDate;
+    }
+
+    public UserRelation() {
+    }
 
     public String getType() {
         return type;
@@ -23,11 +39,6 @@ public class UserRelation {
     public void setType(String type) {
         this.type = type;
     }
-
-    private String type;
-
-    @CreatedDate
-    private long createdDate;
 
     public long getCreatedDate() {
         return createdDate;
@@ -59,16 +70,5 @@ public class UserRelation {
 
     public void setUser2(User user2) {
         this.user2 = user2;
-    }
-
-
-    public UserRelation(User user1, User user2, long createdDate, String type) {
-        this.type = type;
-        this.user1 = user1;
-        this.user2 = user2;
-        this.createdDate = createdDate;
-    }
-
-    public UserRelation() {
     }
 }

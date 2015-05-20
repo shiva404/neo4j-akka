@@ -25,7 +25,7 @@ public class GetUser {
         uriBuilder.path("https://www.goodreads.com");
         uriBuilder.path("user/show");
         uriBuilder.path(goodreadsId + ".xml");
-        
+
         Token sAccessToken = new Token(accessToken, secret);
         OAuthRequest getBooksRequest = new OAuthRequest(Verb.GET, uriBuilder.build().toString());
         goodreadsOauthClient.getsService().signRequest(sAccessToken, getBooksRequest);

@@ -18,7 +18,7 @@ public class SearchResult {
     }
 
     public List<Book> getBooks() {
-        if(books == null){
+        if (books == null) {
             books = new ArrayList<>();
         }
         return books;

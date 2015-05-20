@@ -1,21 +1,17 @@
-
 package com.campusconnect.neo4j.akka.goodreads.types;
 
+import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import javax.annotation.Generated;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.codehaus.jackson.annotate.JsonAnySetter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "@name",
-    "@count"
+        "@name",
+        "@count"
 })
 public class PopularShelf {
 
@@ -27,9 +23,7 @@ public class PopularShelf {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The Name
+     * @return The Name
      */
     @JsonProperty("@name")
     public String getName() {
@@ -37,9 +31,7 @@ public class PopularShelf {
     }
 
     /**
-     * 
-     * @param Name
-     *     The @name
+     * @param Name The @name
      */
     @JsonProperty("@name")
     public void setName(String Name) {
@@ -47,9 +39,7 @@ public class PopularShelf {
     }
 
     /**
-     * 
-     * @return
-     *     The Count
+     * @return The Count
      */
     @JsonProperty("@count")
     public String getCount() {
@@ -57,9 +47,7 @@ public class PopularShelf {
     }
 
     /**
-     * 
-     * @param Count
-     *     The @count
+     * @param Count The @count
      */
     @JsonProperty("@count")
     public void setCount(String Count) {

@@ -1,5 +1,8 @@
 package com.campusconnect.neo4j.tests;
 
+import java.util.List;
+
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -7,7 +10,10 @@ import javax.ws.rs.core.Response;
 
 import org.testng.annotations.Test;
 
+import com.campusconnect.neo4j.tests.functional.GroupResourceTest;
 import com.campusconnect.neo4j.tests.functional.UserResourceTest;
+import com.campusconnect.neo4j.types.Group;
+import com.campusconnect.neo4j.types.GroupPage;
 import com.sun.jersey.api.client.ClientResponse;
 
 /**
@@ -93,6 +99,23 @@ assert clientResponse.getStatus() == 200;
 				.path("users").path(userId5).path("follow").path(userId6).type("application/json")
 				.post(ClientResponse.class);
 		 assert clientResponse.getStatus() == 200;
+		 
+		String groupID1=  GroupResourceTest.createGroup(userId3);
+		String groupID2= GroupResourceTest.createGroup(userId3);
+		String groupID3= GroupResourceTest.createGroup(userId3);
 		
+				
+		
+		 clientResponse = resource
+					.path("users").path(userId3).path("groups").type("application/json")
+					.get(ClientResponse.class);
+			 assert clientResponse.getStatus() == 200;
+			 GroupPage groupPage = clientResponse.getEntity(GroupPage.class);
+			assert groupPage.getSize() == 3;
+			
+		
+		 
+		 
+		 
     }
 }

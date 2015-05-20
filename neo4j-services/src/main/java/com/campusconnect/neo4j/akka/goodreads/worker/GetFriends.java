@@ -3,11 +3,7 @@ package com.campusconnect.neo4j.akka.goodreads.worker;
 import akka.actor.UntypedActor;
 import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
 import com.campusconnect.neo4j.akka.goodreads.client.GoodreadsOauthClient;
-import com.campusconnect.neo4j.akka.goodreads.task.GetBooksTask;
 import com.campusconnect.neo4j.akka.goodreads.task.GetFriendsTask;
-import com.campusconnect.neo4j.akka.goodreads.types.GetBooksResponse;
-import com.campusconnect.neo4j.akka.goodreads.util.ResponseUtils;
-import com.campusconnect.neo4j.types.Book;
 import com.sun.jersey.api.uri.UriBuilderImpl;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -26,10 +22,10 @@ public class GetFriends extends UntypedActor {
 
     @Autowired
     private GoodreadsAsynchHandler goodreadsAsynchHandler;
-    
+
     @Override
     public void onReceive(Object message) throws Exception {
-        if(message instanceof GetFriendsTask) {
+        if (message instanceof GetFriendsTask) {
             GetFriendsTask getFriendsTask = (GetFriendsTask) message;
             UriBuilder uriBuilder = new UriBuilderImpl();
             uriBuilder.path("https://www.goodreads.com");

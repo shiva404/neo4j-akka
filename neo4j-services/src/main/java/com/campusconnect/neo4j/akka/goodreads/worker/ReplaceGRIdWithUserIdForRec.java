@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Created by sn1 on 5/5/15.
  */
-public class ReplaceGRIdWithUserIdForRec extends UntypedActor{
+public class ReplaceGRIdWithUserIdForRec extends UntypedActor {
     @Autowired
     UtilsDao utilsDao;
-    
+
     @Override
     public void onReceive(Object message) throws Exception {
-        if(message instanceof ReplaceGRIdWithUserIdForRecTask) {
+        if (message instanceof ReplaceGRIdWithUserIdForRecTask) {
             ReplaceGRIdWithUserIdForRecTask replaceGRIdWithUserIdForRecTask = (ReplaceGRIdWithUserIdForRecTask) message;
             utilsDao.getAndReplaceGRRecByGoodreadsId(replaceGRIdWithUserIdForRecTask.getGoodreadsId(), replaceGRIdWithUserIdForRecTask.getUserId(), replaceGRIdWithUserIdForRecTask.getImageUrl());
         }

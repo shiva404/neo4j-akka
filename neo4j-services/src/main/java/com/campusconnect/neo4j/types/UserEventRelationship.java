@@ -8,41 +8,40 @@ import org.springframework.data.neo4j.annotation.StartNode;
 
 @RelationshipEntity(type = "ACTIVITY")
 public class UserEventRelationship {
-	@EndNode
-	private AuditEvent auditEvent;
+    @EndNode
+    private AuditEvent auditEvent;
 
-	@GraphId
-	private Long id;
+    @GraphId
+    private Long id;
 
-	@StartNode
-	private User user;
+    @StartNode
+    private User user;
 
-	public UserEventRelationship() {
-		super();
-	}
+    public UserEventRelationship() {
+        super();
+    }
 
-	public UserEventRelationship(AuditEvent auditEvent, User user) {
-		super();
-		this.auditEvent = auditEvent;
-		this.user = user;
-	}
+    public UserEventRelationship(AuditEvent auditEvent, User user) {
+        super();
+        this.auditEvent = auditEvent;
+        this.user = user;
+    }
 
-	public AuditEvent getEvent() {
-		return auditEvent;
-	}
+    public AuditEvent getEvent() {
+        return auditEvent;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public void setEvent(AuditEvent auditEvent) {
+        this.auditEvent = auditEvent;
+    }
 
-	public void setEvent(AuditEvent auditEvent) {
-		this.auditEvent = auditEvent;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
-
+    public void setUser(User user) {
+        this.user = user;
+    }
 
 
 }

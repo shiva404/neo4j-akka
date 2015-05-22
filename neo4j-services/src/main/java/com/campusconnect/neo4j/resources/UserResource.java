@@ -3,31 +3,23 @@ package com.campusconnect.neo4j.resources;
 import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.GroupDao;
-import com.campusconnect.neo4j.da.iface.AddressDao;
-import com.campusconnect.neo4j.da.iface.AuditEventDao;
-import com.campusconnect.neo4j.da.iface.BookDao;
-import com.campusconnect.neo4j.da.iface.NotificationDao;
-import com.campusconnect.neo4j.da.iface.ReminderDao;
-import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.exceptions.DataDuplicateException;
+import com.campusconnect.neo4j.da.iface.*;
 import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
 import com.campusconnect.neo4j.types.*;
 import com.campusconnect.neo4j.util.Validator;
-
-import static com.campusconnect.neo4j.util.ErrorCodes.*;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.campusconnect.neo4j.util.ErrorCodes.INVALId_ARGMENTS;
 
 /**
  * Created by sn1 on 1/22/15.
@@ -124,6 +116,13 @@ public class UserResource {
         User updatedUser = userDao.updateUser(userId, user);
         checkWhetherSynchIsNeeded(updatedUser, fields);
         return Response.ok().entity(updatedUser).build();
+    }
+
+    @POST
+    @Path("{userId}/goodreads/synch")
+    public Response synchGoodreads(@PathParam("userId") final String userId) throws Exception {
+        initiateGoodreadsSynch(userDao.getUser(userId));
+        return Response.ok().build();
     }
 
     private void checkWhetherSynchIsNeeded(User user, Fields fields) {
@@ -451,8 +450,8 @@ public class UserResource {
         return Response.ok().entity(user).build();
 
     }
-    
-    
+
+
     @GET
     @Path("{userId}/reminders")
     public Response getAllReminders(@PathParam("userId") final String userId)
@@ -512,4 +511,18 @@ public class UserResource {
 		reminder.setCreatedDate(currentTime);
 		reminder.setLastModifiedTime(currentTime);
 	}
+    
+    @GET
+    @Path("{userId}/search")
+    public Response searchUsers(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
+        List<User> users = userDao.search(searchString);
+        return Response.ok().entity(new UsersPage(0, users.size(), users)).build();
+    }
+
+    @GET
+    @Path("{userId}/search/friends")
+    public Response searchFriends(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
+        List<User> users = userDao.searchFriends(userId, searchString);
+        return Response.ok().entity(new UsersPage(0, users.size(), users)).build();
+    }
 }

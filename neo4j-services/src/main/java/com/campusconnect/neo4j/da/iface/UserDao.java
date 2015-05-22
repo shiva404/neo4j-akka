@@ -51,4 +51,8 @@ public interface UserDao {
     User getUserByGoogleId(String googleId);
 
     User getUserByEmail(String email);
+
+    List<User> search(String searchString);
+
+    List<User> searchFriends(String userId, String searchString);
 }

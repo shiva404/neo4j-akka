@@ -19,6 +19,14 @@ public class Event {
         this.isPublic = isPublic;
     }
 
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
     public String getAuditEventType() {
         return auditEventType;
     }

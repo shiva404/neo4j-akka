@@ -58,9 +58,6 @@ public class UserDaoImpl implements UserDao {
         String targetEventUserName = user.getName();
         String targetEventUrl = "users/" + targetEventUserId;
         return new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);
-//	return  new Event(AuditEventType.FRIEND.toString(), targetEvent,System.currentTimeMillis());
-
-
     }
 
     @Override
@@ -152,18 +149,10 @@ public class UserDaoImpl implements UserDao {
 
         try {
             Long currentTime = System.currentTimeMillis();
-            String targetEventUserId = follower.getId();
-            String targetEventUserName = follower.getName();
-            String targetEventUrl = "users/" + targetEventUserId;
-            String targetNotificationUserId = user.getId();
-            String targetNoitficationUrl = "users/" + targetNotificationUserId;
-            String targetNotificationstring = user.getName();
-            Target targetEvent = new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);
-            Target targetNotification = new Target(IdType.USER_ID.toString(), "is following you", targetNoitficationUrl);
-            Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetEvent, currentTime, false);
-            Notification followedNotification = new Notification(targetNotification, currentTime);
-            auditEventDao.addEvent(targetEventUserId, followedUSerEvent);
-            notificationDao.addNotification(targetNotificationUserId, followedNotification);
+            Target targetforAuditEvent = createTargetToUser(follower);
+            Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetforAuditEvent, currentTime, true);
+            auditEventDao.addEvent(user.getId(), followedUSerEvent);
+       
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -178,20 +167,19 @@ public class UserDaoImpl implements UserDao {
         try {
             Long currentTime = System.currentTimeMillis();
 
-            String targetNotificationUserId = user.getId();
+            String targetNotificationUserId = friend.getId();
             String targetNoitficationUrl = "users/" + targetNotificationUserId;
-            String targetNotificationstring = user.getName();
+            String targetNotificationstring = friend.getName();
             Target targetEventUser = createTargetToUser(friend);
             Target targetEventFriend = createTargetToUser(user);
             Event beFriendUserEvent1 = new Event(AuditEventType.FRIEND.toString(), targetEventUser, System.currentTimeMillis(), true);
             Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend, System.currentTimeMillis(), true);
-            Target targetNotification = new Target(IdType.USER_ID.toString(), "is friends with you", targetNoitficationUrl);
-            //	Event beFriendUserEvent1 = createEventToUser(friend);
-
+            Target targetNotification = new Target(IdType.USER_ID.toString(),targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
+          
             Notification beFriendNotification = new Notification(targetNotification, currentTime);
             auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
             auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
-            notificationDao.addNotification(targetNotificationUserId, beFriendNotification);
+            notificationDao.addNotification(user.getId(), beFriendNotification);
         } catch (Exception e) {
             e.printStackTrace();
         }

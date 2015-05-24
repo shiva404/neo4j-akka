@@ -6,6 +6,8 @@ import com.campusconnect.neo4j.types.AuditEvent;
 import com.campusconnect.neo4j.types.Event;
 import com.campusconnect.neo4j.types.IdType;
 import com.campusconnect.neo4j.types.Subject;
+import com.campusconnect.neo4j.util.comparator.TimeStampComparator;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -85,6 +87,9 @@ public class AuditEventDaoImpl implements AuditEventDao {
                 }
             }
         }
+        
+        Collections.sort(events, new TimeStampComparator());
+        
         return events;
     }
 }

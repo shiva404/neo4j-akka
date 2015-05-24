@@ -10,4 +10,7 @@ public interface EmailDao {
     public void sendBorrowBookInitEmail(User borrower, User owner, Book book);
 
     public void sendAcceptedToLendBookEmail(User owner, User borrower, Book book);
+    
+    public void sendFriendRequestEmail(User user,User friend);
+ 
 }

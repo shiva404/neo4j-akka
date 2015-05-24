@@ -2,6 +2,7 @@ package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
+import com.campusconnect.neo4j.da.iface.EmailDao;
 import com.campusconnect.neo4j.da.iface.NotificationDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.repositories.BookRepository;
@@ -9,6 +10,7 @@ import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.*;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
@@ -44,6 +46,8 @@ public class UserDaoImpl implements UserDao {
     @Autowired
     private FBDao fbDao;
     private Neo4jTemplate neo4jTemplate;
+    @Autowired
+    private EmailDao emailDao;
 
     public UserDaoImpl(Neo4jTemplate neo4jTemplate) {
         this.neo4jTemplate = neo4jTemplate;
@@ -165,7 +169,7 @@ public static Target createTargetToUser(User user) {
     	}
     }
 
-    public void createFriendRelation(@PartialCacheKey User user, User friend) {
+    public void confirmFriendRelation(@PartialCacheKey User user, User friend) {
 
         long now = System.currentTimeMillis();
         UserRelation userRelation = new UserRelation(user, friend, now, UserRelationType.FRIEND.toString());
@@ -358,5 +362,34 @@ public static Target createTargetToUser(User user) {
 	@Override
 	public UserRelation getUsersRelationShip(User user, User fellowUser) {
 		return userRelationRepository.getUsersRelationship(user.getId(), fellowUser.getId());
+	}
+
+	@Override
+	public List<User> findFriends(String userId) {
+		return userRelationRepository.getFriends(userId);
+	}
+
+	@Override
+	public List<User> findMutualFriends(String currentUser, String userId) {
+		
+		return userRelationRepository.getMutualFriends(currentUser, userId);
+	}
+
+	@Override
+	public void createFriendRelationWithPending(User user, User friend) {
+		
+		   UserRelation userRelation = new UserRelation(user, friend, System.currentTimeMillis(), UserRelationType.FRIEND_REQUEST_PENDING.toString());
+	        neo4jTemplate.save(userRelation);
+	        	emailDao.sendFriendRequestEmail(user, friend);        
+	    //    Notification friendRequestRecievedNotification = new Notification(target, timeStamp)
+	}
+
+	@Override
+	public void deleteFriendRequest(String userId, String friendUserId) {
+		//UserRelation userRelation = userRelationRepository.getUsersRelationship(userId, friendUserId);
+		User user = getUser(userId);
+		User friend = getUser(friendUserId);
+		neo4jTemplate.deleteRelationshipBetween(user, friend, "CONNECTED");
+		
 	}
 }

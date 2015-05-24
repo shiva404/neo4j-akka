@@ -87,11 +87,21 @@ public class DataSetUp extends TestBase {
 						.post(ClientResponse.class);
 		assert clientResponse.getStatus() == 200;
 		
+		clientResponse = resource.path("users").path(userId1).path("friend")
+	              .path(userId2).queryParam("status", "agreed").type("application/json")
+	              .put(ClientResponse.class);
+	      assert clientResponse.getStatus() == 200;
+		
 		//user1 friend with user3
 		clientResponse = resource
 				.path("users").path(userId1).path("friend").path(userId3).type("application/json")
 				.post(ClientResponse.class);
 		assert clientResponse.getStatus() == 200;
+		
+		clientResponse = resource.path("users").path(userId1).path("friend")
+	              .path(userId3).queryParam("status", "agreed").type("application/json")
+	              .put(ClientResponse.class);
+	      assert clientResponse.getStatus() == 200;
 
 		//user1 follow user8
 		clientResponse = resource
@@ -105,11 +115,21 @@ public class DataSetUp extends TestBase {
 				.post(ClientResponse.class);
 		 assert clientResponse.getStatus() == 200;
 		 
+		 clientResponse = resource.path("users").path(userId2).path("friend")
+	              .path(userId9).queryParam("status", "agreed").type("application/json")
+	              .put(ClientResponse.class);
+	      assert clientResponse.getStatus() == 200;
+		 
 		//user3 friend with user1
 		 clientResponse = resource
 				.path("users").path(userId3).path("friend").path(userId1).type("application/json")
 				.post(ClientResponse.class);
 		 assert clientResponse.getStatus() == 200;
+		 
+		 clientResponse = resource.path("users").path(userId3).path("friend")
+	              .path(userId3).queryParam("status", "agreed").type("application/json")
+	              .put(ClientResponse.class);
+	      assert clientResponse.getStatus() == 200;
 		 
 		//user3 friend with user4
 		 clientResponse = resource
@@ -117,17 +137,32 @@ public class DataSetUp extends TestBase {
 				.post(ClientResponse.class);
 		 assert clientResponse.getStatus() == 200;
 		 
+		 clientResponse = resource.path("users").path(userId3).path("friend")
+	              .path(userId4).queryParam("status", "agreed").type("application/json")
+	              .put(ClientResponse.class);
+	      assert clientResponse.getStatus() == 200;
+		 
 		//user3 friend with user7
 		 clientResponse = resource
 				.path("users").path(userId3).path("friend").path(userId7).type("application/json")
 				.post(ClientResponse.class);
 		 assert clientResponse.getStatus() == 200;
 		 
+		 clientResponse = resource.path("users").path(userId3).path("friend")
+	              .path(userId7).queryParam("status", "agreed").type("application/json")
+	              .put(ClientResponse.class);
+	      assert clientResponse.getStatus() == 200;
+		 
 		//user3 friend with user8
 		 clientResponse = resource
 				.path("users").path(userId3).path("friend").path(userId8).type("application/json")
 				.post(ClientResponse.class);
 		 assert clientResponse.getStatus() == 200;
+		 
+		 clientResponse = resource.path("users").path(userId3).path("friend")
+	              .path(userId8).queryParam("status", "agreed").type("application/json")
+	              .put(ClientResponse.class);
+	      assert clientResponse.getStatus() == 200;
 		 
 		//user3 follow with user5
 		 clientResponse = resource
@@ -147,11 +182,21 @@ public class DataSetUp extends TestBase {
 				.post(ClientResponse.class);
 		 assert clientResponse.getStatus() == 200;
 		 
+		 clientResponse = resource.path("users").path(userId4).path("friend")
+	              .path(userId8).queryParam("status", "agreed").type("application/json")
+	              .put(ClientResponse.class);
+	      assert clientResponse.getStatus() == 200;
+		 
 		//user5 friend with user6
 		 clientResponse = resource
 				.path("users").path(userId5).path("friend").path(userId6).type("application/json")
 				.post(ClientResponse.class);
 		 assert clientResponse.getStatus() == 200;
+		 
+		 clientResponse = resource.path("users").path(userId5).path("friend")
+	              .path(userId6).queryParam("status", "agreed").type("application/json")
+	              .put(ClientResponse.class);
+	      assert clientResponse.getStatus() == 200;
 		 
 		//user6 follow with user3
 		 clientResponse = resource

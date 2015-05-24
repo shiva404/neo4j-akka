@@ -1,5 +1,7 @@
 package com.campusconnect.neo4j.types;
 
+import java.util.Comparator;
+
 public class Event {
 
     private Subject subject;
@@ -62,6 +64,4 @@ public class Event {
     public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
     }
-
-
 }

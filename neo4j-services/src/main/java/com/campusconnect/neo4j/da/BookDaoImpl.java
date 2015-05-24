@@ -134,12 +134,12 @@ public class BookDaoImpl implements BookDao {
                 LOGGER.info("Goodreads book is not in there datsbase fetching from goodreads. Id: " + Integer.parseInt(goodreadsId));
                 final Book bookByGoodreadId = goodreadsDao.getBookById(goodreadsId);
                 bookByGoodreadId.setId(UUID.randomUUID().toString());
-                goodreadsAsynchHandler.saveBook(bookByGoodreadId);
+                createBook(bookByGoodreadId);
                 return bookByGoodreadId;
             }
         } catch (Exception e) {
             //Todo : if exception is not found search in goodreads
-            return goodreadsDao.getBookById(goodreadsId);
+            //return goodreadsDao.getBookById(goodreadsId);
         }
         return null;
     }

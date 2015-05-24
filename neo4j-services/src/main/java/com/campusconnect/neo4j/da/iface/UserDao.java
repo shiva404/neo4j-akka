@@ -56,12 +56,15 @@ public interface UserDao {
 
     List<User> searchFriends(String userId, String searchString);
 
-	List<User> findFriends(String userId);
-	
-	List<User> findMutualFriends(String userId,String mutualFriends);
+    List<User> findFriends(String userId);
 
-	void createFriendRelationWithPending(User user, User user2);
+    List<User> findMutualFriends(String userId, String mutualFriends);
 
-	void deleteFriendRequest(String userId, String friendUserId);
-	
+    void createFriendRelationWithPending(User user, User user2);
+
+    void deleteFriendRequest(String userId, String friendUserId);
+
+
+    List<User> getRandomUsers(int size);
+
 }

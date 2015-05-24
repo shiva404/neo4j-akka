@@ -1,6 +1,9 @@
 package com.campusconnect.neo4j.da;
 
+import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.repositories.GroupRepository;
+import com.campusconnect.neo4j.repositories.UserGroupRepository;
+import com.campusconnect.neo4j.types.AccessRoles;
 import com.campusconnect.neo4j.types.Book;
 import com.campusconnect.neo4j.types.Group;
 import com.campusconnect.neo4j.types.User;
@@ -17,6 +20,12 @@ import java.util.List;
 public class GroupDao {
     @Autowired
     private GroupRepository groupRepository;
+    
+    @Autowired 
+    private UserGroupRepository userGroupRepository;
+    
+    @Autowired
+    private UserDao userDao;
 
     private Neo4jTemplate neo4jTemplate;
 
@@ -46,8 +55,25 @@ public class GroupDao {
         return groupRepository.getUsers(groupId);
     }
 
-    public void addUser(UserGroupRelationship userGroupRelationship) {
+    public void addUser(String groupId,String userId,String role,String createdBy) {
+    	
+    	Group group = getGroup(groupId);
+		User user = userDao.getUser(userId);
+		UserGroupRelationship existingUserGroupRelationship = userGroupRepository.getUserGroupRelationShip(userId, groupId);
+		//TODO: null check for role of addUser 
+		if(null!=existingUserGroupRelationship)
+		{
+			existingUserGroupRelationship.setRole(role);
+			neo4jTemplate.save(existingUserGroupRelationship);
+		}
+		else
+		{
+		Long currentTime = System.currentTimeMillis();
+		UserGroupRelationship userGroupRelationship = new UserGroupRelationship(
+				createdBy, currentTime, group, currentTime,
+				role, user);
         neo4jTemplate.save(userGroupRelationship);
+		}
     }
 
     public Group updateGroup(String groupId, Group group) {
@@ -64,5 +90,7 @@ public class GroupDao {
 	public List<Book> getWishListBooks(String groupId) {
 		return groupRepository.getWishListBooks(groupId);
 	}
+	
+	
 
 }

@@ -4,10 +4,18 @@ import com.campusconnect.neo4j.tests.TestBase;
 import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
 import com.campusconnect.neo4j.types.*;
 import com.sun.jersey.api.client.ClientResponse;
+
 import org.testng.annotations.Test;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 /**
  * Created by sn1 on 2/24/15.
@@ -31,6 +39,12 @@ public class UserResourceTest extends TestBase {
         createdUser = clientResponse.getEntity(User.class);
         String userId = createdUser.getId();
         return userId;
+    }
+    
+    public static String createBook()
+    {
+    	   ClientResponse createBookClientResponse = resource.path("books").type("application/json").entity(DataBrewer.getFakeBook()).post(ClientResponse.class);
+    	   return createBookClientResponse.getEntity(Book.class).getId();
     }
 
     public static String createKnowUserWithGoogleId(String userName, String email, String googleId) {
@@ -197,5 +211,37 @@ public class UserResourceTest extends TestBase {
         String userId4 = createKnowUserWithFbId("Namitha", "abc@gmail.com", "abcFbId");
         String userId3 = createKnowUserWithGoogleId("Namitha", "abc@gmail.com", "abcGoogleId");
         assert userId4.toLowerCase().equals(userId3.toLowerCase());
+    }
+    
+    @Test
+    public void testFriendRequestFlow() {
+    	//friend confirmed
+      String userId1 = createKnowUserWithGoogleId("Namitha", "namics08@gmail.com", "namabc");
+      String friend = createKnowUserWithGoogleId("chiwahwah","shiva.n404@gmail.com","chiwahwah");
+      
+      ClientResponse agreedStatusCR = resource.path("users").path(userId1).path("friend")
+              .path(friend).type("application/json")
+              .post(ClientResponse.class);
+      assert agreedStatusCR.getStatus() == 200;
+      
+    agreedStatusCR = resource.path("users").path(userId1).path("friend")
+              .path(friend).queryParam("status", "agreed").type("application/json")
+              .put(ClientResponse.class);
+      assert agreedStatusCR.getStatus() == 200;
+      
+      //friend request cancelled
+      String userId2 = createUser();
+      String friend2 = createUser();
+      
+    agreedStatusCR = resource.path("users").path(userId2).path("friend")
+              .path(friend2).type("application/json")
+              .post(ClientResponse.class);
+      assert agreedStatusCR.getStatus() == 200;
+      
+    agreedStatusCR = resource.path("users").path(userId2).path("friend")
+              .path(friend2).queryParam("status", "cancel").type("application/json")
+              .put(ClientResponse.class);
+      assert agreedStatusCR.getStatus() == 200;
+      
     }
 }

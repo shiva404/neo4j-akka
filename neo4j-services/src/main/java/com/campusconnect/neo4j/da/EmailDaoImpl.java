@@ -25,4 +25,11 @@ public class EmailDaoImpl implements EmailDao {
     public void sendAcceptedToLendBookEmail(User owner, User borrower, Book book) {
         neo4jAsynchHandler.sendAcceptToLendBookEmail(owner, borrower, book);
     }
+
+	@Override
+	public void sendFriendRequestEmail(User user, User friend) {
+		
+		neo4jAsynchHandler.sendFriendRequestEmail(user, friend);
+		
+	}
 }

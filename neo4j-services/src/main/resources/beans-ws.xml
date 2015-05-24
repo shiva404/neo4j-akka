@@ -99,6 +99,7 @@
         <constructor-arg index="0" ref="borrowInitEmailRouter"/>
         <constructor-arg index="1" ref="utilSuccessListener"/>
         <constructor-arg index="2" ref="acceptToLendBookEmailRouter"/>
+        <constructor-arg index="3" ref="friendrequestEmailRouter"/>
     </bean>
 
     <bean class="com.campusconnect.neo4j.resources.UserResource">
@@ -201,6 +202,17 @@
         <property name="actorSystem" ref="actorSystem"/>
         <property name="actorClass"
                   value="com.campusconnect.neo4j.akka.util.worker.email.AcceptedToLendBookEmailWorker"/>
+        <property name="routerConfig">
+            <bean class="akka.routing.SmallestMailboxPool">
+                <constructor-arg type="int" value="${akka.friends.get.workers.count}"/>
+            </bean>
+        </property>
+    </bean>
+    
+     <bean id="friendrequestEmailRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
+        <property name="actorSystem" ref="actorSystem"/>
+        <property name="actorClass"
+                  value="com.campusconnect.neo4j.akka.util.worker.email.FriendRequestEmailWorker"/>
         <property name="routerConfig">
             <bean class="akka.routing.SmallestMailboxPool">
                 <constructor-arg type="int" value="${akka.friends.get.workers.count}"/>

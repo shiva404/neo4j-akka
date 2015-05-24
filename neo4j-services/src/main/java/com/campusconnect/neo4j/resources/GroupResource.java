@@ -46,14 +46,10 @@ public class GroupResource {
 	public Response createGroup(Group group, @QueryParam("userId") final String userId) {
 		group.setId(UUID.randomUUID().toString());
 		setGroupCreateProperties(group, userId);
-		Long currentTime = System.currentTimeMillis();
 		Group createdGroup = groupDao.createGroup(group);
-		User user = userDao.getUser(userId);
-		UserGroupRelationship userGroupRelationship = new UserGroupRelationship(
-				userId, currentTime, createdGroup, currentTime,
-				AccessRoles.ADMIN.toString(), user);
+		
 		// Todo Add user as admin
-		groupDao.addUser(userGroupRelationship);
+		groupDao.addUser(createdGroup.getId(),userId,AccessRoles.ADMIN.toString(),userId);
 		return Response.created(null).entity(createdGroup).build();
 	}
 
@@ -75,6 +71,7 @@ public class GroupResource {
 	@Path("{groupID}")
 	public Response updateGroup(@PathParam("groupId") final String groupId,
 			Group group) {
+		//Todo Add the user who updated Group (last updated by)
 		Group groupToBeUpdated = groupDao.updateGroup(groupId, group);
 		group.setLastModifiedTime(System.currentTimeMillis());
 		return Response.created(null).entity(groupToBeUpdated).build();
@@ -91,15 +88,10 @@ public class GroupResource {
 	@POST
 	@Path("{groupId}/users/{userId}")
 	public Response addUser(@PathParam("groupId") final String groupId,
-			@PathParam("userId") final String userId,
+			@PathParam("userId") final String userId,@QueryParam("role") final String role,
 			@QueryParam("createdBy") final String createdBy) {
-		Group group = groupDao.getGroup(groupId);
-		User user = userDao.getUser(userId);
-		Long currentTime = System.currentTimeMillis();
-		UserGroupRelationship userGroupRelationship = new UserGroupRelationship(
-				createdBy, currentTime, group, currentTime,
-				AccessRoles.READ.toString(), user);
-		groupDao.addUser(userGroupRelationship);
+		
+		groupDao.addUser(groupId,userId,role,createdBy);
 		return Response.created(null).build();
 	}
 
@@ -108,19 +100,12 @@ public class GroupResource {
 	public Response addUsers(@PathParam("groupId") final String groupId,
 			@QueryParam("createdBy") final String createdBy,
 			final UserIdsPage userIdsPage) {
-		Group group = groupDao.getGroup(groupId);
-
 		// Todo validate user exist
 		// Todo CreatedBy is of Admin or Write USER_ACCESS
 		Long currentTime = System.currentTimeMillis();
 		for (String userId : userIdsPage.getUserIds()) {
-			
 			User user = userDao.getUser(userId);
-			
-			UserGroupRelationship userGroupRelationship = new UserGroupRelationship(
-					createdBy, currentTime, group, currentTime,
-					AccessRoles.READ.toString(), user);
-			groupDao.addUser(userGroupRelationship);
+			groupDao.addUser(groupId,userId,AccessRoles.READ.toString(),createdBy);
 		}
 		return Response.ok().build();
 	}

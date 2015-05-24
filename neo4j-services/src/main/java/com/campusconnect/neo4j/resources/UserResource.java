@@ -229,10 +229,14 @@ public class UserResource {
     @Path("{userId}/books/{bookId}/own")
     public Response addBook(@PathParam("userId") final String userId, 
                             @PathParam("bookId") final String bookId,
-                            @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
-        
+                            @QueryParam("status") @DefaultValue("none") final String status, @QueryParam("idType") String bookIdType) throws Exception {
         User user = userDao.getUser(userId);
-        Book book = bookDao.getBook(bookId);
+        Book book = null;
+        if (bookIdType == null || bookIdType.equals("id")) {
+            book = bookDao.getBook(bookId);
+        } else if (bookIdType.equals("grId")) {
+            book = bookDao.getBookByGoodreadsId(bookId);
+        }
         long now = System.currentTimeMillis();
         bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status, now));
         return Response.ok().build();
@@ -242,10 +246,15 @@ public class UserResource {
     @Path("{userId}/books/{bookId}/wish")
     public Response addBookToWishList(@PathParam("userId") final String userId,
                             @PathParam("bookId") final String bookId,
-                            @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
+                            @QueryParam("status") @DefaultValue("none") final String status, @QueryParam("idType") String bookIdType) throws Exception {
         
         User user = userDao.getUser(userId);
-        Book book = bookDao.getBook(bookId);
+        Book book = null;
+        if (bookIdType == null || bookIdType.equals("id")) {
+            book = bookDao.getBook(bookId);
+        } else if (bookIdType.equals("grId")) {
+            book = bookDao.getBookByGoodreadsId(bookId);
+        }
         long now = System.currentTimeMillis();
         bookDao.addWishBookToUser(new WishListRelationship(user, book, status, now, now));
         return Response.ok().build();
@@ -348,7 +357,6 @@ public class UserResource {
     	userDao.createFollowingRelation(userDao.getUser(userId), userDao.getUser(followUserId));
 		return Response.ok().build(); 	
     }
-    
     
     @POST
     @Path("{userId}/friend/{friendUserId}")
@@ -556,6 +564,13 @@ public class UserResource {
     public Response searchFriends(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
         List<User> users = userDao.searchFriends(userId, searchString);
         return Response.ok().entity(new UsersPage(0, users.size(), users)).build();
+    }
+
+    @GET
+    @Path("random")
+    public Response getRandomUsers(@QueryParam("size") @DefaultValue("10") final String size) {
+        List<User> userList = userDao.getRandomUsers(Integer.parseInt(size));
+        return Response.ok().entity(new UsersPage(0, userList.size(), userList)).build();
     }
     
     @GET

@@ -21,4 +21,8 @@ public interface UserRepository extends GraphRepository<User> {
 
     @Query("MATCH (n:User) - [:CONNECTED {type:\"FRIEND\"}] - (me:User {id:{0}}) WHERE n.name =~ {1} RETURN n")
     List<User> searchFriends(String userId, String searchString);
+
+    @Query("match (users :User) return users limit {0}")
+    List<User> getRandomUsers(int size);
+
 }

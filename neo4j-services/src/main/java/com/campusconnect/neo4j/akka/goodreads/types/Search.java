@@ -17,7 +17,6 @@ import java.util.Map;
         "results-end",
         "total-results",
         "source",
-        "query-time-seconds",
         "results"
 })
 public class Search {
@@ -32,8 +31,6 @@ public class Search {
     private String totalResults;
     @JsonProperty("source")
     private String source;
-    @JsonProperty("query-time-seconds")
-    private String queryTimeSeconds;
     @JsonProperty("results")
     private List<Result> results = new ArrayList<Result>();
     @JsonIgnore
@@ -117,22 +114,6 @@ public class Search {
     @JsonProperty("source")
     public void setSource(String source) {
         this.source = source;
-    }
-
-    /**
-     * @return The queryTimeSeconds
-     */
-    @JsonProperty("query-time-seconds")
-    public String getQueryTimeSeconds() {
-        return queryTimeSeconds;
-    }
-
-    /**
-     * @param queryTimeSeconds The query-time-seconds
-     */
-    @JsonProperty("query-time-seconds")
-    public void setQueryTimeSeconds(String queryTimeSeconds) {
-        this.queryTimeSeconds = queryTimeSeconds;
     }
 
     /**

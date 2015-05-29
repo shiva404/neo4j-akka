@@ -5,5 +5,6 @@ package com.campusconnect.neo4j.types;
  */
 public enum UserRelationType {
     FOLLOWING,
-    FRIEND
+    FRIEND,
+    FRIEND_REQUEST_PENDING
 }

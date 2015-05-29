@@ -229,10 +229,14 @@ public class UserResource {
     @Path("{userId}/books/{bookId}/own")
     public Response addBook(@PathParam("userId") final String userId, 
                             @PathParam("bookId") final String bookId,
-                            @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
-        
+                            @QueryParam("status") @DefaultValue("none") final String status, @QueryParam("idType") String bookIdType) throws Exception {
         User user = userDao.getUser(userId);
-        Book book = bookDao.getBook(bookId);
+        Book book = null;
+        if (bookIdType == null || bookIdType.equals("id")) {
+            book = bookDao.getBook(bookId);
+        } else if (bookIdType.equals("grId")) {
+            book = bookDao.getBookByGoodreadsId(bookId);
+        }
         long now = System.currentTimeMillis();
         bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status, now));
         return Response.ok().build();
@@ -242,12 +246,30 @@ public class UserResource {
     @Path("{userId}/books/{bookId}/wish")
     public Response addBookToWishList(@PathParam("userId") final String userId,
                             @PathParam("bookId") final String bookId,
+                            @QueryParam("status") @DefaultValue("none") final String status, @QueryParam("idType") String bookIdType) throws Exception {
+        
+        User user = userDao.getUser(userId);
+        Book book = null;
+        if (bookIdType == null || bookIdType.equals("id")) {
+            book = bookDao.getBook(bookId);
+        } else if (bookIdType.equals("grId")) {
+            book = bookDao.getBookByGoodreadsId(bookId);
+        }
+        long now = System.currentTimeMillis();
+        bookDao.addWishBookToUser(new WishListRelationship(user, book, status, now, now));
+        return Response.ok().build();
+    }
+    
+    @POST
+    @Path("{userId}/books/{bookId}/read")
+    public Response addBookToReadList(@PathParam("userId") final String userId,
+                            @PathParam("bookId") final String bookId,
                             @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
         
         User user = userDao.getUser(userId);
         Book book = bookDao.getBook(bookId);
         long now = System.currentTimeMillis();
-        bookDao.addWishBookToUser(new WishListRelationship(user, book, status, now, now));
+        bookDao.listBookAsRead(new ReadRelation(user, book, status, now, now, null));
         return Response.ok().build();
     }
     
@@ -338,11 +360,29 @@ public class UserResource {
     
     @POST
     @Path("{userId}/friend/{friendUserId}")
-    public Response friend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId)
+    public Response addFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId)
     {
-    	userDao.createFriendRelation(userDao.getUser(userId), userDao.getUser(friendUserId));
+    	userDao.createFriendRelationWithPending(userDao.getUser(userId), userDao.getUser(friendUserId));
 		return Response.ok().build();
       //  return null;
+    }
+    
+    @PUT
+    @Path("{userId}/friend/{friendUserId}")
+    public Response confirmFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId,@QueryParam("status" )final String status)
+    {
+    	if(status.toLowerCase().equals("agreed"))
+    	{
+    	userDao.confirmFriendRelation(userDao.getUser(userId), userDao.getUser(friendUserId));
+    	//TODO:notification to user about acceptance
+	
+    	}
+    	else if(status.toLowerCase().equals("cancel"))
+    	{
+    		userDao.deleteFriendRequest(userId,friendUserId);
+    		
+    	}
+    	return Response.ok().build();
     }
     
     @PUT
@@ -513,16 +553,35 @@ public class UserResource {
 	}
     
     @GET
-    @Path("search")
-    public Response searchUsers(@QueryParam("q") String searchString) {
+    @Path("{userId}/search")
+    public Response searchUsers(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
         List<User> users = userDao.search(searchString);
         return Response.ok().entity(new UsersPage(0, users.size(), users)).build();
     }
 
     @GET
-    @Path("{userId}/search")
+    @Path("{userId}/search/friends")
     public Response searchFriends(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
         List<User> users = userDao.searchFriends(userId, searchString);
         return Response.ok().entity(new UsersPage(0, users.size(), users)).build();
+    }
+
+    @GET
+    @Path("random")
+    public Response getRandomUsers(@QueryParam("size") @DefaultValue("10") final String size) {
+        List<User> userList = userDao.getRandomUsers(Integer.parseInt(size));
+        return Response.ok().entity(new UsersPage(0, userList.size(), userList)).build();
+    }
+    
+    @GET
+    @Path("{userId}/friends")
+    public Response findFriends(@PathParam("userId") String userId, @QueryParam("currentUser") String currentUser) {
+        List<User> friends = userDao.findFriends(userId);
+        List<User> mutualFriends = userDao.findMutualFriends(currentUser, userId);
+        
+        FriendsPage friendsPage = new FriendsPage(0,friends.size(),friends);
+        FriendsPage mutualFriendsPage = new FriendsPage(0,mutualFriends.size(),mutualFriends);
+        Friends allFriends = new Friends(friendsPage,mutualFriendsPage);
+        return Response.ok().entity(allFriends).build();
     }
 }

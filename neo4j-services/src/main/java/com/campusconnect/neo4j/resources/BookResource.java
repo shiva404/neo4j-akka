@@ -80,13 +80,15 @@ public class BookResource {
                                  @QueryParam("borrowerId") String borrowerId, @QueryParam("status") String status, @QueryParam("sharePh ") String phoneSharing, BorrowRequest borrowRequest) {
         //locked - for user
         //agreed - for borrower
+        //ToDo update API so that owner and borrower are in query param
+        //Handle Phone number here
         Book book = bookDao.getBook(bookId);
         User user = userDao.getUser(userId);
         if (status.equals("agreed")) {
             if (borrowerId != null) {
                 User borrower = userDao.getUser(borrowerId);
                 if (borrower != null)
-                    bookDao.updateBookStatusOnAgreement(user, book, borrower, borrowRequest.getAdditionalMessage());
+                    bookDao.updateBookStatusOnAgreement(user, book, borrower, borrowRequest == null ? null : borrowRequest.getAdditionalMessage());
 
                 //todo: throw error userNot found
             } else {

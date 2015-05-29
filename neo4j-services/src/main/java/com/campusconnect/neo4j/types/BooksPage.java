@@ -7,9 +7,9 @@ import java.util.List;
  * Created by sn1 on 4/24/15.
  */
 public class BooksPage {
-    int size;
-    int offset;
     List<Book> books;
+    int offset;
+    int size;
 
     public BooksPage() {
 
@@ -21,25 +21,25 @@ public class BooksPage {
         this.books = books;
     }
 
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
+    public List<Book> getBooks() {
+        if (books == null)
+            books = new ArrayList<>();
+        return books;
     }
 
     public int getOffset() {
         return offset;
     }
 
+    public int getSize() {
+        return size;
+    }
+
     public void setOffset(int offset) {
         this.offset = offset;
     }
 
-    public List<Book> getBooks() {
-        if (books == null)
-            books = new ArrayList<>();
-        return books;
+    public void setSize(int size) {
+        this.size = size;
     }
 }

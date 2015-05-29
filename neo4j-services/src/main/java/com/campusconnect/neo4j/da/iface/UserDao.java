@@ -14,7 +14,7 @@ public interface UserDao {
 
     UserRelation getUsersRelationShip(User user, User fellowUser);
 
-    void createFriendRelation(User user, User friend);
+    void confirmFriendRelation(User user, User friend);
 
     User createUser(User user, String accessToken);
 
@@ -55,4 +55,16 @@ public interface UserDao {
     List<User> search(String searchString);
 
     List<User> searchFriends(String userId, String searchString);
+
+    List<User> findFriends(String userId);
+
+    List<User> findMutualFriends(String userId, String mutualFriends);
+
+    void createFriendRelationWithPending(User user, User user2);
+
+    void deleteFriendRequest(String userId, String friendUserId);
+
+
+    List<User> getRandomUsers(int size);
+
 }

@@ -2,6 +2,7 @@ package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
+import com.campusconnect.neo4j.da.iface.EmailDao;
 import com.campusconnect.neo4j.da.iface.NotificationDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.repositories.BookRepository;
@@ -32,34 +33,33 @@ public class UserDaoImpl implements UserDao {
     BookRepository bookRepository;
     @Autowired
     UserRelationRepository userRelationRepository;
-    
+
     @Autowired
     GoodreadsAsynchHandler goodreadsAsynchHandler;
-    @Autowired 
+    @Autowired
     AuditEventDao auditEventDao;
-    
+
     @Autowired
     NotificationDao notificationDao;
     ObjectMapper objectMapper;
     @Autowired
     private FBDao fbDao;
     private Neo4jTemplate neo4jTemplate;
+    @Autowired
+    private EmailDao emailDao;
 
     public UserDaoImpl(Neo4jTemplate neo4jTemplate) {
         this.neo4jTemplate = neo4jTemplate;
         this.objectMapper = new ObjectMapper();
     }
 
-public static Target createTargetToUser(User user) {
-    String targetEventUserId = user.getId();
-    String targetEventUserName = user.getName();
-    String targetEventUrl = "users/" + targetEventUserId;
-    return new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);
-//	return  new Event(AuditEventType.FRIEND.toString(), targetEvent,System.currentTimeMillis());
+    public static Target createTargetToUser(User user) {
+        String targetEventUserId = user.getId();
+        String targetEventUserName = user.getName();
+        String targetEventUrl = "users/" + targetEventUserId;
+        return new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);
+    }
 
-
-}
-    
     @Override
     public User createUser(User user, String accessToken) {
         user.setId(UUID.randomUUID().toString());
@@ -104,7 +104,7 @@ public static Target createTargetToUser(User user) {
     public User getUser(String userId) {
         return userRepository.findBySchemaPropertyValue("id", userId);
     }
-    
+
     @Override
     public User getUserByFbId(String fbId) {
         return userRepository.findBySchemaPropertyValue("fbId", fbId);
@@ -120,9 +120,8 @@ public static Target createTargetToUser(User user) {
         return userRepository.findBySchemaPropertyValue("googleId", googleId);
     }
 
-    public User getUserByEmail(String email)
-    {
-    	return userRepository.findBySchemaPropertyValue("email", email);
+    public User getUserByEmail(String email) {
+        return userRepository.findBySchemaPropertyValue("email", email);
     }
 
     @Override
@@ -136,6 +135,11 @@ public static Target createTargetToUser(User user) {
     }
 
     @Override
+    public List<User> getRandomUsers(int size) {
+        return userRepository.getRandomUsers(size);
+    }
+
+    @Override
 //    @TriggersRemove(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public void createFollowingRelation(@PartialCacheKey User user, User follower) {
 
@@ -143,29 +147,18 @@ public static Target createTargetToUser(User user) {
         UserRelation userRelation = new UserRelation(user, follower, now, UserRelationType.FOLLOWING.toString());
         neo4jTemplate.save(userRelation);
 
-        try
-    	{
-    	Long currentTime = System.currentTimeMillis();
-            String targetEventUserId = follower.getId();
-            String targetEventUserName = follower.getName();
-            String targetEventUrl = "users/" + targetEventUserId;
-            String targetNotificationUserId = user.getId();
-    	String targetNoitficationUrl = "users/" + targetNotificationUserId;
-    	String targetNotificationstring = user.getName();
-            Target targetEvent = new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);
-            Target targetNotification = new Target(IdType.USER_ID.toString(), "is following you", targetNoitficationUrl);
-            Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetEvent, currentTime, false);
-            Notification followedNotification = new Notification(targetNotification, currentTime);
-            auditEventDao.addEvent(targetEventUserId, followedUSerEvent);
-            notificationDao.addNotification(targetNotificationUserId, followedNotification);
+        try {
+            Long currentTime = System.currentTimeMillis();
+            Target targetforAuditEvent = createTargetToUser(follower);
+            Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetforAuditEvent, currentTime, true);
+            auditEventDao.addEvent(user.getId(), followedUSerEvent);
+       
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    	catch(Exception e)
-    	{
-    		e.printStackTrace();
-    	}
     }
 
-    public void createFriendRelation(@PartialCacheKey User user, User friend) {
+    public void confirmFriendRelation(@PartialCacheKey User user, User friend) {
 
         long now = System.currentTimeMillis();
         UserRelation userRelation = new UserRelation(user, friend, now, UserRelationType.FRIEND.toString());
@@ -174,20 +167,19 @@ public static Target createTargetToUser(User user) {
         try {
             Long currentTime = System.currentTimeMillis();
 
-            String targetNotificationUserId = user.getId();
+            String targetNotificationUserId = friend.getId();
             String targetNoitficationUrl = "users/" + targetNotificationUserId;
-            String targetNotificationstring = user.getName();
+            String targetNotificationstring = friend.getName();
             Target targetEventUser = createTargetToUser(friend);
             Target targetEventFriend = createTargetToUser(user);
             Event beFriendUserEvent1 = new Event(AuditEventType.FRIEND.toString(), targetEventUser, System.currentTimeMillis(), true);
             Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend, System.currentTimeMillis(), true);
-            Target targetNotification = new Target(IdType.USER_ID.toString(), "is friends with you", targetNoitficationUrl);
-            //	Event beFriendUserEvent1 = createEventToUser(friend);
-
+            Target targetNotification = new Target(IdType.USER_ID.toString(),targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
+          
             Notification beFriendNotification = new Notification(targetNotification, currentTime);
             auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
             auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
-            notificationDao.addNotification(targetNotificationUserId, beFriendNotification);
+            notificationDao.addNotification(user.getId(), beFriendNotification);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -210,7 +202,7 @@ public static Target createTargetToUser(User user) {
     public List<User> getFollowing(String userId) {
         return userRepository.getFollowing(userId);
     }
-    
+
     @Override
 //    @Cacheable(cacheName = "userOwnedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<OwnedBook> getOwnedBooks(String userId) {
@@ -253,7 +245,7 @@ public static Target createTargetToUser(User user) {
         }
         return ownedBooks;
     }
-    
+
     @Override
 //    @Cacheable(cacheName = "userBorrowedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<BorrowedBook> getBorrowedBooks(String userId) {
@@ -262,7 +254,7 @@ public static Target createTargetToUser(User user) {
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:BORROWED]->(books:Book) return books, relation", params);
         return getBorrowedBooksFromResultMap(mapResult);
     }
-    
+
     @Override
     public void addAddressToUser(Address address, User user) {
         if (address.getId() == null)
@@ -355,8 +347,37 @@ public static Target createTargetToUser(User user) {
 
     }
 
-	@Override
-	public UserRelation getUsersRelationShip(User user, User fellowUser) {
-		return userRelationRepository.getUsersRelationship(user.getId(), fellowUser.getId());
-	}
+    @Override
+    public UserRelation getUsersRelationShip(User user, User fellowUser) {
+        return userRelationRepository.getUsersRelationship(user.getId(), fellowUser.getId());
+    }
+
+    @Override
+    public List<User> findFriends(String userId) {
+        return userRelationRepository.getFriends(userId);
+    }
+
+    @Override
+    public List<User> findMutualFriends(String currentUser, String userId) {
+
+        return userRelationRepository.getMutualFriends(currentUser, userId);
+    }
+
+    @Override
+    public void createFriendRelationWithPending(User user, User friend) {
+
+        UserRelation userRelation = new UserRelation(user, friend, System.currentTimeMillis(), UserRelationType.FRIEND_REQUEST_PENDING.toString());
+        neo4jTemplate.save(userRelation);
+        emailDao.sendFriendRequestEmail(user, friend);
+        //    Notification friendRequestRecievedNotification = new Notification(target, timeStamp)
+    }
+
+    @Override
+    public void deleteFriendRequest(String userId, String friendUserId) {
+        //UserRelation userRelation = userRelationRepository.getUsersRelationship(userId, friendUserId);
+        User user = getUser(userId);
+        User friend = getUser(friendUserId);
+        neo4jTemplate.deleteRelationshipBetween(user, friend, "CONNECTED");
+
+    }
 }

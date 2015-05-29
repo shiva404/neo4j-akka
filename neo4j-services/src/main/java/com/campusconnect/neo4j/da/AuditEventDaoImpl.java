@@ -1,20 +1,18 @@
 package com.campusconnect.neo4j.da;
 
-import java.io.IOException;
-import java.util.*;
-
-import com.campusconnect.neo4j.types.IdType;
-import com.campusconnect.neo4j.types.Subject;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.repositories.AuditEventRepository;
 import com.campusconnect.neo4j.types.AuditEvent;
 import com.campusconnect.neo4j.types.Event;
-import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.conversion.Result;
+import com.campusconnect.neo4j.types.IdType;
+import com.campusconnect.neo4j.types.Subject;
+import com.campusconnect.neo4j.util.comparator.TimeStampComparator;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
+import java.util.*;
 
 public class AuditEventDaoImpl implements AuditEventDao {
 	
@@ -68,18 +66,30 @@ public class AuditEventDaoImpl implements AuditEventDao {
         List<AuditEvent> followersAuditEvents = auditEventRepository.getAuditEventsForFollowers(userId);
         List<AuditEvent> friendsAuditEvents = auditEventRepository.getAuditEventsForFriends(userId);
 
-        List<AuditEvent> mergedEvents = new ArrayList<>(friendsAuditEvents);
-        mergedEvents.addAll(followersAuditEvents);
+        Map<Long, AuditEvent> mergedEvents = new HashMap<>();
+
+        for (AuditEvent auditEvent : followersAuditEvents) {
+            mergedEvents.put(auditEvent.getNodeId(), auditEvent);
+        }
+
+        for (AuditEvent auditEvent : friendsAuditEvents) {
+            mergedEvents.put(auditEvent.getNodeId(), auditEvent);
+        }
 
         List<Event> events = new ArrayList<>();
-        for (AuditEvent auditEvent : friendsAuditEvents) {
+        for (Long key : mergedEvents.keySet()) {
+            AuditEvent auditEvent = mergedEvents.get(key);
             for (String eventString : auditEvent.getEvents()) {
                 Event event = objectMapper.readValue(eventString, Event.class);
-                event.setSubject(new Subject(IdType.USER_ID.toString(), auditEvent.getUserName(), "/users/" + auditEvent.getUserId(), auditEvent.getImageUrl()));
-                events.add(event);
+                if (event.isPublic()) {
+                    event.setSubject(new Subject(IdType.USER_ID.toString(), auditEvent.getUserName(), "/users/" + auditEvent.getUserId(), auditEvent.getImageUrl()));
+                    events.add(event);
+                }
             }
         }
-        //TODO make sure following and friend relation
+        
+        Collections.sort(events, new TimeStampComparator());
+        
         return events;
     }
 }

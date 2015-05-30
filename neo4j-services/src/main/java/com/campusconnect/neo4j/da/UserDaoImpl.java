@@ -10,7 +10,6 @@ import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.*;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
@@ -126,8 +125,11 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> search(String searchString) {
-        return userRepository.searchUsers(String.format(SEARCH_STRING, searchString));
+    public List<User> search(String searchString, String userId) {
+        List<User> users = userRepository.searchUsers(String.format(SEARCH_STRING, searchString));
+        List<User> friends = findFriends(userId, userId);
+        List<User> mergedResult = replaceBooksWithExistingFriends(users, friends);
+        return mergedResult;
     }
 
     @Override
@@ -153,7 +155,7 @@ public class UserDaoImpl implements UserDao {
             Target targetforAuditEvent = createTargetToUser(follower);
             Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetforAuditEvent, currentTime, true);
             auditEventDao.addEvent(user.getId(), followedUSerEvent);
-       
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -175,8 +177,8 @@ public class UserDaoImpl implements UserDao {
             Target targetEventFriend = createTargetToUser(user);
             Event beFriendUserEvent1 = new Event(AuditEventType.FRIEND.toString(), targetEventUser, System.currentTimeMillis(), true);
             Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend, System.currentTimeMillis(), true);
-            Target targetNotification = new Target(IdType.USER_ID.toString(),targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
-          
+            Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
+
             Notification beFriendNotification = new Notification(targetNotification, currentTime);
             auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
             auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
@@ -215,7 +217,11 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<Book> getReadBooks(String userId) {
-        return bookRepository.getBooks(userId);
+        List<Book> books = bookRepository.getBooks(userId);
+        for (Book book : books) {
+            book.setBookType("READ");
+        }
+        return books;
     }
 
     @Override
@@ -241,6 +247,7 @@ public class UserDaoImpl implements UserDao {
             RestRelationship rawOwnsRelationship = (RestRelationship) objectMap.get("relation");
 
             Book book = neo4jTemplate.convert(bookNode, Book.class);
+            book.setBookType("Own");
             OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawOwnsRelationship, OwnsRelationship.class);
             ownedBooks.add(new OwnedBook(book, ownsRelationship));
         }
@@ -309,6 +316,7 @@ public class UserDaoImpl implements UserDao {
             RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
 
             Book book = neo4jTemplate.convert(bookNode, Book.class);
+            book.setBookType("WISH");
             WishListRelationship whishListRelationship = neo4jTemplate.convert(rawWishRelationship, WishListRelationship.class);
             wishListBooks.add(new WishListBook(book, whishListRelationship));
         }
@@ -322,6 +330,7 @@ public class UserDaoImpl implements UserDao {
             RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
 
             Book book = neo4jTemplate.convert(bookNode, Book.class);
+            book.setBookType("WISH");
             GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation = neo4jTemplate.convert(rawWishRelationship, GoodreadsFriendBookRecRelation.class);
             userRecommendations.add(new UserRecommendation(book, goodreadsFriendBookRecRelation));
         }
@@ -335,6 +344,7 @@ public class UserDaoImpl implements UserDao {
             RestRelationship rawOwnsRelationship = (RestRelationship) objectMap.get("relation");
 
             Book book = neo4jTemplate.convert(bookNode, Book.class);
+            book.setBookType("BORROWED");
             BorrowRelation borrowRelationship = neo4jTemplate.convert(rawOwnsRelationship, BorrowRelation.class);
             borrowedBooks.add(new BorrowedBook(book, borrowRelationship));
         }
@@ -354,42 +364,73 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> findFriends(String userId) {
-        return userRelationRepository.getFriends(userId);
+    public List<User> findFriends(String userId, String currentUser) {
+        List<User> friends = userRelationRepository.getFriends(userId);
+        if (currentUser == null) {
+            return friends;
+        } else if (currentUser.equals(userId)) {
+            for (User user : friends) {
+                user.setUserRelation(UserRelationType.FRIEND.toString());
+            }
+            return friends;
+        } else {
+            List<User> userFriends = userRelationRepository.getFriends(currentUser);
+            for (User user : userFriends) {
+                user.setUserRelation(UserRelationType.FRIEND.toString());
+            }
+            return replaceBooksWithExistingFriends(friends, userFriends);
+        }
     }
+
+    private List<User> replaceBooksWithExistingFriends(List<User> friends, List<User> userExistingFriends) {
+        Map<String, User> friendsMapWithId = new HashMap<>(friends.size());
+        for (User user : friends) {
+            friendsMapWithId.put(user.getId(), user);
+        }
+        for (User existingUser : userExistingFriends) {
+            for (User user : friends) {
+                if (user.getId().equals(existingUser.getId())) {
+                    friendsMapWithId.put(user.getGoodreadsId(), existingUser);
+                }
+            }
+        }
+        List<User> resultUser = new ArrayList<>();
+        for (User user : friendsMapWithId.values()) {
+            resultUser.add(user);
+        }
+        return resultUser;
+    }
+
 
     @Override
     public List<User> findMutualFriends(String currentUser, String userId) {
-
-        return userRelationRepository.getMutualFriends(currentUser, userId);
+        List<User> mutualFriends = userRelationRepository.getMutualFriends(currentUser, userId);
+        for (User user : mutualFriends) {
+            user.setUserRelation(UserRelationType.FRIEND.toString());
+        }
+        return mutualFriends;
     }
 
     @Override
     public void createFriendRelationWithPending(User user, User friend) {
 
-    	String relationType = null;
-    	UserRelation existingRelation = getUsersRelationShip(user,friend);
-    	if(null != existingRelation)
-    	{
-    		relationType = existingRelation.getType();
-    	}
-    	if(null!= relationType && relationType.equals(UserRelationType.FRIEND_REQUEST_PENDING.toString()) )
-    		
-    	{
-    		throw new IllegalArgumentException("You have already sent a friend Request");
-    	}
-    	
-    	else if(null!= relationType &&  relationType.equals(UserRelationType.FRIEND.toString()))
-    	{
-    		throw new IllegalArgumentException("You are already friend's with " + friend.getName());
-    	}
-    	else
-    	{
-        UserRelation userRelation = new UserRelation(user, friend, System.currentTimeMillis(), UserRelationType.FRIEND_REQUEST_PENDING.toString());
-        neo4jTemplate.save(userRelation);
-        emailDao.sendFriendRequestEmail(user, friend);
-        //    Notification friendRequestRecievedNotification = new Notification(target, timeStamp)
-    	}
+        String relationType = null;
+        UserRelation existingRelation = getUsersRelationShip(user, friend);
+        if (null != existingRelation) {
+            relationType = existingRelation.getType();
+        }
+        if (null != relationType && relationType.equals(UserRelationType.FRIEND_REQUEST_PENDING.toString()))
+
+        {
+            throw new IllegalArgumentException("You have already sent a friend Request");
+        } else if (null != relationType && relationType.equals(UserRelationType.FRIEND.toString())) {
+            throw new IllegalArgumentException("You are already friend's with " + friend.getName());
+        } else {
+            UserRelation userRelation = new UserRelation(user, friend, System.currentTimeMillis(), UserRelationType.FRIEND_REQUEST_PENDING.toString());
+            neo4jTemplate.save(userRelation);
+            emailDao.sendFriendRequestEmail(user, friend);
+            //    Notification friendRequestRecievedNotification = new Notification(target, timeStamp)
+        }
     }
 
     @Override

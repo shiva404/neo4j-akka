@@ -50,6 +50,7 @@ public class User implements Serializable {
     private String profileImageUrl;
     private String workDesignation;
     private String workLocation;
+    private String userRelation;
 
     public User() {
 
@@ -64,6 +65,14 @@ public class User implements Serializable {
         this.name = name;
         this.email = email;
         this.phone = phone;
+    }
+
+    public String getUserRelation() {
+        return userRelation;
+    }
+
+    public void setUserRelation(String userRelation) {
+        this.userRelation = userRelation;
     }
 
     public String getGoodReadsSynchStatus() {

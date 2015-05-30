@@ -52,11 +52,9 @@ public interface UserDao {
 
     User getUserByEmail(String email);
 
-    List<User> search(String searchString);
-
     List<User> searchFriends(String userId, String searchString);
 
-    List<User> findFriends(String userId);
+    List<User> findFriends(String userId, String currentUser);
 
     List<User> findMutualFriends(String userId, String mutualFriends);
 
@@ -67,4 +65,5 @@ public interface UserDao {
 
     List<User> getRandomUsers(int size);
 
+    List<User> search(String searchString, String userId);
 }

@@ -33,6 +33,7 @@ public class BorrowedBook extends Book implements Serializable {
         setNumberOfPages(book.getNumberOfPages());
         setPublishedYear(book.getPublishedYear());
         setPublisher(book.getPublisher());
+        setBookType(book.getBookType());
         this.status = borrowRelation.getStatus();
         this.dueDate = borrowRelation.getDueDate();
         this.createdDate = borrowRelation.getCreatedDate();

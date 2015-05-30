@@ -7,7 +7,6 @@ import com.campusconnect.neo4j.types.Event;
 import com.campusconnect.neo4j.types.IdType;
 import com.campusconnect.neo4j.types.Subject;
 import com.campusconnect.neo4j.util.comparator.TimeStampComparator;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,21 +14,20 @@ import java.io.IOException;
 import java.util.*;
 
 public class AuditEventDaoImpl implements AuditEventDao {
-	
-	@Autowired
-	AuditEventRepository auditEventRepository;
-	ObjectMapper objectMapper = new ObjectMapper();
-	
 
-	@Override
-	public AuditEvent saveEvent(AuditEvent auditEvent) {		
-		return auditEventRepository.save(auditEvent);		
-	}
+    @Autowired
+    AuditEventRepository auditEventRepository;
+    ObjectMapper objectMapper = new ObjectMapper();
+
+
+    @Override
+    public AuditEvent saveEvent(AuditEvent auditEvent) {
+        return auditEventRepository.save(auditEvent);
+    }
 
 
     @Override
     public List<Event> getEvents(String userId) {
-
         AuditEvent auditEvent = auditEventRepository.getAuditEventForUser(userId);
         Set<String> event = auditEvent.getEvents();
         List<Event> events = new LinkedList<Event>();
@@ -38,8 +36,10 @@ public class AuditEventDaoImpl implements AuditEventDao {
             try {
                 System.out.println("each event" + eachEvent);
                 Event eventDeserialised = objectMapper.readValue(eachEvent, Event.class);
-                 eventDeserialised.setSubject(new Subject(IdType.USER_ID.toString(), auditEvent.getUserName(), "/users/" + auditEvent.getUserId(), auditEvent.getImageUrl()));
-                events.add(eventDeserialised);
+                if (eventDeserialised.isPublic()) {
+                    eventDeserialised.setSubject(new Subject(IdType.USER_ID.toString(), auditEvent.getUserName(), "/users/" + auditEvent.getUserId(), auditEvent.getImageUrl()));
+                    events.add(eventDeserialised);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -47,8 +47,8 @@ public class AuditEventDaoImpl implements AuditEventDao {
         return events;
     }
 
-	@Override
-	public AuditEvent addEvent(String userId, Event event) {
+    @Override
+    public AuditEvent addEvent(String userId, Event event) {
         try {
             String eventString = objectMapper.writeValueAsString(event);
             AuditEvent auditEvent = auditEventRepository.getAuditEventForUser(userId);
@@ -60,7 +60,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
             return null;
         }
     }
-    
+
     @Override
     public List<Event> getFeedEvents(String userId) throws IOException {
         List<AuditEvent> followersAuditEvents = auditEventRepository.getAuditEventsForFollowers(userId);
@@ -87,9 +87,8 @@ public class AuditEventDaoImpl implements AuditEventDao {
                 }
             }
         }
-        
+
         Collections.sort(events, new TimeStampComparator());
-        
         return events;
     }
 }

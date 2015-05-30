@@ -37,6 +37,10 @@
     <bean class="com.campusconnect.neo4j.da.UserDaoImpl" id="userDao">
         <constructor-arg index="0" ref="neo4jTemplate"/>
     </bean>
+    
+    <bean class="com.campusconnect.neo4j.da.FavouriteDaoImpl" id="favouriteDao">
+        <constructor-arg index="0" ref="neo4jTemplate"/>
+    </bean>
 
     <bean class="com.campusconnect.neo4j.da.CollegeDao" id="collegeDao">
         <constructor-arg index="0" ref="neo4jTemplate"/>
@@ -141,6 +145,11 @@
     <bean class="com.campusconnect.neo4j.resources.BookResource">
         <constructor-arg index="0" ref="bookDao"/>
         <constructor-arg index="1" ref="userDao"/>
+    </bean>
+
+	 <bean class="com.campusconnect.neo4j.resources.FavouriteResource">
+        <constructor-arg index="0" ref="favouriteDao"/>
+      
     </bean>
 
     <bean class="com.campusconnect.neo4j.akka.facebook.client.FacebookClient" id="facebookClient">

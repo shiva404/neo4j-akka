@@ -64,37 +64,7 @@ public class UserResourceTest extends TestBase {
         String userId = createdUser.getId();
         return userId;
     }
-
-    @Test
-    public void testFavouritesAdditionToUser() {
-
-        Favourites favourites = new Favourites();
-        Set<String> favTopics = new HashSet<String>();
-
-        favTopics.add("Suspense");
-        favTopics.add("Trhiller");
-        favTopics.add("Fiction");
-        favTopics.add("Non Fiction");
-
-        favourites.setFavourites(favTopics);
-
-        ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithAddress()).post(ClientResponse.class);
-        assert clientResponse.getStatus() == 201;
-        createdUser = clientResponse.getEntity(User.class);
-        String userId = createdUser.getId();
-
-        ClientResponse clientResponse1 = resource.path("users").path(userId).path("favourites").type("application/json").entity(favourites).put(ClientResponse.class);
-        assert clientResponse1.getStatus() == 200;
-
-        ClientResponse getClientResponse = resource.path("users").path(userId).accept("application/json").get(ClientResponse.class);
-        assert getClientResponse.getStatus() == 200;
-
-        updatedUser = getClientResponse.getEntity(User.class);
-        Set<String> favouritesSetOnUser = updatedUser.getFavorites();
-        assert favouritesSetOnUser.size() == 4;
-    }
-
-
+    
     @Test
     public void testCompleteUserFlow() {
         ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithAddress()).post(ClientResponse.class);

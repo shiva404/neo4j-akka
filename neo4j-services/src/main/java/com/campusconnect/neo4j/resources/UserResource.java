@@ -385,15 +385,15 @@ public class UserResource {
     	return Response.ok().build();
     }
     
-    @PUT
-    @Path("{userId}/favourites")
-    public Response setFavourites(@PathParam("userId") final String userId,final Favourites favourites)
-    {
-    	 User user = userDao.getUser(userId);
-    	 user.setFavorites(favourites.getFavourites());
-    	 userDao.updateUser(userId, user);
-         return Response.ok().build();
-    }
+//    @PUT
+//    @Path("{userId}/favourites")
+//    public Response setFavourites(@PathParam("userId") final String userId,final Favourites favourites)
+//    {
+//    	 User user = userDao.getUser(userId);
+//    	 user.setFavorites(favourites.getFavourites());
+//    	 userDao.updateUser(userId, user);
+//         return Response.ok().build();
+//    }
     private void addPropertiesForCreate(User user) {
         final long createdDate = System.currentTimeMillis();
         user.setCreatedDate(createdDate);

@@ -88,4 +88,9 @@ public class DataBrewer {
     	return new Reminder(currentTime, currentTime, subject, "Collect the Book", "desc", currentTime);
     }
 
+	public static Favourite getFakeFavourites(String genre) {
+		
+		return new Favourite(genre);
+	}
+
 }

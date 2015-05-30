@@ -10,6 +10,7 @@ import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.*;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
@@ -366,10 +367,29 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void createFriendRelationWithPending(User user, User friend) {
 
+    	String relationType = null;
+    	UserRelation existingRelation = getUsersRelationShip(user,friend);
+    	if(null != existingRelation)
+    	{
+    		relationType = existingRelation.getType();
+    	}
+    	if(null!= relationType && relationType.equals(UserRelationType.FRIEND_REQUEST_PENDING.toString()) )
+    		
+    	{
+    		throw new IllegalArgumentException("You have already sent a friend Request");
+    	}
+    	
+    	else if(null!= relationType &&  relationType.equals(UserRelationType.FRIEND.toString()))
+    	{
+    		throw new IllegalArgumentException("You are already friend's with " + friend.getName());
+    	}
+    	else
+    	{
         UserRelation userRelation = new UserRelation(user, friend, System.currentTimeMillis(), UserRelationType.FRIEND_REQUEST_PENDING.toString());
         neo4jTemplate.save(userRelation);
         emailDao.sendFriendRequestEmail(user, friend);
         //    Notification friendRequestRecievedNotification = new Notification(target, timeStamp)
+    	}
     }
 
     @Override

@@ -10,8 +10,8 @@ import org.springframework.data.neo4j.repository.GraphRepository;
 
 public interface UserRelationRepository extends GraphRepository<UserRelation> {
 
-    @Query("match (users:User{id:{0}})-[r:CONNECTED]-(fellowUser:User{id: {1}}) return r")
-    public UserRelation getUsersRelationship(String userId, String fellowUserId);
+    @Query("match (users:User{id:{0}})-[r:CONNECTED]-(fellowUser:User{id:{1}}) return r")
+    public List<UserRelation> getUsersRelationship(String userId,String fellowUserId);
 
     @Query("match(seeingUserprofile:User{id:{0})-[r:CONNECTED]-(friends:User) return friends")
 	public List<User> getFriends(String userId);

@@ -516,6 +516,7 @@ public class UserDaoImpl implements UserDao {
 			if (count != index) {
 				neo4jTemplate.delete(relation);
 			}
+			count++;
 		}
 	}
 

@@ -180,18 +180,16 @@ public class UserDaoImpl implements UserDao {
 
 	public void confirmFriendRelation(@PartialCacheKey User user, User friend) {
 
-		long now = System.currentTimeMillis();
+	//	long now = System.currentTimeMillis();
 		List<UserRelation> existingRelation = getUsersRelationShip(user, friend);
 
 		UserRelation relation;
-		if (existingRelation.size() == 1) {
+	if (existingRelation.size() == 1) {
 			relation = existingRelation.get(0);
-			if (relation.getType().equals(
-					UserRelationType.FRIEND_REQUEST_PENDING)) {
-				UserRelation userRelation = new UserRelation(user, friend,
-						System.currentTimeMillis(),
-						UserRelationType.FRIEND_REQUEST_PENDING.toString());
-				neo4jTemplate.save(userRelation);
+			if (relation.getType().equals(UserRelationType.FRIEND_REQUEST_PENDING.toString())) {
+				
+				relation.setType(UserRelationType.FRIEND.toString());
+				neo4jTemplate.save(relation);
 
 				try {
 					Long currentTime = System.currentTimeMillis();
@@ -225,7 +223,7 @@ public class UserDaoImpl implements UserDao {
 				}
 
 				return;
-			} else if (relation.getType().equals(UserRelationType.FRIEND)) {
+			} else if (relation.getType().equals(UserRelationType.FRIEND.toString())) {
 				throw new IllegalArgumentException(
 						"You are already friend's with " + friend.getName());
 			}
@@ -451,8 +449,7 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	public List<UserRelation> getUsersRelationShip(User user, User fellowUser) {
-		return userRelationRepository.getUsersRelationship(user.getId(),
-				fellowUser.getId());
+		return userRelationRepository.getUsersRelationship(user.getId(),fellowUser.getId());
 	}
 
 	@Override
@@ -475,10 +472,10 @@ public class UserDaoImpl implements UserDao {
 		if (existingRelation.size() == 1) {
 			relation = existingRelation.get(0);
 			if (relation.getType().equals(
-					UserRelationType.FRIEND_REQUEST_PENDING)) {
+					UserRelationType.FRIEND_REQUEST_PENDING.toString())) {
 				throw new IllegalArgumentException(
 						"You have already sent a friend Request");
-			} else if (relation.getType().equals(UserRelationType.FRIEND)) {
+			} else if (relation.getType().equals(UserRelationType.FRIEND.toString())) {
 				throw new IllegalArgumentException(
 						"You are already friend's with " + friend.getName());
 			}

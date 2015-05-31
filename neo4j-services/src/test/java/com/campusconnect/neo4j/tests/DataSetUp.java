@@ -180,30 +180,13 @@ public class DataSetUp extends TestBase {
 				.path(userId6).type("application/json")
 				.post(ClientResponse.class);
 		assert clientResponse.getStatus() == 200;
-//		// Resend
-//		clientResponse = resource.path("users").path(userId5).path("friend")
-//				.path(userId6).type("application/json")
-//				.post(ClientResponse.class);
-//		assert clientResponse.getStatus() == 200;
 
 		clientResponse = resource.path("users").path(userId5).path("friend")
 				.path(userId6).queryParam("status", "agreed")
 				.type("application/json").put(ClientResponse.class);
 		assert clientResponse.getStatus() == 200;
 
-//		// Resend
-//		clientResponse = resource.path("users").path(userId5).path("friend")
-//				.path(userId6).type("application/json")
-//				.post(ClientResponse.class);
-//		assert clientResponse.getStatus() == 200;
-
-		// Resend
-		clientResponse = resource.path("users").path(userId5).path("friend")
-				.path(userId6).queryParam("status", "agreed")
-				.type("application/json").put(ClientResponse.class);
-		assert clientResponse.getStatus() == 200;
-
-		// user6 follow with user3
+	// user6 follow with user3
 		clientResponse = resource.path("users").path(userId6).path("follow")
 				.path(userId3).type("application/json")
 				.post(ClientResponse.class);

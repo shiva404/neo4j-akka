@@ -193,8 +193,25 @@ public class UserResourceTest extends TestBase {
               .path(friend).type("application/json")
               .post(ClientResponse.class);
       assert agreedStatusCR.getStatus() == 200;
+//      //Resend test 1
+//      agreedStatusCR = resource.path("users").path(userId1).path("friend")
+//              .path(friend).type("application/json")
+//              .post(ClientResponse.class);
+//      assert agreedStatusCR.getStatus() == 200;
       
     agreedStatusCR = resource.path("users").path(userId1).path("friend")
+              .path(friend).queryParam("status", "agreed").type("application/json")
+              .put(ClientResponse.class);
+      assert agreedStatusCR.getStatus() == 200;
+      
+//    //Resend test 2
+//      agreedStatusCR = resource.path("users").path(userId1).path("friend")
+//              .path(friend).type("application/json")
+//              .post(ClientResponse.class);
+//      assert agreedStatusCR.getStatus() == 200;
+      
+      //Resend Test 3
+      agreedStatusCR = resource.path("users").path(userId1).path("friend")
               .path(friend).queryParam("status", "agreed").type("application/json")
               .put(ClientResponse.class);
       assert agreedStatusCR.getStatus() == 200;

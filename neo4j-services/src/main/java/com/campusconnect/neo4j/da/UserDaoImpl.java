@@ -10,7 +10,6 @@ import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.*;
 import com.googlecode.ehcache.annotations.*;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
@@ -25,90 +24,90 @@ import java.util.*;
  */
 public class UserDaoImpl implements UserDao {
 
-	String SEARCH_STRING = "(?i)%1$s.*";
+    String SEARCH_STRING = "(?i)%1$s.*";
 
-	@Autowired
-	UserRepository userRepository;
-	@Autowired
-	BookRepository bookRepository;
-	@Autowired
-	UserRelationRepository userRelationRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    BookRepository bookRepository;
+    @Autowired
+    UserRelationRepository userRelationRepository;
 
-	@Autowired
-	GoodreadsAsynchHandler goodreadsAsynchHandler;
-	@Autowired
-	AuditEventDao auditEventDao;
+    @Autowired
+    GoodreadsAsynchHandler goodreadsAsynchHandler;
+    @Autowired
+    AuditEventDao auditEventDao;
 
-	@Autowired
-	NotificationDao notificationDao;
-	ObjectMapper objectMapper;
-	@Autowired
-	private FBDao fbDao;
-	private Neo4jTemplate neo4jTemplate;
-	@Autowired
-	private EmailDao emailDao;
+    @Autowired
+    NotificationDao notificationDao;
+    ObjectMapper objectMapper;
+    @Autowired
+    private FBDao fbDao;
+    private Neo4jTemplate neo4jTemplate;
+    @Autowired
+    private EmailDao emailDao;
 
-	public UserDaoImpl(Neo4jTemplate neo4jTemplate) {
-		this.neo4jTemplate = neo4jTemplate;
-		this.objectMapper = new ObjectMapper();
-	}
+    public UserDaoImpl(Neo4jTemplate neo4jTemplate) {
+        this.neo4jTemplate = neo4jTemplate;
+        this.objectMapper = new ObjectMapper();
+    }
 
-	public static Target createTargetToUser(User user) {
-		String targetEventUserId = user.getId();
-		String targetEventUserName = user.getName();
-		String targetEventUrl = "users/" + targetEventUserId;
-		return new Target(IdType.USER_ID.toString(), targetEventUserName,
-				targetEventUrl);
-	}
+    public static Target createTargetToUser(User user) {
+        String targetEventUserId = user.getId();
+        String targetEventUserName = user.getName();
+        String targetEventUrl = "users/" + targetEventUserId;
+        return new Target(IdType.USER_ID.toString(), targetEventUserName,
+                targetEventUrl);
+    }
 
-	@Override
-	public User createUser(User user, String accessToken) {
-		user.setId(UUID.randomUUID().toString());
-		if (accessToken != null && user.getFbId() != null) {
-			String profileImageUrl = fbDao.getUserProfileImage(user.getFbId(),
-					accessToken);
-			if (profileImageUrl != null) {
-				user.setProfileImageUrl(profileImageUrl);
-			}
-		}
+    @Override
+    public User createUser(User user, String accessToken) {
+        user.setId(UUID.randomUUID().toString());
+        if (accessToken != null && user.getFbId() != null) {
+            String profileImageUrl = fbDao.getUserProfileImage(user.getFbId(),
+                    accessToken);
+            if (profileImageUrl != null) {
+                user.setProfileImageUrl(profileImageUrl);
+            }
+        }
 
-		User createdUser = neo4jTemplate.save(user);
-		try {
-			Long currentTime = System.currentTimeMillis();
-			Event userCreatedEvent = new Event(
-					AuditEventType.CREATED.toString(), null, currentTime, false);
-			String serializedEvent = objectMapper
-					.writeValueAsString(userCreatedEvent);
-			AuditEvent auditEvent = new AuditEvent();
-			Set<String> events = auditEvent.getEvents();
-			auditEvent.setUserId(createdUser.getId());
-			auditEvent.setUserName(createdUser.getName());
-			auditEvent.setImageUrl(createdUser.getProfileImageUrl());
-			NotificationEntity notificationEntityFresh = new NotificationEntity();
-			NotificationEntity notificationEntityPast = new NotificationEntity();
-			events.add(serializedEvent);
-			auditEvent = auditEventDao.saveEvent(auditEvent);
-			notificationEntityFresh = notificationDao
-					.savenotification(notificationEntityFresh);
-			notificationEntityPast = notificationDao
-					.savenotification(notificationEntityPast);
-			UserEventRelationship userEventRelationship = new UserEventRelationship(
-					auditEvent, createdUser);
-			UserNotificationRelationship userFreshNotificationRelationship = new UserNotificationRelationship(
-					createdUser, notificationEntityFresh,
-					NotificationType.FRESH.toString());
-			UserNotificationRelationship userPastNotificationRelationship = new UserNotificationRelationship(
-					createdUser, notificationEntityPast,
-					NotificationType.PAST.toString());
-			neo4jTemplate.save(userFreshNotificationRelationship);
-			neo4jTemplate.save(userPastNotificationRelationship);
-			neo4jTemplate.save(userEventRelationship);
+        User createdUser = neo4jTemplate.save(user);
+        try {
+            Long currentTime = System.currentTimeMillis();
+            Event userCreatedEvent = new Event(
+                    AuditEventType.CREATED.toString(), null, currentTime, false);
+            String serializedEvent = objectMapper
+                    .writeValueAsString(userCreatedEvent);
+            AuditEvent auditEvent = new AuditEvent();
+            Set<String> events = auditEvent.getEvents();
+            auditEvent.setUserId(createdUser.getId());
+            auditEvent.setUserName(createdUser.getName());
+            auditEvent.setImageUrl(createdUser.getProfileImageUrl());
+            NotificationEntity notificationEntityFresh = new NotificationEntity();
+            NotificationEntity notificationEntityPast = new NotificationEntity();
+            events.add(serializedEvent);
+            auditEvent = auditEventDao.saveEvent(auditEvent);
+            notificationEntityFresh = notificationDao
+                    .savenotification(notificationEntityFresh);
+            notificationEntityPast = notificationDao
+                    .savenotification(notificationEntityPast);
+            UserEventRelationship userEventRelationship = new UserEventRelationship(
+                    auditEvent, createdUser);
+            UserNotificationRelationship userFreshNotificationRelationship = new UserNotificationRelationship(
+                    createdUser, notificationEntityFresh,
+                    NotificationType.FRESH.toString());
+            UserNotificationRelationship userPastNotificationRelationship = new UserNotificationRelationship(
+                    createdUser, notificationEntityPast,
+                    NotificationType.PAST.toString());
+            neo4jTemplate.save(userFreshNotificationRelationship);
+            neo4jTemplate.save(userPastNotificationRelationship);
+            neo4jTemplate.save(userEventRelationship);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return createdUser;
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return createdUser;
+    }
 
 
     @Override
@@ -173,58 +172,58 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
-	public void confirmFriendRelation(@PartialCacheKey User user, User friend) {
+    public void confirmFriendRelation(@PartialCacheKey User user, User friend) {
 
-	//	long now = System.currentTimeMillis();
-		List<UserRelation> existingRelation = getUsersRelationShip(user, friend);
+        //	long now = System.currentTimeMillis();
+        List<UserRelation> existingRelation = userRelationRepository.getUsersRelationship(user.getId(), friend.getId());
 
-		UserRelation relation;
-	if (existingRelation.size() == 1) {
-			relation = existingRelation.get(0);
-			if (relation.getType().equals(UserRelationType.FRIEND_REQUEST_PENDING.toString())) {
-				
-				relation.setType(UserRelationType.FRIEND.toString());
-				neo4jTemplate.save(relation);
+        UserRelation relation;
+        if (existingRelation.size() == 1) {
+            relation = existingRelation.get(0);
+            if (relation.getType().equals(UserRelationType.FRIEND_REQUEST_PENDING.toString())) {
+
+                relation.setType(UserRelationType.FRIEND.toString());
+                neo4jTemplate.save(relation);
                 try {
-                Long currentTime = System.currentTimeMillis();    
+                    Long currentTime = System.currentTimeMillis();
 
-                String targetNotificationUserId = friend.getId();
-                String targetNoitficationUrl = "users/" + targetNotificationUserId;
-                String targetNotificationstring = friend.getName();
-                Target targetEventUser = createTargetToUser(friend);
-                Target targetEventFriend = createTargetToUser(user);
-                Event beFriendUserEvent1 = new Event(AuditEventType.FRIEND.toString(), targetEventUser, System.currentTimeMillis(), true);
-                Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend, System.currentTimeMillis(), true);
-                Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
-    
-                Notification beFriendNotification = new Notification(targetNotification, currentTime);
-                auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
-                auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
-                notificationDao.addNotification(user.getId(), beFriendNotification);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                    String targetNotificationUserId = friend.getId();
+                    String targetNoitficationUrl = "users/" + targetNotificationUserId;
+                    String targetNotificationstring = friend.getName();
+                    Target targetEventUser = createTargetToUser(friend);
+                    Target targetEventFriend = createTargetToUser(user);
+                    Event beFriendUserEvent1 = new Event(AuditEventType.FRIEND.toString(), targetEventUser, System.currentTimeMillis(), true);
+                    Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend, System.currentTimeMillis(), true);
+                    Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
+
+                    Notification beFriendNotification = new Notification(targetNotification, currentTime);
+                    auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
+                    auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
+                    notificationDao.addNotification(user.getId(), beFriendNotification);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 return;
             } else if (relation.getType().equals(UserRelationType.FRIEND.toString())) {
                 throw new IllegalArgumentException(
                         "You are already friend's with " + friend.getName());
             }
-    } else if (existingRelation.size() > 1) {
-        int index = checkUserRelationExists(existingRelation,
-                UserRelationType.FRIEND.toString());
-        if (index != -1) {
-            deleteRelationExceptIndex(existingRelation, index);
-            throw new IllegalArgumentException(
-                    "You are already friend's with " + friend.getName());
+        } else if (existingRelation.size() > 1) {
+            int index = checkUserRelationExists(existingRelation,
+                    UserRelationType.FRIEND.toString());
+            if (index != -1) {
+                deleteRelationExceptIndex(existingRelation, index);
+                throw new IllegalArgumentException(
+                        "You are already friend's with " + friend.getName());
+            }
+            index = checkUserRelationExists(existingRelation,
+                    UserRelationType.FRIEND_REQUEST_PENDING.toString());
+            if (index != -1) {
+                deleteRelationExceptIndex(existingRelation, index);
+                throw new IllegalArgumentException(
+                        "You have already sent a friend Request");
+            }
         }
-        index = checkUserRelationExists(existingRelation,
-                UserRelationType.FRIEND_REQUEST_PENDING.toString());
-        if (index != -1) {
-            deleteRelationExceptIndex(existingRelation, index);
-            throw new IllegalArgumentException(
-                    "You have already sent a friend Request");
-        }
-    }        
     }
 
     @Override
@@ -398,11 +397,6 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public UserRelation getUsersRelationShip(User user, User fellowUser) {
-        return userRelationRepository.getUsersRelationship(user.getId(), fellowUser.getId());
-    }
-
-    @Override
     public List<User> findFriends(String userId, String currentUser) {
         List<User> friends = userRelationRepository.getFriends(userId);
         if (currentUser == null) {
@@ -453,7 +447,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void createFriendRelationWithPending(User user, User friend) {
 
-        List<UserRelation> existingRelation = getUsersRelationShip(user, friend);
+        List<UserRelation> existingRelation = userRelationRepository.getUsersRelationship(user.getId(), friend.getId());
 
         UserRelation relation;
         if (existingRelation.size() == 1) {

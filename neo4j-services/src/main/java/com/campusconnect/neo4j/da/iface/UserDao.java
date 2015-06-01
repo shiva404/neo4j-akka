@@ -62,7 +62,5 @@ public interface UserDao {
 
     List<User> getRandomUsers(int size);
 
-	List<UserRelation> getUsersRelationShip(User user,User fellowUser);
-
     List<User> search(String searchString, String userId);
 }

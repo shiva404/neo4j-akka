@@ -6,9 +6,11 @@ import com.campusconnect.neo4j.types.Neo4jErrorResponse;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
 import static com.campusconnect.neo4j.util.ErrorCodes.INTERNAL_SERVER_ERROR;
 
+@Provider
 public class Neo4jExceptionMapper implements ExceptionMapper<Throwable> {
 
     public static Neo4jErrorResponse getNeo4jErrorResponse(Neo4jException neo4jException) {

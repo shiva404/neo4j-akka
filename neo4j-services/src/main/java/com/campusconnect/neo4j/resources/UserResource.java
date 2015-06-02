@@ -334,6 +334,14 @@ public class UserResource {
     }
 
     @GET
+    @Path("{userId}/friends/pending")
+    public Response getPendingFriends(@PathParam("userId") final String userId) {
+        final List<User> pendingFriends = userDao.findPendingFriendReq(userId);
+        UsersPage usersPage = new UsersPage(0, pendingFriends.size(), pendingFriends);
+        return Response.ok().entity(usersPage).build();
+    }
+
+    @GET
     @Path("{userId}/following")
     public Response getFollowing(@PathParam("userId") final String userId) {
         final List<User> following = userDao.getFollowing(userId);
@@ -545,8 +553,8 @@ public class UserResource {
 
     @GET
     @Path("random")
-    public Response getRandomUsers(@QueryParam("size") @DefaultValue("10") final String size) {
-        List<User> userList = userDao.getRandomUsers(Integer.parseInt(size));
+    public Response getRandomUsers(@QueryParam("size") @DefaultValue("10") final String size, @QueryParam("currentUserId") String currentUser) {
+        List<User> userList = userDao.getRandomUsers(Integer.parseInt(size), currentUser);
         return Response.ok().entity(new UsersPage(0, userList.size(), userList)).build();
     }
 

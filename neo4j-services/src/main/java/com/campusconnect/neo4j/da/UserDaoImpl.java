@@ -26,7 +26,6 @@ public class UserDaoImpl implements UserDao {
 
     String SEARCH_STRING = "(?i)%1$s.*";
 
-
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -57,14 +56,16 @@ public class UserDaoImpl implements UserDao {
         String targetEventUserId = user.getId();
         String targetEventUserName = user.getName();
         String targetEventUrl = "users/" + targetEventUserId;
-        return new Target(IdType.USER_ID.toString(), targetEventUserName, targetEventUrl);
+        return new Target(IdType.USER_ID.toString(), targetEventUserName,
+                targetEventUrl);
     }
 
     @Override
     public User createUser(User user, String accessToken) {
         user.setId(UUID.randomUUID().toString());
         if (accessToken != null && user.getFbId() != null) {
-            String profileImageUrl = fbDao.getUserProfileImage(user.getFbId(), accessToken);
+            String profileImageUrl = fbDao.getUserProfileImage(user.getFbId(),
+                    accessToken);
             if (profileImageUrl != null) {
                 user.setProfileImageUrl(profileImageUrl);
             }
@@ -73,8 +74,10 @@ public class UserDaoImpl implements UserDao {
         User createdUser = neo4jTemplate.save(user);
         try {
             Long currentTime = System.currentTimeMillis();
-            Event userCreatedEvent = new Event(AuditEventType.CREATED.toString(), null, currentTime, false);
-            String serializedEvent = objectMapper.writeValueAsString(userCreatedEvent);
+            Event userCreatedEvent = new Event(
+                    AuditEventType.CREATED.toString(), null, currentTime, false);
+            String serializedEvent = objectMapper
+                    .writeValueAsString(userCreatedEvent);
             AuditEvent auditEvent = new AuditEvent();
             Set<String> events = auditEvent.getEvents();
             auditEvent.setUserId(createdUser.getId());
@@ -84,11 +87,18 @@ public class UserDaoImpl implements UserDao {
             NotificationEntity notificationEntityPast = new NotificationEntity();
             events.add(serializedEvent);
             auditEvent = auditEventDao.saveEvent(auditEvent);
-            notificationEntityFresh = notificationDao.savenotification(notificationEntityFresh);
-            notificationEntityPast = notificationDao.savenotification(notificationEntityPast);
-            UserEventRelationship userEventRelationship = new UserEventRelationship(auditEvent, createdUser);
-            UserNotificationRelationship userFreshNotificationRelationship = new UserNotificationRelationship(createdUser, notificationEntityFresh, NotificationType.FRESH.toString());
-            UserNotificationRelationship userPastNotificationRelationship = new UserNotificationRelationship(createdUser, notificationEntityPast, NotificationType.PAST.toString());
+            notificationEntityFresh = notificationDao
+                    .savenotification(notificationEntityFresh);
+            notificationEntityPast = notificationDao
+                    .savenotification(notificationEntityPast);
+            UserEventRelationship userEventRelationship = new UserEventRelationship(
+                    auditEvent, createdUser);
+            UserNotificationRelationship userFreshNotificationRelationship = new UserNotificationRelationship(
+                    createdUser, notificationEntityFresh,
+                    NotificationType.FRESH.toString());
+            UserNotificationRelationship userPastNotificationRelationship = new UserNotificationRelationship(
+                    createdUser, notificationEntityPast,
+                    NotificationType.PAST.toString());
             neo4jTemplate.save(userFreshNotificationRelationship);
             neo4jTemplate.save(userPastNotificationRelationship);
             neo4jTemplate.save(userEventRelationship);
@@ -98,6 +108,7 @@ public class UserDaoImpl implements UserDao {
         }
         return createdUser;
     }
+
 
     @Override
     @Cacheable(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
@@ -128,18 +139,38 @@ public class UserDaoImpl implements UserDao {
     public List<User> search(String searchString, String userId) {
         List<User> users = userRepository.searchUsers(String.format(SEARCH_STRING, searchString));
         List<User> friends = findFriends(userId, userId);
-        List<User> mergedResult = replaceBooksWithExistingFriends(users, friends);
-        return mergedResult;
+        friends.addAll(findPendingFriendReq(userId));
+        return replaceBooksWithExistingFriends(users, friends);
+    }
+
+    @Override
+    public List<User> findPendingFriendReq(String userId) {
+        List<User> pendingFriends = userRelationRepository.getPendingFriendRequests(userId);
+        for (User user : pendingFriends) {
+            user.setUserRelation(UserRelationType.FRIEND_REQUEST_PENDING.toString());
+        }
+        return pendingFriends;
+    }
+
+    @Override
+    public List<UserRelation> getUsersRelationShip(User user, User fellowUser) {
+        return userRelationRepository.getUsersRelationship(user.getId(), fellowUser.getId());
     }
 
     @Override
     public List<User> searchFriends(String userId, String searchString) {
-        return userRepository.searchFriends(userId, String.format(SEARCH_STRING, searchString));
+        List<User> users = userRepository.searchFriends(userId, String.format(SEARCH_STRING, searchString));
+        List<User> friends = findFriends(userId, userId);
+        friends.addAll(findPendingFriendReq(userId));
+        return replaceBooksWithExistingFriends(users, friends);
     }
 
     @Override
-    public List<User> getRandomUsers(int size) {
-        return userRepository.getRandomUsers(size);
+    public List<User> getRandomUsers(int size, String userId) {
+        List<User> users = userRepository.getRandomUsers(size);
+        List<User> friends = findFriends(userId, userId);
+        friends.addAll(findPendingFriendReq(userId));
+        return replaceBooksWithExistingFriends(users, friends);
     }
 
     @Override
@@ -163,28 +194,55 @@ public class UserDaoImpl implements UserDao {
 
     public void confirmFriendRelation(@PartialCacheKey User user, User friend) {
 
-        long now = System.currentTimeMillis();
-        UserRelation userRelation = new UserRelation(user, friend, now, UserRelationType.FRIEND.toString());
-        neo4jTemplate.save(userRelation);
+        //	long now = System.currentTimeMillis();
+        List<UserRelation> existingRelation = userRelationRepository.getUsersRelationship(user.getId(), friend.getId());
 
-        try {
-            Long currentTime = System.currentTimeMillis();
+        UserRelation relation;
+        if (existingRelation.size() == 1) {
+            relation = existingRelation.get(0);
+            if (relation.getType().equals(UserRelationType.FRIEND_REQUEST_PENDING.toString())) {
 
-            String targetNotificationUserId = friend.getId();
-            String targetNoitficationUrl = "users/" + targetNotificationUserId;
-            String targetNotificationstring = friend.getName();
-            Target targetEventUser = createTargetToUser(friend);
-            Target targetEventFriend = createTargetToUser(user);
-            Event beFriendUserEvent1 = new Event(AuditEventType.FRIEND.toString(), targetEventUser, System.currentTimeMillis(), true);
-            Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend, System.currentTimeMillis(), true);
-            Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
+                relation.setType(UserRelationType.FRIEND.toString());
+                neo4jTemplate.save(relation);
+                try {
+                    Long currentTime = System.currentTimeMillis();
 
-            Notification beFriendNotification = new Notification(targetNotification, currentTime);
-            auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
-            auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
-            notificationDao.addNotification(user.getId(), beFriendNotification);
-        } catch (Exception e) {
-            e.printStackTrace();
+                    String targetNotificationUserId = friend.getId();
+                    String targetNoitficationUrl = "users/" + targetNotificationUserId;
+                    String targetNotificationstring = friend.getName();
+                    Target targetEventUser = createTargetToUser(friend);
+                    Target targetEventFriend = createTargetToUser(user);
+                    Event beFriendUserEvent1 = new Event(AuditEventType.FRIEND.toString(), targetEventUser, System.currentTimeMillis(), true);
+                    Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend, System.currentTimeMillis(), true);
+                    Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
+
+                    Notification beFriendNotification = new Notification(targetNotification, currentTime);
+                    auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
+                    auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
+                    notificationDao.addNotification(user.getId(), beFriendNotification);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return;
+            } else if (relation.getType().equals(UserRelationType.FRIEND.toString())) {
+                throw new IllegalArgumentException(
+                        "You are already friend's with " + friend.getName());
+            }
+        } else if (existingRelation.size() > 1) {
+            int index = checkUserRelationExists(existingRelation,
+                    UserRelationType.FRIEND.toString());
+            if (index != -1) {
+                deleteRelationExceptIndex(existingRelation, index);
+                throw new IllegalArgumentException(
+                        "You are already friend's with " + friend.getName());
+            }
+            index = checkUserRelationExists(existingRelation,
+                    UserRelationType.FRIEND_REQUEST_PENDING.toString());
+            if (index != -1) {
+                deleteRelationExceptIndex(existingRelation, index);
+                throw new IllegalArgumentException(
+                        "You have already sent a friend Request");
+            }
         }
     }
 
@@ -359,11 +417,6 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public UserRelation getUsersRelationShip(User user, User fellowUser) {
-        return userRelationRepository.getUsersRelationship(user.getId(), fellowUser.getId());
-    }
-
-    @Override
     public List<User> findFriends(String userId, String currentUser) {
         List<User> friends = userRelationRepository.getFriends(userId);
         if (currentUser == null) {
@@ -390,7 +443,7 @@ public class UserDaoImpl implements UserDao {
         for (User existingUser : userExistingFriends) {
             for (User user : friends) {
                 if (user.getId().equals(existingUser.getId())) {
-                    friendsMapWithId.put(user.getGoodreadsId(), existingUser);
+                    friendsMapWithId.put(user.getId(), existingUser);
                 }
             }
         }
@@ -414,22 +467,43 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void createFriendRelationWithPending(User user, User friend) {
 
-        String relationType = null;
-        UserRelation existingRelation = getUsersRelationShip(user, friend);
-        if (null != existingRelation) {
-            relationType = existingRelation.getType();
-        }
-        if (null != relationType && relationType.equals(UserRelationType.FRIEND_REQUEST_PENDING.toString()))
+        List<UserRelation> existingRelation = userRelationRepository.getUsersRelationship(user.getId(), friend.getId());
 
-        {
-            throw new IllegalArgumentException("You have already sent a friend Request");
-        } else if (null != relationType && relationType.equals(UserRelationType.FRIEND.toString())) {
-            throw new IllegalArgumentException("You are already friend's with " + friend.getName());
+        UserRelation relation;
+        if (existingRelation.size() == 1) {
+            relation = existingRelation.get(0);
+            if (relation.getType().equals(
+                    UserRelationType.FRIEND_REQUEST_PENDING.toString())) {
+                throw new IllegalArgumentException(
+                        "You have already sent a friend Request");
+            } else if (relation.getType().equals(UserRelationType.FRIEND.toString())) {
+                throw new IllegalArgumentException(
+                        "You are already friend's with " + friend.getName());
+            }
+        } else if (existingRelation.size() > 1) {
+            int index = checkUserRelationExists(existingRelation,
+                    UserRelationType.FRIEND.toString());
+            if (index != -1) {
+                deleteRelationExceptIndex(existingRelation, index);
+                throw new IllegalArgumentException(
+                        "You are already friend's with " + friend.getName());
+            }
+            index = checkUserRelationExists(existingRelation,
+                    UserRelationType.FRIEND_REQUEST_PENDING.toString());
+            if (index != -1) {
+                deleteRelationExceptIndex(existingRelation, index);
+                throw new IllegalArgumentException(
+                        "You have already sent a friend Request");
+            }
+
         } else {
-            UserRelation userRelation = new UserRelation(user, friend, System.currentTimeMillis(), UserRelationType.FRIEND_REQUEST_PENDING.toString());
+            UserRelation userRelation = new UserRelation(user, friend,
+                    System.currentTimeMillis(),
+                    UserRelationType.FRIEND_REQUEST_PENDING.toString());
             neo4jTemplate.save(userRelation);
             emailDao.sendFriendRequestEmail(user, friend);
-            //    Notification friendRequestRecievedNotification = new Notification(target, timeStamp)
+            // Notification friendRequestRecievedNotification = new
+            // Notification(target, timeStamp)
         }
     }
 
@@ -441,4 +515,28 @@ public class UserDaoImpl implements UserDao {
         neo4jTemplate.deleteRelationshipBetween(user, friend, "CONNECTED");
 
     }
+
+    private void deleteRelationExceptIndex(List<UserRelation> existingRelation,
+                                           int index) {
+        int count = 0;
+        for (UserRelation relation : existingRelation) {
+            if (count != index) {
+                neo4jTemplate.delete(relation);
+            }
+            count++;
+        }
+    }
+
+    private int checkUserRelationExists(List<UserRelation> existingRelation,
+                                        String type) {
+
+        for (int i = 0; i < existingRelation.size(); i++) {
+            if (existingRelation.get(i).getType().equals(type)) {
+                return i;
+            }
+
+        }
+        return -1;
+    }
+
 }

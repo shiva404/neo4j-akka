@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
-public class ValidatorTest {
+public class UserObjectValidatorTest {
 
     @Test
     public void testValidatorWithNullUserObject() {

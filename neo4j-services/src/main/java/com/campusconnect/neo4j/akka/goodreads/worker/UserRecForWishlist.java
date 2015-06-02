@@ -35,18 +35,22 @@ public class UserRecForWishlist extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if (message instanceof UserRecForWishListTask) {
             UserRecForWishListTask userRecForWishListTask = (UserRecForWishListTask) message;
+
+            //Get books for user friend
             GetBooksResponse getBooksResponse = getBooks.getBooksForUser(userRecForWishListTask.getFriend().getId(), userRecForWishListTask.getPage());
             if (getBooksResponse != null) {
-
                 final Reviews reviews = getBooksResponse.getReviews();
                 List<Book> books = new ArrayList<>();
                 if (reviews != null && reviews.getReview() != null) {
 
+                    //If more books present the message to fetch the books back
                     if (Integer.parseInt(reviews.getEnd()) != Integer.parseInt(reviews.getTotal())) {
                         getSelf().tell(new UserRecForWishListTask(userRecForWishListTask.getAccessToken(), userRecForWishListTask.getAccessSecret(),
                                 userRecForWishListTask.getUserId(), userRecForWishListTask.getGoodreadsId(), userRecForWishListTask.getFriend(), userRecForWishListTask.getWishListBooks(),
                                 userRecForWishListTask.getPage() + 1, userRecForWishListTask.getUserRecommendations()), getSender());
                     }
+
+                    //prepare books list
                     for (Review review : reviews.getReview()) {
                         if (review.getShelves() != null && !review.getShelves().isEmpty() && !review.getShelves().get(0).getName().equals(GoodreadsStatus.TO_READ.toString())) {
                             com.campusconnect.neo4j.types.Book book = BookMapper.getBookFromGoodreadsBook(review.getBook());
@@ -55,11 +59,12 @@ public class UserRecForWishlist extends UntypedActor {
                     }
                 }
 
+                //See what all books need to rec with user
                 List<WishListBook> wishListBooks = userRecForWishListTask.getWishListBooks();
                 if (wishListBooks != null)
                     for (Book wishListBook : wishListBooks) {
                         for (Book friendBook : books) {
-                            if (wishListBook.getGoodreadsId().equals(friendBook.getGoodreadsId())) {
+                            if (wishListBook.getGoodreadsId() != null && wishListBook.getGoodreadsId().equals(friendBook.getGoodreadsId())) {
                                 if (recExists(wishListBook.getGoodreadsId(), userRecForWishListTask.getFriend().getId(), userRecForWishListTask.getUserRecommendations())) {
                                     logger.info("User Recommendation already exists:");
                                 } else {

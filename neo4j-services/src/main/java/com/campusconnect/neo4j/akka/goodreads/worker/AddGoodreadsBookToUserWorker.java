@@ -21,8 +21,8 @@ public class AddGoodreadsBookToUserWorker extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if (message instanceof AddGoodreadsBookToUserTask) {
             AddGoodreadsBookToUserTask addGoodreadsBookToUserTask = (AddGoodreadsBookToUserTask) message;
-            // Book book = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(addGoodreadsBookToUserTask.getBook().getGoodreadsId().toString(), addGoodreadsBookToUserTask.getBook());
-            Book book = bookDao.getBookByGoodreadsId(addGoodreadsBookToUserTask.getBook().getGoodreadsId().toString());
+            // Book book = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(addGoodreadsBookToUserTask.getBookRelatedUser().getGoodreadsId().toString(), addGoodreadsBookToUserTask.getBookRelatedUser());
+            Book book = bookDao.getBookByGoodreadsId(addGoodreadsBookToUserTask.getBook().getGoodreadsId());
             User user = userDao.getUser(addGoodreadsBookToUserTask.getUserId());
 
             //todo: dont create a relation if already exists

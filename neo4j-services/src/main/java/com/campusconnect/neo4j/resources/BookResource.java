@@ -45,14 +45,28 @@ public class BookResource {
     @GET
     @Path("{bookId}/users/{userId}")
     public Response getBookWithRespectToUser(@PathParam("bookId") String bookId, @PathParam("userId") final String userId, @QueryParam("expectedType") final String expectedType) {
-        Book book = bookDao.getBook(bookId, userId);
+        Book book = bookDao.getBookRelatedUser(bookId, userId);
+        if (book == null)
+            book = bookDao.getBook(bookId);
         return Response.ok().entity(book).build();
+    }
+
+    @GET
+    @Path("goodreadsId/{bookId}/users/{userId}")
+    public Response getBookByGrIdWithRespectToUser(@PathParam("bookId") String bookId, @PathParam("userId") final String userId, @QueryParam("expectedType") final String expectedType) throws IOException {
+        //TODO: make sure bookId is integer
+        //Save book if not already exists
+        Book book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
+        Book relatedBook = bookDao.getBookByGoodreadsIdWithUser(Integer.parseInt(bookId), userId);
+        if (relatedBook == null)
+            relatedBook = book;
+        return Response.ok().entity(relatedBook).build();
     }
 
     @GET
     @Path("goodreadsId/{goodreadsId}")
     public Response getBookByGoodreadsId(@PathParam("goodreadsId") final String goodreadsId) throws IOException {
-        Book book = bookDao.getBookByGoodreadsId(goodreadsId);
+        Book book = bookDao.getBookByGoodreadsId(Integer.parseInt(goodreadsId));
         return Response.ok().entity(book).build();
     }
 
@@ -109,8 +123,13 @@ public class BookResource {
 
     @GET
     @Path("search")
-    public Response search(@QueryParam("q") final String queryString) {
-        SearchResult searchResult = bookDao.search(queryString);
+    public Response search(@QueryParam("q") final String queryString, @QueryParam("userId") final String userId) {
+        SearchResult searchResult;
+        if (userId == null) {
+            searchResult = bookDao.search(queryString);
+        } else {
+            searchResult = bookDao.searchWithRespectToUser(userId, queryString);
+        }
         return Response.ok().entity(searchResult).build();
     }
 

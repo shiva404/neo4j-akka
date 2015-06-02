@@ -29,6 +29,7 @@ public class OwnedBook extends Book implements Serializable {
         setNumberOfPages(book.getNumberOfPages());
         setPublishedYear(book.getPublishedYear());
         setPublisher(book.getPublisher());
+        setBookType(book.getBookType());
         this.createdDate = ownsRelationship.getCreatedDate();
         this.status = ownsRelationship.getStatus();
         this.lastModifiedDate = ownsRelationship.getLastModifiedDate();

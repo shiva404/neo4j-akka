@@ -28,10 +28,13 @@ public class BookDaoImpl implements BookDao {
     private static final Logger LOGGER = LoggerFactory.getLogger(BookDaoImpl.class);
     @Autowired
     BookRepository bookRepository;
+
     @Autowired
     OwnsRelationshipRepository ownsRelationshipRepository;
+
     @Autowired
     UserRecRepository userRecRepository;
+
     private Neo4jTemplate neo4jTemplate;
     private GoodreadsDao goodreadsDao;
     private GoodreadsAsynchHandler goodreadsAsynchHandler;
@@ -126,16 +129,45 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
+    public SearchResult searchWithRespectToUser(String userId, String searchString) {
+        SearchResult searchResult = goodreadsDao.search(searchString);
+        List<Book> existingBooks = getBooksRelatedUser(userId);
+        List<Book> resultBooks = replaceBooksWithExistingBooks(searchResult.getBooks(), existingBooks);
+        return new SearchResult(resultBooks);
+    }
+
+    private List<Book> replaceBooksWithExistingBooks(List<Book> books, List<Book> existingBooks) {
+        Map<Integer, Book> bookMapWithGrId = new HashMap<>(books.size());
+        for (Book book : books) {
+            bookMapWithGrId.put(book.getGoodreadsId(), book);
+        }
+        for (Book existingBook : existingBooks) {
+            for (Book book : books) {
+                if (existingBook.getGoodreadsId() != null && book.getGoodreadsId().equals(existingBook.getGoodreadsId())) {
+                    bookMapWithGrId.put(book.getGoodreadsId(), existingBook);
+                }
+            }
+        }
+        List<Book> resultBooks = new ArrayList<>();
+        for (Book book : bookMapWithGrId.values()) {
+            resultBooks.add(book);
+        }
+        return resultBooks;
+    }
+
+    @Override
 //    @Cacheable(cacheName = "bookByGRIdCache", keyGenerator = @KeyGenerator(name="HashCodeCacheKeyGenerator", properties = @Property( name="includeMethod", value="false")))
-    public Book getBookByGoodreadsId(String goodreadsId) throws IOException {
+    public Book getBookByGoodreadsId(Integer goodreadsId) throws IOException {
         try {
             Book book = bookRepository.findBySchemaPropertyValue("goodreadsId", goodreadsId);
             if (book == null) {
-                LOGGER.info("Goodreads book is not in there datsbase fetching from goodreads. Id: " + Integer.parseInt(goodreadsId));
-                final Book bookByGoodreadId = goodreadsDao.getBookById(goodreadsId);
+                LOGGER.info("Goodreads book is not in there datsbase fetching from goodreads. Id: " + goodreadsId);
+                final Book bookByGoodreadId = goodreadsDao.getBookById(goodreadsId.toString());
                 bookByGoodreadId.setId(UUID.randomUUID().toString());
                 createBook(bookByGoodreadId);
                 return bookByGoodreadId;
+            } else {
+                return book;
             }
         } catch (Exception e) {
             //Todo : if exception is not found search in goodreads
@@ -193,11 +225,24 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public Book getBook(String bookId, String userId) {
+    public Book getBookRelatedUser(String bookId, String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("bookId", bookId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book {id: {bookId}}) - [relation] - (user:User {id: {userId}}) return relation, book", params);
+        //todo throw not found
+        List<Book> books = getBookDetails(mapResult, userId);
+        if (books.size() > 0) {
+            return books.get(0);
+        } else
+            return null;
+    }
+
+    @Override
+    public List<Book> getBooksRelatedUser(String userId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book) - [relation] - (user:User {id: {userId}}) return relation, book", params);
         //todo throw not found
         return getBookDetails(mapResult, userId);
     }
@@ -209,41 +254,45 @@ public class BookDaoImpl implements BookDao {
         params.put("goodreadsId", goodreadsId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book {goodreadsId: {goodreadsId}}) - [relation] - (user:User {id: {userId}}) return relation, book", params);
         //todo throw not found
-        return getBookDetails(mapResult, userId);
+        List<Book> books = getBookDetails(mapResult, userId);
+        if (books.size() > 0) {
+            return books.get(0);
+        } else
+            return null;
     }
 
-    private Book getBookDetails(Result<Map<String, Object>> mapResult, String userId) {
-        Book book = null;
+    private List<Book> getBookDetails(Result<Map<String, Object>> mapResult, String userId) {
+        List<Book> books = new ArrayList<>();
         for (Map<String, Object> objectMap : mapResult) {
             RestNode bookNode = (RestNode) objectMap.get("book");
             RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
 
-            book = neo4jTemplate.convert(bookNode, Book.class);
+            Book book = neo4jTemplate.convert(bookNode, Book.class);
             if (rawWishRelationship.getType().name().equals("OWNS")) {
                 book.setBookType("OWNS");
                 OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawWishRelationship, OwnsRelationship.class);
                 book.getAdditionalProperties().putAll(ownsRelationship.getFieldsAsMap());
-                return book;
+                books.add(book);
             }
             if (rawWishRelationship.getType().name().equals("BORROWED")) {
                 book.setBookType("BORROWED");
                 BorrowRelation borrowRelation = neo4jTemplate.convert(rawWishRelationship, BorrowRelation.class);
                 book.getAdditionalProperties().putAll(borrowRelation.getFieldsAsMap());
-                return book;
+                books.add(book);
             }
             if (rawWishRelationship.getType().name().equals("WISH")) {
                 book.setBookType("WISH");
                 //find if there are any recommendations
                 List<UserRecommendation> userRecommendations = getRecommendationsForUserAndBook(book.getId(), userId);
                 book.getAdditionalProperties().put("recommendations", userRecommendations);
-                return book;
+                books.add(book);
             }
             if (rawWishRelationship.getType().name().equals("READ")) {
                 book.setBookType("READ");
                 //find if there are any recommendations
-                return book;
+                books.add(book);
             }
         }
-        return book;
+        return books;
     }
 }

@@ -1,9 +1,6 @@
 package com.campusconnect.neo4j.da.iface;
 
 import com.campusconnect.neo4j.types.*;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -35,8 +32,8 @@ public interface BookDao {
 
     SearchResult search(String queryString);
 
-    @Cacheable(cacheName = "bookByGRIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    Book getBookByGoodreadsId(String goodreadsId) throws IOException;
+    // @Cacheable(cacheName = "bookByGRIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+    Book getBookByGoodreadsId(Integer goodreadsId) throws IOException;
 
     public Book getBookByGoodreadsIdAndSaveIfNotExists(String goodreadsId, Book book);
 
@@ -48,7 +45,11 @@ public interface BookDao {
 
     List<UserRecommendation> getRecommendationsForUserAndBook(String bookId, String userId);
 
-    Book getBook(String bookId, String userId);
+    Book getBookRelatedUser(String bookId, String userId);
 
     Book getBookByGoodreadsIdWithUser(Integer goodreadsId, String userId);
+
+    List<Book> getBooksRelatedUser(String userId);
+
+    SearchResult searchWithRespectToUser(String userId, String searchString);
 }

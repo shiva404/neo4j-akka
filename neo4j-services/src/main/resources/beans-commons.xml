@@ -10,7 +10,7 @@
         <property name="locations">
             <list>
                 <value>classpath*:conf/neo4j-common.properties</value>
-                <value>classpath*:conf/neo4j-${APP_ENV:pprod}.properties</value>
+                <value>classpath*:conf/neo4j-${APP_ENV:pprd}.properties</value>
                 <value>classpath:local.properties</value>
             </list>
         </property>

@@ -60,7 +60,12 @@ public interface UserDao {
 
     void deleteFriendRequest(String userId, String friendUserId);
 
-    List<User> getRandomUsers(int size);
+
+    List<User> getRandomUsers(int size, String userID);
 
     List<User> search(String searchString, String userId);
+
+    List<User> findPendingFriendReq(String userId);
+
+    List<UserRelation> getUsersRelationShip(User user, User fellowUser);
 }

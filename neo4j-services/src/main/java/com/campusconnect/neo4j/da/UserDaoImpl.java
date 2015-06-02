@@ -139,18 +139,38 @@ public class UserDaoImpl implements UserDao {
     public List<User> search(String searchString, String userId) {
         List<User> users = userRepository.searchUsers(String.format(SEARCH_STRING, searchString));
         List<User> friends = findFriends(userId, userId);
-        List<User> mergedResult = replaceBooksWithExistingFriends(users, friends);
-        return mergedResult;
+        friends.addAll(findPendingFriendReq(userId));
+        return replaceBooksWithExistingFriends(users, friends);
+    }
+
+    @Override
+    public List<User> findPendingFriendReq(String userId) {
+        List<User> pendingFriends = userRelationRepository.getPendingFriendRequests(userId);
+        for (User user : pendingFriends) {
+            user.setUserRelation(UserRelationType.FRIEND_REQUEST_PENDING.toString());
+        }
+        return pendingFriends;
+    }
+
+    @Override
+    public List<UserRelation> getUsersRelationShip(User user, User fellowUser) {
+        return userRelationRepository.getUsersRelationship(user.getId(), fellowUser.getId());
     }
 
     @Override
     public List<User> searchFriends(String userId, String searchString) {
-        return userRepository.searchFriends(userId, String.format(SEARCH_STRING, searchString));
+        List<User> users = userRepository.searchFriends(userId, String.format(SEARCH_STRING, searchString));
+        List<User> friends = findFriends(userId, userId);
+        friends.addAll(findPendingFriendReq(userId));
+        return replaceBooksWithExistingFriends(users, friends);
     }
 
     @Override
-    public List<User> getRandomUsers(int size) {
-        return userRepository.getRandomUsers(size);
+    public List<User> getRandomUsers(int size, String userId) {
+        List<User> users = userRepository.getRandomUsers(size);
+        List<User> friends = findFriends(userId, userId);
+        friends.addAll(findPendingFriendReq(userId));
+        return replaceBooksWithExistingFriends(users, friends);
     }
 
     @Override
@@ -423,7 +443,7 @@ public class UserDaoImpl implements UserDao {
         for (User existingUser : userExistingFriends) {
             for (User user : friends) {
                 if (user.getId().equals(existingUser.getId())) {
-                    friendsMapWithId.put(user.getGoodreadsId(), existingUser);
+                    friendsMapWithId.put(user.getId(), existingUser);
                 }
             }
         }

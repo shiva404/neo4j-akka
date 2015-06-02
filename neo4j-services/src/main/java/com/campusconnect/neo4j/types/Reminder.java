@@ -9,70 +9,90 @@ import org.springframework.data.neo4j.annotation.NodeEntity;
 public class Reminder {
 
     @CreatedDate
-    private Long createdDate;
-    @LastModifiedDate
-    private Long lastModifiedTime;
-    @GraphId
-    private Long nodeId;
-    private String subject;
-    private String reminderMessage;
+    private long createdDate;
     private String description;
-    private Long reminderTime;
+    @LastModifiedDate
+    private long lastModifiedTime;
 
-    public Reminder() {
+	@GraphId
+    private Long nodeId;
+
+	private String reminderMessage;
+
+	private long reminderTime;
+
+	private String subject;
+
+	public Reminder() {
     }
 
-    public Reminder(Long createdDate, Long lastModifiedTime,
+	public Reminder(Long createdDate, Long lastModifiedTime,
                     String subject, String reminderMessage, String description, Long reminderTime) {
         super();
         this.createdDate = createdDate;
         this.lastModifiedTime = lastModifiedTime;
-        this.reminderMessage = reminderMessage;
         this.reminderTime = reminderTime;
         this.subject = subject;
         this.reminderMessage = reminderMessage;
         this.description = description;
     }
 
-    public long getCreatedDate() {
-        return createdDate;
-    }
+	public long getCreatedDate() {
+		return createdDate;
+	}
 
-    public void setCreatedDate(long createdDate) {
-        this.createdDate = createdDate;
-    }
+	public void setCreatedDate(long createdDate) {
+		this.createdDate = createdDate;
+	}
 
-    public long getLastModifiedTime() {
-        return lastModifiedTime;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public void setLastModifiedTime(long lastModifiedTime) {
-        this.lastModifiedTime = lastModifiedTime;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public Long getNodeId() {
-        return nodeId;
-    }
+	public long getLastModifiedTime() {
+		return lastModifiedTime;
+	}
 
-    public void setNodeId(Long nodeId) {
-        this.nodeId = nodeId;
-    }
+	public void setLastModifiedTime(long lastModifiedTime) {
+		this.lastModifiedTime = lastModifiedTime;
+	}
 
-    public String getReminderMessage() {
-        return reminderMessage;
-    }
+	public Long getNodeId() {
+		return nodeId;
+	}
 
-    public void setReminderMessage(String reminderMessage) {
-        this.reminderMessage = reminderMessage;
-    }
+	public void setNodeId(Long nodeId) {
+		this.nodeId = nodeId;
+	}
 
-    public Long getReminderTime() {
-        return reminderTime;
-    }
+	public String getReminderMessage() {
+		return reminderMessage;
+	}
 
-    public void setReminderTime(Long reminderTime) {
-        this.reminderTime = reminderTime;
-    }
+	public void setReminderMessage(String reminderMessage) {
+		this.reminderMessage = reminderMessage;
+	}
+
+	public long getReminderTime() {
+		return reminderTime;
+	}
+
+	public void setReminderTime(long reminderTime) {
+		this.reminderTime = reminderTime;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+ 
 
 
 }

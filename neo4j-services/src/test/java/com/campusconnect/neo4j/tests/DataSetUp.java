@@ -2,9 +2,14 @@ package com.campusconnect.neo4j.tests;
 
 import com.campusconnect.neo4j.tests.functional.GroupResourceTest;
 import com.campusconnect.neo4j.tests.functional.UserResourceTest;
+import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
 import com.campusconnect.neo4j.types.BorrowRequest;
 import com.campusconnect.neo4j.types.GroupPage;
+import com.campusconnect.neo4j.types.Reminder;
+import com.campusconnect.neo4j.types.ReminderAbout;
+import com.campusconnect.neo4j.types.ReminderPage;
 import com.sun.jersey.api.client.ClientResponse;
+
 import org.testng.annotations.Test;
 
 /**
@@ -225,7 +230,7 @@ public class DataSetUp extends TestBase {
                 .type("application/json").get(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
         GroupPage groupPage = clientResponse.getEntity(GroupPage.class);
-        assert groupPage.getSize() == 2;
+       // assert groupPage.getSize() == 2;
 
         clientResponse = resource.path("users").path(userId1).path("books")
                 .path(book2).path("wish").type("application/json")
@@ -338,6 +343,51 @@ public class DataSetUp extends TestBase {
                 .path(book6).path("wish").type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
+        
+        Reminder reminder = DataBrewer.getFakeReminder("Subject");
+        ClientResponse clientResponseForReminderCreation = resource.path("users").path(userId3).path("reminders").queryParam("reminderAbout", ReminderAbout.COLLECT.toString()).queryParam("createdBy", userId1).type("application/json").entity(reminder).post(ClientResponse.class);
+        assert clientResponseForReminderCreation.getStatus() == 201;
+        Reminder reminderCreated = clientResponseForReminderCreation.getEntity(Reminder.class);
+
+
+        ClientResponse clientResponseToGetReminderCreated = resource.path("users").path(userId3).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").get(ClientResponse.class);
+        Reminder reminderReturned = clientResponseToGetReminderCreated.getEntity(Reminder.class);
+        assert reminderReturned.getReminderMessage().equalsIgnoreCase(reminderCreated.getReminderMessage()) && reminderReturned.getReminderTime() == reminderCreated.getReminderTime();
+
+        reminderReturned.setReminderMessage("Collect Book Time Update");
+        Long updatedTime = System.currentTimeMillis();
+        reminderReturned.setReminderTime(updatedTime);
+        ClientResponse clientResponseToUpdateReminder = resource.path("users").path(userId3).path("reminders").path(reminderReturned.getNodeId().toString()).queryParam("createdBy", userId4).type("application/json").entity(reminderReturned).put(ClientResponse.class);
+        assert clientResponseToUpdateReminder.getStatus() == 200;
+
+        ClientResponse clientResponseToGetReminderUpdated = resource.path("users").path(userId3).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").get(ClientResponse.class);
+        Reminder reminderUpdated = clientResponseToGetReminderUpdated.getEntity(Reminder.class);
+        assert reminderUpdated.getReminderMessage().equalsIgnoreCase(reminderReturned.getReminderMessage()) && reminderUpdated.getReminderTime()==reminderReturned.getReminderTime();
+
+
+        ClientResponse clientResponseToDeleteReminder = resource.path("users").path(userId3).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").delete(ClientResponse.class);
+        assert clientResponseToDeleteReminder.getStatus() == 200;
+
+        //Multiple Reminders of a User Fetch test
+
+        clientResponseForReminderCreation = resource.path("users").path(userId3).path("reminders").queryParam("reminderAbout", ReminderAbout.COLLECT.toString()).queryParam("createdBy", userId7).type("application/json").entity(DataBrewer.getFakeReminder("Reminder One")).post(ClientResponse.class);
+        assert clientResponseForReminderCreation.getStatus() == 201;
+
+        clientResponseForReminderCreation = resource.path("users").path(userId3).path("reminders").queryParam("reminderAbout", ReminderAbout.COLLECT.toString()).queryParam("createdBy", userId2).type("application/json").entity(DataBrewer.getFakeReminder("Reminder two")).post(ClientResponse.class);
+        assert clientResponseForReminderCreation.getStatus() == 201;
+
+        clientResponseForReminderCreation = resource.path("users").path(userId3).path("reminders").queryParam("reminderAbout", ReminderAbout.COLLECT.toString()).queryParam("createdBy", userId4).type("application/json").entity(DataBrewer.getFakeReminder("Reminder three")).post(ClientResponse.class);
+        assert clientResponseForReminderCreation.getStatus() == 201;
+
+        clientResponseForReminderCreation = resource.path("users").path(userId3).path("reminders").queryParam("reminderAbout", ReminderAbout.COLLECT.toString()).queryParam("createdBy", userId5).type("application/json").entity(DataBrewer.getFakeReminder("Reminder four")).post(ClientResponse.class);
+        assert clientResponseForReminderCreation.getStatus() == 201;
+
+        clientResponseForReminderCreation = resource.path("users").path(userId3).path("reminders").queryParam("reminderAbout", ReminderAbout.COLLECT.toString()).queryParam("createdBy", userId6).type("application/json").entity(DataBrewer.getFakeReminder("Reminder five")).post(ClientResponse.class);
+        assert clientResponseForReminderCreation.getStatus() == 201;
+
+        ClientResponse clientResponseForMultipleReminderFetch = resource.path("users").path(userId3).path("reminders").type("application/json").get(ClientResponse.class);
+        assert clientResponseForMultipleReminderFetch.getStatus() == 200;
+        ReminderPage reminderPage = clientResponseForMultipleReminderFetch.getEntity(ReminderPage.class);
 
     }
 }

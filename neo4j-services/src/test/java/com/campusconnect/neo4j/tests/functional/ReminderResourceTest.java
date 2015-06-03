@@ -33,6 +33,7 @@ public class ReminderResourceTest extends TestBase {
         ClientResponse clientResponseToGetReminderUpdated = resource.path("users").path(userId).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").get(ClientResponse.class);
         Reminder reminderUpdated = clientResponseToGetReminderUpdated.getEntity(Reminder.class);
         assert reminderUpdated.getReminderMessage().equalsIgnoreCase(reminderReturned.getReminderMessage()) && reminderUpdated.getReminderTime() == reminderReturned.getReminderTime();
+        assert reminderUpdated.getReminderMessage().equalsIgnoreCase(reminderReturned.getReminderMessage()) && reminderUpdated.getReminderTime() == reminderReturned.getReminderTime();
 
 
         ClientResponse clientResponseToDeleteReminder = resource.path("users").path(userId).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").delete(ClientResponse.class);

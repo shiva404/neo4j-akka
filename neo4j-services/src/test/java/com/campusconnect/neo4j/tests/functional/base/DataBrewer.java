@@ -85,7 +85,12 @@ public class DataBrewer {
     {
     	
     	Long currentTime = System.currentTimeMillis(); 
-    	return new Reminder(currentTime, currentTime, subject, "Collect the Book", "desc", currentTime);
+    	return new Reminder(currentTime, currentTime, subject, faker.lorem().fixedString(20), "desc", currentTime);
     }
+
+	public static Favourite getFakeFavourites(String genre) {
+		
+		return new Favourite(genre);
+	}
 
 }

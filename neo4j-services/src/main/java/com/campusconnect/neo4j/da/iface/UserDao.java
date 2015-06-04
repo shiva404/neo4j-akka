@@ -12,8 +12,6 @@ public interface UserDao {
 
     void createFollowingRelation(User user, User follower);
 
-    UserRelation getUsersRelationShip(User user, User fellowUser);
-
     void confirmFriendRelation(User user, User friend);
 
     User createUser(User user, String accessToken);
@@ -52,11 +50,9 @@ public interface UserDao {
 
     User getUserByEmail(String email);
 
-    List<User> search(String searchString);
-
     List<User> searchFriends(String userId, String searchString);
 
-    List<User> findFriends(String userId);
+    List<User> findFriends(String userId, String currentUser);
 
     List<User> findMutualFriends(String userId, String mutualFriends);
 
@@ -65,6 +61,11 @@ public interface UserDao {
     void deleteFriendRequest(String userId, String friendUserId);
 
 
-    List<User> getRandomUsers(int size);
+    List<User> getRandomUsers(int size, String userID);
 
+    List<User> search(String searchString, String userId);
+
+    List<User> findPendingFriendReq(String userId);
+
+    List<UserRelation> getUsersRelationShip(User user, User fellowUser);
 }

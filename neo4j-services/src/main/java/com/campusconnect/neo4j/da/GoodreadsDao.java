@@ -50,7 +50,6 @@ public class GoodreadsDao {
     private SearchResult formSearchResult(SearchResponse searchResponse) {
         List<Book> searchBooks = new ArrayList<>();
         if (searchResponse.getSearch() != null)
-
             for (Result result : searchResponse.getSearch().getResults()) {
                 final BestBook bestBook = result.getBestBook();
                 if (bestBook != null) {

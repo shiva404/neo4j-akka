@@ -4,18 +4,7 @@ import com.campusconnect.neo4j.tests.TestBase;
 import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
 import com.campusconnect.neo4j.types.*;
 import com.sun.jersey.api.client.ClientResponse;
-
 import org.testng.annotations.Test;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 
 /**
  * Created by sn1 on 2/24/15.
@@ -40,11 +29,10 @@ public class UserResourceTest extends TestBase {
         String userId = createdUser.getId();
         return userId;
     }
-    
-    public static String createBook()
-    {
-    	   ClientResponse createBookClientResponse = resource.path("books").type("application/json").entity(DataBrewer.getFakeBook()).post(ClientResponse.class);
-    	   return createBookClientResponse.getEntity(Book.class).getId();
+
+    public static String createBook() {
+        ClientResponse createBookClientResponse = resource.path("books").type("application/json").entity(DataBrewer.getFakeBook()).post(ClientResponse.class);
+        return createBookClientResponse.getEntity(Book.class).getId();
     }
 
     public static String createKnowUserWithGoogleId(String userName, String email, String googleId) {
@@ -64,36 +52,6 @@ public class UserResourceTest extends TestBase {
         String userId = createdUser.getId();
         return userId;
     }
-
-    @Test
-    public void testFavouritesAdditionToUser() {
-
-        Favourites favourites = new Favourites();
-        Set<String> favTopics = new HashSet<String>();
-
-        favTopics.add("Suspense");
-        favTopics.add("Trhiller");
-        favTopics.add("Fiction");
-        favTopics.add("Non Fiction");
-
-        favourites.setFavourites(favTopics);
-
-        ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithAddress()).post(ClientResponse.class);
-        assert clientResponse.getStatus() == 201;
-        createdUser = clientResponse.getEntity(User.class);
-        String userId = createdUser.getId();
-
-        ClientResponse clientResponse1 = resource.path("users").path(userId).path("favourites").type("application/json").entity(favourites).put(ClientResponse.class);
-        assert clientResponse1.getStatus() == 200;
-
-        ClientResponse getClientResponse = resource.path("users").path(userId).accept("application/json").get(ClientResponse.class);
-        assert getClientResponse.getStatus() == 200;
-
-        updatedUser = getClientResponse.getEntity(User.class);
-        Set<String> favouritesSetOnUser = updatedUser.getFavorites();
-        assert favouritesSetOnUser.size() == 4;
-    }
-
 
     @Test
     public void testCompleteUserFlow() {
@@ -143,105 +101,4 @@ public class UserResourceTest extends TestBase {
         assert getBook != null;
     }
 
-
-    @Test(dependsOnMethods = "bookE2EFlows")
-    public void listingBookE2EFlow() {
-
-
-        ClientResponse addBookCR = resource.path("users").path(createdUser.getId()).path("books").path(createdBook.getId()).path("own").queryParam("status", "available").type("application/json").put(ClientResponse.class);
-        assert addBookCR.getStatus() == 200;
-        ClientResponse addBookCR2 = resource.path("users").path(createdUser.getId()).path("books").path(createdBook2.getId()).path("own").queryParam("status", "available").type("application/json").put(ClientResponse.class);
-        assert addBookCR2.getStatus() == 200;
-
-        ClientResponse updateBookStatusCR = resource.path("users").path(createdUser.getId()).path("books").path(createdBook.getId()).path("own").queryParam("status", "lent").type("application/json").put(ClientResponse.class);
-        assert updateBookStatusCR.getStatus() == 200;
-
-        ClientResponse ownedBooks = resource.path("users").path(createdUser.getId()).path("books").queryParam("filter", "owned").accept("application/json").get(ClientResponse.class);
-        assert ownedBooks.getStatus() == 200;
-        OwnedBooksPage ownedBooksPage = ownedBooks.getEntity(OwnedBooksPage.class);
-        assert ownedBooksPage.getSize() == 2;
-
-        ClientResponse availableBooks = resource.path("users").path(createdUser.getId()).path("books").queryParam("filter", "available").accept("application/json").get(ClientResponse.class);
-        assert availableBooks.getStatus() == 200;
-        OwnedBooksPage availableBooksPage = availableBooks.getEntity(OwnedBooksPage.class);
-        assert availableBooksPage.getSize() == 1;
-        availableBook = availableBooksPage.getOwnedBooks().get(0);
-
-        ClientResponse lentBooks = resource.path("users").path(createdUser.getId()).path("books").queryParam("filter", "lent").accept("application/json").get(ClientResponse.class);
-        assert lentBooks.getStatus() == 200;
-        OwnedBooksPage lentBooksPage = lentBooks.getEntity(OwnedBooksPage.class);
-        assert lentBooksPage.getSize() == 1;
-        lentBook = lentBooksPage.getOwnedBooks().get(0);
-    }
-
-    @Test(dependsOnMethods = "listingBookE2EFlow")
-    public void testBorrowingTest() {
-        ClientResponse borrowReqResponse = resource.path("books").path(availableBook.getId()).path("borrow").type("application/json")
-                .entity(DataBrewer.getBorrowRequest(createdUser.getId(), createdUser2.getId())).post(ClientResponse.class);
-        assert borrowReqResponse.getStatus() == 200;
-
-        ClientResponse agreedStatusCR = resource.path("books").path(availableBook.getId()).path("users")
-                .path(createdUser.getId()).queryParam("borrowerId", createdUser2.getId()).queryParam("status", "agreed")
-                .type("application/json")
-                .put(ClientResponse.class);
-        assert agreedStatusCR.getStatus() == 200;
-
-        ClientResponse updateStatusCR = resource.path("books").path(availableBook.getId()).path("users")
-                .path(createdUser.getId()).queryParam("borrowerId", createdUser2.getId()).queryParam("status", "success")
-                .type("application/json")
-                .put(ClientResponse.class);
-        assert updateStatusCR.getStatus() == 200;
-    }
-
-    @Test(dependsOnMethods = "testBorrowingTest")
-    public void testGetBorrowedBooks() {
-        ClientResponse borrowedBooksCR = resource.path("users").path(createdUser2.getId()).path("books").queryParam("filter", "borrowed").accept("application/json").get(ClientResponse.class);
-        assert borrowedBooksCR.getStatus() == 200;
-        BorrowedBooksPage borrowedBooksPage = borrowedBooksCR.getEntity(BorrowedBooksPage.class);
-    }
-
-    @Test
-    public void testIdempotencyOfCreationOfUser() {
-        String userId1 = createKnowUserWithGoogleId("Namitha", "xyz@gmail.com", "xyzGoogleId");
-        String userId2 = createKnowUserWithFbId("Namitha", "xyz@gmail.com", "xyzFbId");
-        System.out.println(userId1);
-        System.out.println(userId2);
-        assert userId1.toLowerCase().equals(userId2.toLowerCase());
-
-        String userId4 = createKnowUserWithFbId("Namitha", "abc@gmail.com", "abcFbId");
-        String userId3 = createKnowUserWithGoogleId("Namitha", "abc@gmail.com", "abcGoogleId");
-        assert userId4.toLowerCase().equals(userId3.toLowerCase());
-    }
-    
-    @Test
-    public void testFriendRequestFlow() {
-    	//friend confirmed
-      String userId1 = createKnowUserWithGoogleId("Namitha", "namics08@gmail.com", "namabc");
-      String friend = createKnowUserWithGoogleId("chiwahwah","shiva.n404@gmail.com","chiwahwah");
-      
-      ClientResponse agreedStatusCR = resource.path("users").path(userId1).path("friend")
-              .path(friend).type("application/json")
-              .post(ClientResponse.class);
-      assert agreedStatusCR.getStatus() == 200;
-      
-    agreedStatusCR = resource.path("users").path(userId1).path("friend")
-              .path(friend).queryParam("status", "agreed").type("application/json")
-              .put(ClientResponse.class);
-      assert agreedStatusCR.getStatus() == 200;
-      
-      //friend request cancelled
-      String userId2 = createUser();
-      String friend2 = createUser();
-      
-    agreedStatusCR = resource.path("users").path(userId2).path("friend")
-              .path(friend2).type("application/json")
-              .post(ClientResponse.class);
-      assert agreedStatusCR.getStatus() == 200;
-      
-    agreedStatusCR = resource.path("users").path(userId2).path("friend")
-              .path(friend2).queryParam("status", "cancel").type("application/json")
-              .put(ClientResponse.class);
-      assert agreedStatusCR.getStatus() == 200;
-      
-    }
 }

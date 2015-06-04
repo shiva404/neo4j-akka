@@ -22,7 +22,7 @@ public class ReminderResourceTest extends TestBase {
 
         ClientResponse clientResponseToGetReminderCreated = resource.path("users").path(userId).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").get(ClientResponse.class);
         Reminder reminderReturned = clientResponseToGetReminderCreated.getEntity(Reminder.class);
-        assert reminderReturned.getReminderMessage().equalsIgnoreCase(reminderCreated.getReminderMessage()) && reminderReturned.getReminderTime().equals(reminderCreated.getReminderTime());
+        assert reminderReturned.getReminderMessage().equalsIgnoreCase(reminderCreated.getReminderMessage()) && reminderReturned.getReminderTime() == reminderCreated.getReminderTime();
 
         reminderReturned.setReminderMessage("Collect Book Time Update");
         Long updatedTime = System.currentTimeMillis();
@@ -32,7 +32,8 @@ public class ReminderResourceTest extends TestBase {
 
         ClientResponse clientResponseToGetReminderUpdated = resource.path("users").path(userId).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").get(ClientResponse.class);
         Reminder reminderUpdated = clientResponseToGetReminderUpdated.getEntity(Reminder.class);
-        assert reminderUpdated.getReminderMessage().equalsIgnoreCase(reminderReturned.getReminderMessage()) && reminderUpdated.getReminderTime().equals(reminderReturned.getReminderTime());
+        assert reminderUpdated.getReminderMessage().equalsIgnoreCase(reminderReturned.getReminderMessage()) && reminderUpdated.getReminderTime() == reminderReturned.getReminderTime();
+        assert reminderUpdated.getReminderMessage().equalsIgnoreCase(reminderReturned.getReminderMessage()) && reminderUpdated.getReminderTime() == reminderReturned.getReminderTime();
 
 
         ClientResponse clientResponseToDeleteReminder = resource.path("users").path(userId).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").delete(ClientResponse.class);

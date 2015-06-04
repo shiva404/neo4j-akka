@@ -9,7 +9,12 @@ import com.campusconnect.neo4j.akka.goodreads.types.Review;
 import com.campusconnect.neo4j.akka.goodreads.types.Reviews;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.common.GoodreadsStatus;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.GoodreadsFriendBookRecRelation;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.UserRecommendation;
+import com.campusconnect.neo4j.types.web.WishListBook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +58,7 @@ public class UserRecForWishlist extends UntypedActor {
                     //prepare books list
                     for (Review review : reviews.getReview()) {
                         if (review.getShelves() != null && !review.getShelves().isEmpty() && !review.getShelves().get(0).getName().equals(GoodreadsStatus.TO_READ.toString())) {
-                            com.campusconnect.neo4j.types.Book book = BookMapper.getBookFromGoodreadsBook(review.getBook());
+                            Book book = BookMapper.getBookFromGoodreadsBook(review.getBook());
                             books.add(book);
                         }
                     }

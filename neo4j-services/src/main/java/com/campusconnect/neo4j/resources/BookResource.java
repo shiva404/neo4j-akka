@@ -2,10 +2,10 @@ package com.campusconnect.neo4j.resources;
 
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.Book;
-import com.campusconnect.neo4j.types.BorrowRequest;
-import com.campusconnect.neo4j.types.SearchResult;
-import com.campusconnect.neo4j.types.User;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.BorrowRequest;
+import com.campusconnect.neo4j.types.web.SearchResult;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;

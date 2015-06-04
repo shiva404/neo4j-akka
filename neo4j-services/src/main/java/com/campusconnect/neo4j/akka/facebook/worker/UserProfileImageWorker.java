@@ -4,7 +4,7 @@ import akka.actor.UntypedActor;
 import com.campusconnect.neo4j.akka.facebook.api.GetUserProfileImage;
 import com.campusconnect.neo4j.akka.facebook.task.UserProfileImageTask;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.User;
+import com.campusconnect.neo4j.types.neo4j.User;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

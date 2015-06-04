@@ -1,9 +1,9 @@
 package com.campusconnect.neo4j.tests.functional;
 
 import com.campusconnect.neo4j.tests.TestBase;
-import com.campusconnect.neo4j.types.User;
-import com.campusconnect.neo4j.types.UserIdsPage;
-import com.campusconnect.neo4j.types.UsersPage;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.UserIdsPage;
+import com.campusconnect.neo4j.types.web.UsersPage;
 import com.sun.jersey.api.client.ClientResponse;
 import org.testng.annotations.Test;
 

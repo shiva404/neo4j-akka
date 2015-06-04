@@ -3,7 +3,7 @@ package com.campusconnect.neo4j.akka.goodreads.worker;
 import akka.actor.UntypedActor;
 import com.campusconnect.neo4j.akka.goodreads.task.SaveBookTask;
 import com.campusconnect.neo4j.da.iface.BookDao;
-import com.campusconnect.neo4j.types.Book;
+import com.campusconnect.neo4j.types.neo4j.Book;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

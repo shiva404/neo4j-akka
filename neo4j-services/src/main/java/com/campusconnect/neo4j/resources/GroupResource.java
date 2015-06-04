@@ -2,7 +2,13 @@ package com.campusconnect.neo4j.resources;
 
 import com.campusconnect.neo4j.da.GroupDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.common.AccessRoles;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.Group;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.BooksPage;
+import com.campusconnect.neo4j.types.web.UserIdsPage;
+import com.campusconnect.neo4j.types.web.UsersPage;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;

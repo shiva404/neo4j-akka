@@ -2,7 +2,11 @@ package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.repositories.AuditEventRepository;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.common.AuditEventType;
+import com.campusconnect.neo4j.types.common.IdType;
+import com.campusconnect.neo4j.types.neo4j.AuditEvent;
+import com.campusconnect.neo4j.types.web.Event;
+import com.campusconnect.neo4j.types.web.Subject;
 import com.campusconnect.neo4j.util.EventDisplayStrings;
 import com.campusconnect.neo4j.util.comparator.TimeStampComparator;
 import org.codehaus.jackson.map.ObjectMapper;

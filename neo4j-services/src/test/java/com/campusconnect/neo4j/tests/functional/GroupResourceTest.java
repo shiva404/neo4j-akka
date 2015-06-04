@@ -2,7 +2,7 @@ package com.campusconnect.neo4j.tests.functional;
 
 import com.campusconnect.neo4j.tests.TestBase;
 import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
-import com.campusconnect.neo4j.types.Group;
+import com.campusconnect.neo4j.types.neo4j.Group;
 import com.sun.jersey.api.client.ClientResponse;
 import org.testng.annotations.Test;
 

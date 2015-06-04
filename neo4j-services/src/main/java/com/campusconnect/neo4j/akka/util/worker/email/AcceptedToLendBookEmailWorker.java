@@ -2,8 +2,8 @@ package com.campusconnect.neo4j.akka.util.worker.email;
 
 import akka.actor.UntypedActor;
 import com.campusconnect.neo4j.akka.util.task.AcceptionToLendBookTask;
-import com.campusconnect.neo4j.types.Book;
-import com.campusconnect.neo4j.types.User;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.User;
 
 import javax.mail.Message;
 import javax.mail.Session;

@@ -1,16 +1,14 @@
 package com.campusconnect.neo4j.repositories;
 
-import java.util.List;
-
+import com.campusconnect.neo4j.types.neo4j.Favourite;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
-import com.campusconnect.neo4j.types.Book;
-import com.campusconnect.neo4j.types.Favourite;
+import java.util.List;
 
-public interface FavouriteRepository extends GraphRepository<Favourite>{
+public interface FavouriteRepository extends GraphRepository<Favourite> {
 
-	  @Query(value = "match (favourites:Favourite) return favourites")
-	public List<Favourite> getFavourites();
+    @Query(value = "match (favourites:Favourite) return favourites")
+    public List<Favourite> getFavourites();
 
 }

@@ -5,8 +5,8 @@ import com.campusconnect.neo4j.akka.goodreads.api.GetBook;
 import com.campusconnect.neo4j.akka.goodreads.api.Search;
 import com.campusconnect.neo4j.akka.goodreads.mappers.BookMapper;
 import com.campusconnect.neo4j.akka.goodreads.types.*;
-import com.campusconnect.neo4j.types.Book;
-import com.campusconnect.neo4j.types.SearchResult;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.web.SearchResult;
 
 import java.io.IOException;
 import java.util.ArrayList;

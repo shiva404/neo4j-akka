@@ -1,49 +1,32 @@
-package com.campusconnect.neo4j.types.neo4j;
+package com.campusconnect.neo4j.types.web;
 
+import com.campusconnect.neo4j.types.neo4j.Address;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.neo4j.annotation.Fetch;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.NodeEntity;
-
-import java.io.Serializable;
 import java.util.Set;
 
 /**
- * Created by sn1 on 1/17/15.
+ * Created with IntelliJ IDEA.
+ * User: sn1
+ * Date: 6/4/15
+ * Time: 9:31 PM
+ * To change this template use File | Settings | File Templates.
  */
-
-@NodeEntity
-public class User implements Serializable {
-
-    @Fetch
+public class User {
     private Set<Address> addresses;
-
-    @CreatedDate
     private long createdDate;
-
-    @Indexed
     private String email;
     private Set<String> favorites;
-    @Indexed()
     private String fbId;
     private String goodreadsAccessToken;
     private String goodreadsAccessTokenSecret;
     private String goodreadsAuthStatus;
     private String goodReadsSynchStatus;
     private long lastGoodreadsSychDate;
-    @Indexed()
     private String goodreadsId;
-    @Indexed()
     private String googleId;
-    @Indexed(unique = true)
     private String id;
-    @LastModifiedDate
     private long lastModifiedDate;
     private String name;
-    @GraphId
     private Long nodeId;
     private String phone;
     private String gender;
@@ -56,35 +39,17 @@ public class User implements Serializable {
 
     }
 
-    public User(Set<Address> addresses, long createdDate, String email, Set<String> favorites, String fbId, String goodreadsAccessToken, String goodreadsAccessTokenSecret, String goodreadsAuthStatus, String goodReadsSynchStatus, long lastGoodreadsSychDate, String goodreadsId, String googleId, String id, long lastModifiedDate, String name, String phone, String gender, String profileImageUrl, String workDesignation, String workLocation, String userRelation) {
-        this.addresses = addresses;
-        this.createdDate = createdDate;
-        this.email = email;
-        this.favorites = favorites;
-        this.fbId = fbId;
-        this.goodreadsAccessToken = goodreadsAccessToken;
-        this.goodreadsAccessTokenSecret = goodreadsAccessTokenSecret;
-        this.goodreadsAuthStatus = goodreadsAuthStatus;
-        this.goodReadsSynchStatus = goodReadsSynchStatus;
-        this.lastGoodreadsSychDate = lastGoodreadsSychDate;
-        this.goodreadsId = goodreadsId;
-        this.googleId = googleId;
-        this.lastModifiedDate = lastModifiedDate;
-        this.name = name;
-        this.id = id;
-        this.phone = phone;
-        this.gender = gender;
-        this.profileImageUrl = profileImageUrl;
-        this.workDesignation = workDesignation;
-        this.workLocation = workLocation;
-        this.userRelation = userRelation;
-    }
-
     public User(String name, String email) {
-
         this.name = name;
         this.email = email;
     }
+
+    public User(String name, String email, String phone) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+    }
+
 
     public String getUserRelation() {
         return userRelation;
@@ -158,7 +123,33 @@ public class User implements Serializable {
         this.favorites = favourites;
     }
 
+
+    public User(Set<Address> addresses, long createdDate, String email, Set<String> favorites, String fbId, String goodreadsAccessToken, String goodreadsAccessTokenSecret, String goodreadsAuthStatus, String goodReadsSynchStatus, long lastGoodreadsSychDate, String goodreadsId, String googleId, String id, long lastModifiedDate, String name, String phone, String gender, String profileImageUrl, String workDesignation, String workLocation, String userRelation) {
+        this.addresses = addresses;
+        this.createdDate = createdDate;
+        this.email = email;
+        this.favorites = favorites;
+        this.fbId = fbId;
+        this.goodreadsAccessToken = goodreadsAccessToken;
+        this.goodreadsAccessTokenSecret = goodreadsAccessTokenSecret;
+        this.goodreadsAuthStatus = goodreadsAuthStatus;
+        this.goodReadsSynchStatus = goodReadsSynchStatus;
+        this.lastGoodreadsSychDate = lastGoodreadsSychDate;
+        this.goodreadsId = goodreadsId;
+        this.googleId = googleId;
+        this.lastModifiedDate = lastModifiedDate;
+        this.name = name;
+        this.id = id;
+        this.phone = phone;
+        this.gender = gender;
+        this.profileImageUrl = profileImageUrl;
+        this.workDesignation = workDesignation;
+        this.workLocation = workLocation;
+        this.userRelation = userRelation;
+    }
+
     public String getFbId() {
+
         return fbId;
     }
 

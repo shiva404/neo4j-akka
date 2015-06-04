@@ -1,16 +1,9 @@
-package com.campusconnect.neo4j.types.neo4j;
+package com.campusconnect.neo4j.types.web;
 
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.NodeEntity;
-
-import java.io.Serializable;
-
-@NodeEntity
-public class Favourite implements Serializable {
+public class Favourite {
 
     private String genre;
 
-    @GraphId
     private Long nodeId;
 
     public Favourite() {

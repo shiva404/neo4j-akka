@@ -1,30 +1,20 @@
-package com.campusconnect.neo4j.types.neo4j;
+package com.campusconnect.neo4j.types.web;
 
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.NodeEntity;
-
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by sn1 on 2/16/15.
+ * Created with IntelliJ IDEA.
+ * User: sn1
+ * Date: 6/4/15
+ * Time: 10:39 PM
+ * To change this template use File | Settings | File Templates.
  */
-@NodeEntity
-public class Book implements Serializable {
-    @GraphId
-    private Long nodeId;
-
-    @Indexed(unique = true)
+public class Book {
     private String id;
-
-    @Indexed()
     private Integer goodreadsId;
-
     private String authorName;
     private String goodreadsAuthorId;
-
     private String name;
     private String isbn;
     private String isbn13;
@@ -37,18 +27,7 @@ public class Book implements Serializable {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     private String imageUrl;
 
-    public Book(Integer goodreadsId, String authorName, String goodreadsAuthorId, String name, String isbn, String isbn13, int publishedYear, String description, String publisher, Integer numberOfPages, String imageUrl) {
-        this.goodreadsId = goodreadsId;
-        this.authorName = authorName;
-        this.goodreadsAuthorId = goodreadsAuthorId;
-        this.name = name;
-        this.isbn = isbn;
-        this.isbn13 = isbn13;
-        this.publishedYear = publishedYear;
-        this.description = description;
-        this.publisher = publisher;
-        this.numberOfPages = numberOfPages;
-        this.imageUrl = imageUrl;
+    public Book() {
     }
 
     public Book(String id, Integer goodreadsId, String authorName, String goodreadsAuthorId, String name, String isbn, String isbn13,
@@ -67,9 +46,6 @@ public class Book implements Serializable {
         this.imageUrl = imageUrl;
     }
 
-    public Book() {
-    }
-
     public Book(String name, String isbn) {
         this.name = name;
         this.isbn = isbn;
@@ -80,6 +56,7 @@ public class Book implements Serializable {
         this.name = name;
         this.isbn = isbn;
     }
+
 
     public String getBookType() {
         return bookType;
@@ -155,14 +132,6 @@ public class Book implements Serializable {
         this.goodreadsAuthorId = goodreadsAuthorId;
     }
 
-    public Long getNodeId() {
-        return nodeId;
-    }
-
-    public void setNodeId(Long nodeId) {
-        this.nodeId = nodeId;
-    }
-
     public String getId() {
         return id;
     }
@@ -206,7 +175,6 @@ public class Book implements Serializable {
     @Override
     public String toString() {
         return "Book{" +
-                "nodeId=" + nodeId +
                 ", id='" + id + '\'' +
                 ", goodreadsId=" + goodreadsId +
                 ", authorName='" + authorName + '\'' +

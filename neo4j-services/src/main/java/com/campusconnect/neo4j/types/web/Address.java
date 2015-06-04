@@ -1,29 +1,14 @@
-package com.campusconnect.neo4j.types.neo4j;
+package com.campusconnect.neo4j.types.web;
 
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.NodeEntity;
-
-import java.io.Serializable;
-
-/**
- * Created by sn1 on 2/23/15.
- */
-@NodeEntity
-public class Address implements Serializable {
+public class Address {
     private String city;
 
     private String country;
 
-    @CreatedDate
     private long createdDate;
 
-    @GraphId
     private Long id;
     private String landmark;
-    @LastModifiedDate
     private long lastModifiedTime;
     private String latitude;
     private String line1;

@@ -30,7 +30,7 @@ public class DataBrewer {
     }
 
     public static User getFakeUserWithAddress() {
-        User user = new User(faker.name().name(), faker.internet().emailAddress(), faker.phoneNumber().phoneNumber());
+        User user = new User(faker.name().name(), faker.internet().emailAddress());
         Set<Address> addresses = new HashSet<>();
         addresses.add(getFakeAddress(AddressType.HOME.toString()));
         user.setAddresses(addresses);
@@ -39,7 +39,7 @@ public class DataBrewer {
     }
 
     public static User getFakeUserWithKnownEmailAddressAndGoogleId(String userName, String email, String googleId) {
-        User user = new User(userName, email, faker.phoneNumber().phoneNumber());
+        User user = new User(userName, email);
         Set<Address> addresses = new HashSet<>();
         addresses.add(getFakeAddress(AddressType.HOME.toString()));
         user.setAddresses(addresses);
@@ -49,7 +49,7 @@ public class DataBrewer {
     }
 
     public static User getFakeUserWithKnownEmailAddressAndFbId(String userName, String email, String fbId) {
-        User user = new User(userName, email, faker.phoneNumber().phoneNumber());
+        User user = new User(userName, email);
         Set<Address> addresses = new HashSet<>();
         addresses.add(getFakeAddress(AddressType.HOME.toString()));
         user.setAddresses(addresses);

@@ -1,10 +1,10 @@
-package com.campusconnect.neo4j.types.neo4j;
+package com.campusconnect.neo4j.types.web;
 
 import java.util.List;
 
 public class GroupPage {
 
-    List<Group> group;
+    List<com.campusconnect.neo4j.types.neo4j.Group> group;
     private int offset;
 
     private int size;
@@ -13,14 +13,14 @@ public class GroupPage {
         super();
     }
 
-    public GroupPage(List<Group> group, int offset, int size) {
+    public GroupPage(List<com.campusconnect.neo4j.types.neo4j.Group> group, int offset, int size) {
         super();
         this.group = group;
         this.offset = offset;
         this.size = size;
     }
 
-    public List<Group> getGroup() {
+    public List<com.campusconnect.neo4j.types.neo4j.Group> getGroup() {
         return group;
     }
 
@@ -32,7 +32,7 @@ public class GroupPage {
         return size;
     }
 
-    public void setGroup(List<Group> group) {
+    public void setGroup(List<com.campusconnect.neo4j.types.neo4j.Group> group) {
         this.group = group;
     }
 

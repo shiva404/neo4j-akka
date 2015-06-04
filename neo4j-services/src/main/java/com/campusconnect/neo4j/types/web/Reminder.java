@@ -1,20 +1,10 @@
-package com.campusconnect.neo4j.types.neo4j;
+package com.campusconnect.neo4j.types.web;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.NodeEntity;
-
-@NodeEntity
 public class Reminder {
 
-    @CreatedDate
     private long createdDate;
     private String description;
-    @LastModifiedDate
     private long lastModifiedTime;
-
-    @GraphId
     private Long nodeId;
 
     private String reminderMessage;
@@ -34,17 +24,6 @@ public class Reminder {
         this.reminderMessage = reminderMessage;
         this.reminderTime = reminderTime;
         this.subject = subject;
-    }
-
-    public Reminder(Long createdDate, Long lastModifiedTime,
-                    String subject, String reminderMessage, String description, Long reminderTime) {
-        super();
-        this.createdDate = createdDate;
-        this.lastModifiedTime = lastModifiedTime;
-        this.reminderTime = reminderTime;
-        this.subject = subject;
-        this.reminderMessage = reminderMessage;
-        this.description = description;
     }
 
     public long getCreatedDate() {

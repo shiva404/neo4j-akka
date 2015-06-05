@@ -1,6 +1,9 @@
 package com.campusconnect.neo4j.da.iface;
 
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.neo4j.*;
+import com.campusconnect.neo4j.types.web.BorrowRequest;
+import com.campusconnect.neo4j.types.web.SearchResult;
+import com.campusconnect.neo4j.types.web.UserRecommendation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;

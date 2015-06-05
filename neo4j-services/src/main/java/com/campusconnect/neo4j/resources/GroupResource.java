@@ -2,10 +2,18 @@ package com.campusconnect.neo4j.resources;
 
 import com.campusconnect.neo4j.da.GroupDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
+import com.campusconnect.neo4j.types.common.AccessRoles;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.Group;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.BooksPage;
+import com.campusconnect.neo4j.types.web.UserIdsPage;
+import com.campusconnect.neo4j.types.web.UsersPage;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -93,7 +101,11 @@ public class GroupResource {
     @Path("{groupId}/users")
     public Response getUsers(@PathParam("groupId") final String groupId) {
         List<User> users = groupDao.getUsers(groupId);
-        UsersPage usersListPage = new UsersPage(0, users.size(), users);
+        List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(users.size());
+        for (User user : users) {
+            returnUsers.add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+        }
+        UsersPage usersListPage = new UsersPage(0, returnUsers.size(), returnUsers);
         return Response.ok().entity(usersListPage).build();
     }
 
@@ -102,11 +114,18 @@ public class GroupResource {
     public Response getBooks(@PathParam("groupId") final String groupId, @QueryParam("filter") String filterParam) {
         if (null == filterParam || filterParam.equals("") || filterParam.toLowerCase().equals("available")) {
             List<Book> books = groupDao.getavailableBooks(groupId);
-            BooksPage booksPage = new BooksPage(0, books.size(), books);
+            List<com.campusconnect.neo4j.types.web.Book> returnBooks = new ArrayList<>();
+            for (Book book : books)
+                returnBooks.add(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
+
+            BooksPage booksPage = new BooksPage(0, returnBooks.size(), returnBooks);
             return Response.ok().entity(booksPage).build();
         } else if (filterParam.toLowerCase().equals("lookingfor")) {
             List<Book> books = groupDao.getWishListBooks(groupId);
-            BooksPage booksPage = new BooksPage(0, books.size(), books);
+            List<com.campusconnect.neo4j.types.web.Book> returnBooks = new ArrayList<>();
+            for (Book book : books)
+                returnBooks.add(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
+            BooksPage booksPage = new BooksPage(0, returnBooks.size(), returnBooks);
             return Response.ok().entity(booksPage).build();
         }
         return Response.ok().entity(new BooksPage()).build();

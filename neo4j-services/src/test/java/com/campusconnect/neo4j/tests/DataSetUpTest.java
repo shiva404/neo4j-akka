@@ -3,7 +3,11 @@ package com.campusconnect.neo4j.tests;
 import com.campusconnect.neo4j.tests.functional.GroupResourceTest;
 import com.campusconnect.neo4j.tests.functional.UserResourceTest;
 import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.common.ReminderAbout;
+import com.campusconnect.neo4j.types.neo4j.Reminder;
+import com.campusconnect.neo4j.types.web.BorrowRequest;
+import com.campusconnect.neo4j.types.web.GroupPage;
+import com.campusconnect.neo4j.types.web.ReminderPage;
 import com.sun.jersey.api.client.ClientResponse;
 import org.testng.annotations.Test;
 

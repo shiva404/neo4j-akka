@@ -2,9 +2,9 @@ package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.da.iface.NotificationDao;
 import com.campusconnect.neo4j.repositories.NotificationRepository;
-import com.campusconnect.neo4j.types.Notification;
-import com.campusconnect.neo4j.types.NotificationEntity;
-import com.campusconnect.neo4j.types.NotificationType;
+import com.campusconnect.neo4j.types.common.NotificationType;
+import com.campusconnect.neo4j.types.neo4j.NotificationEntity;
+import com.campusconnect.neo4j.types.web.Notification;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 

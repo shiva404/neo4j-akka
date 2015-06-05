@@ -1,7 +1,7 @@
 package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.repositories.GoodreadsRecRepository;
-import com.campusconnect.neo4j.types.GoodreadsFriendBookRecRelation;
+import com.campusconnect.neo4j.types.neo4j.GoodreadsFriendBookRecRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 

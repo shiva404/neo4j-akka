@@ -5,10 +5,16 @@ import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.da.iface.EmailDao;
 import com.campusconnect.neo4j.da.iface.NotificationDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.common.*;
+import com.campusconnect.neo4j.types.neo4j.Address;
+import com.campusconnect.neo4j.types.neo4j.*;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.*;
 import com.googlecode.ehcache.annotations.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
@@ -307,7 +313,15 @@ public class UserDaoImpl implements UserDao {
             Book book = neo4jTemplate.convert(bookNode, Book.class);
             book.setBookType("Own");
             OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawOwnsRelationship, OwnsRelationship.class);
-            ownedBooks.add(new OwnedBook(book, ownsRelationship));
+
+            com.campusconnect.neo4j.types.web.Book webBook = Neo4jToWebMapper.mapBookNeo4jToWeb(book);
+            OwnedBook ownedBook = new OwnedBook(webBook);
+            ownedBook.setCreatedDate(ownsRelationship.getCreatedDate());
+            ownedBook.setStatus(ownsRelationship.getStatus());
+            ownedBook.setLastModifiedDate(ownsRelationship.getLastModifiedDate());
+            ownedBook.setBorrowerId(ownsRelationship.getBorrowerId());
+            ownedBook.setDueDate(ownsRelationship.getDueDate());
+            ownedBooks.add(ownedBook);
         }
         return ownedBooks;
     }
@@ -376,7 +390,12 @@ public class UserDaoImpl implements UserDao {
             Book book = neo4jTemplate.convert(bookNode, Book.class);
             book.setBookType("WISH");
             WishListRelationship whishListRelationship = neo4jTemplate.convert(rawWishRelationship, WishListRelationship.class);
-            wishListBooks.add(new WishListBook(book, whishListRelationship));
+
+            com.campusconnect.neo4j.types.web.Book webBook = Neo4jToWebMapper.mapBookNeo4jToWeb(book);
+
+            WishListBook wishListBook = new WishListBook(webBook);
+
+            wishListBooks.add(wishListBook);
         }
         return wishListBooks;
     }
@@ -390,7 +409,15 @@ public class UserDaoImpl implements UserDao {
             Book book = neo4jTemplate.convert(bookNode, Book.class);
             book.setBookType("WISH");
             GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation = neo4jTemplate.convert(rawWishRelationship, GoodreadsFriendBookRecRelation.class);
-            userRecommendations.add(new UserRecommendation(book, goodreadsFriendBookRecRelation));
+
+            UserRecommendation userRecommendation = new UserRecommendation(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
+            userRecommendation.setFriendGoodreadsId(goodreadsFriendBookRecRelation.getFriendGoodreadsId());
+            userRecommendation.setFriendImageUrl(goodreadsFriendBookRecRelation.getFriendImageUrl());
+            userRecommendation.setFriendName(goodreadsFriendBookRecRelation.getFriendName());
+            userRecommendation.setUserId(goodreadsFriendBookRecRelation.getFriendName());
+            userRecommendation.setCreateDate(goodreadsFriendBookRecRelation.getCreatedDate());
+            userRecommendation.setFriendId(goodreadsFriendBookRecRelation.getFriendId());
+            userRecommendations.add(userRecommendation);
         }
         return userRecommendations;
     }
@@ -404,7 +431,20 @@ public class UserDaoImpl implements UserDao {
             Book book = neo4jTemplate.convert(bookNode, Book.class);
             book.setBookType("BORROWED");
             BorrowRelation borrowRelationship = neo4jTemplate.convert(rawOwnsRelationship, BorrowRelation.class);
-            borrowedBooks.add(new BorrowedBook(book, borrowRelationship));
+
+            com.campusconnect.neo4j.types.web.Book webBook = Neo4jToWebMapper.mapBookNeo4jToWeb(book);
+
+            BorrowedBook borrowedBook = new BorrowedBook(webBook);
+
+            borrowedBook.setStatus(borrowRelationship.getStatus());
+            borrowedBook.setDueDate(borrowRelationship.getDueDate());
+            borrowedBook.setCreatedDate(borrowRelationship.getCreatedDate());
+            borrowedBook.setOwnerUserId(borrowRelationship.getOwnerUserId());
+            borrowedBook.setAdditionalComments(borrowRelationship.getAdditionalComments());
+            borrowedBook.setBorrowDate(borrowRelationship.getBorrowDate());
+            borrowedBook.setContractPeriodInDays(borrowRelationship.getContractPeriodInDays());
+            borrowedBook.setLastModifiedDate(borrowRelationship.getLastModifiedDate());
+            borrowedBooks.add(borrowedBook);
         }
         return borrowedBooks;
     }

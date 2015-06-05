@@ -1,7 +1,7 @@
 package com.campusconnect.neo4j.repositories;
 
-import com.campusconnect.neo4j.types.User;
-import com.campusconnect.neo4j.types.UserRelation;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.neo4j.UserRelation;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
@@ -18,7 +18,7 @@ public interface UserRelationRepository extends GraphRepository<UserRelation> {
     @Query("match (currentUser:User {id:{0}}) - [r1:CONNECTED] - (mutualFriend:User) - [r2:CONNECTED] - (user:User {id:{1}}) return mutualFriend")
     public List<User> getMutualFriends(String currentUser, String userID);
 
-    @Query("match (user:User {id:{0}})- [r:CONNECTED {type:\"FRIEND_REQUEST_PENDING\"}]-(fellowUser:User) return fellowUser")
+    @Query("match (user:User {id:{0}})<- [r:CONNECTED {type:\"FRIEND_REQUEST_PENDING\"}]-(fellowUser:User) return fellowUser")
     public List<User> getPendingFriendRequests(String userID);
 
     @Query("match (users:User{id:{0}})-[r:CONNECTED]-(fellowUser:User) return fellowUser")

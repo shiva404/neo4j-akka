@@ -1,6 +1,10 @@
 package com.campusconnect.neo4j.da.iface;
 
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.neo4j.*;
+import com.campusconnect.neo4j.types.web.BorrowedBook;
+import com.campusconnect.neo4j.types.web.OwnedBook;
+import com.campusconnect.neo4j.types.web.UserRecommendation;
+import com.campusconnect.neo4j.types.web.WishListBook;
 
 import java.util.List;
 

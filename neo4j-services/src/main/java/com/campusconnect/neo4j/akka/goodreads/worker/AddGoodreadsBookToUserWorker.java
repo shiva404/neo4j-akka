@@ -4,7 +4,11 @@ import akka.actor.UntypedActor;
 import com.campusconnect.neo4j.akka.goodreads.task.AddGoodreadsBookToUserTask;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.common.GoodreadsStatus;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.ReadRelation;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.neo4j.WishListRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

@@ -11,7 +11,7 @@ import com.campusconnect.neo4j.akka.goodreads.types.GetFriendsResponse;
 import com.campusconnect.neo4j.akka.goodreads.types.User;
 import com.campusconnect.neo4j.akka.goodreads.util.ResponseUtils;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.UserRecommendation;
+import com.campusconnect.neo4j.types.web.UserRecommendation;
 import com.sun.jersey.api.uri.UriBuilderImpl;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -68,7 +68,7 @@ public class FriendsBookSearchForWishListWorker extends UntypedActor {
                 }
                 logger.info("acquiring data from friends of number: " + friends.getUser().size() + " for user :" + getFriendsTask.getUserId() + " page : " + getFriendsTask.getPage());
 
-                com.campusconnect.neo4j.types.User referUser = userDao.getUser(getFriendsTask.getUserId());
+                com.campusconnect.neo4j.types.neo4j.User referUser = userDao.getUser(getFriendsTask.getUserId());
                 goodreadsAsynchHandler.getAddGoodReadsFriendsRouter().tell(new AddFriendsFromGoodReadsTask(referUser, friends), getSender());
 
                 for (User user : friends.getUser()) {

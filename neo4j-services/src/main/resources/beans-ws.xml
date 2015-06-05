@@ -19,7 +19,7 @@
     <context:component-scan base-package="com.campusconnect.neo4j.akka.facebook.worker"/>
     <import resource="beans-commons.xml"/>
     <neo4j:repositories base-package="com.campusconnect.neo4j.repositories"/>
-    <neo4j:config base-package="com.campusconnect.neo4j.types" graphDatabaseService="graphDatabaseService"/>
+    <neo4j:config base-package="com.campusconnect.neo4j.types.neo4j" graphDatabaseService="graphDatabaseService"/>
 
     <bean class="com.campusconnect.neo4j.providers.Neo4jExceptionMapper" scope="singleton" id="exceptionMapper"/>
 
@@ -39,14 +39,6 @@
     </bean>
 
     <bean class="com.campusconnect.neo4j.da.FavouriteDaoImpl" id="favouriteDao">
-        <constructor-arg index="0" ref="neo4jTemplate"/>
-    </bean>
-
-    <bean class="com.campusconnect.neo4j.da.CollegeDao" id="collegeDao">
-        <constructor-arg index="0" ref="neo4jTemplate"/>
-    </bean>
-
-    <bean class="com.campusconnect.neo4j.da.DepartmentDao" id="departmentDao">
         <constructor-arg index="0" ref="neo4jTemplate"/>
     </bean>
 

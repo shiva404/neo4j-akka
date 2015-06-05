@@ -7,9 +7,9 @@ import com.campusconnect.neo4j.akka.goodreads.types.Book;
  * Created by sn1 on 3/12/15.
  */
 public class BookMapper {
-    public static com.campusconnect.neo4j.types.Book getBookFromGoodreadsBook(Book goodreadsBook) {
+    public static com.campusconnect.neo4j.types.neo4j.Book getBookFromGoodreadsBook(Book goodreadsBook) {
         if (goodreadsBook != null) {
-            com.campusconnect.neo4j.types.Book book = new com.campusconnect.neo4j.types.Book();
+            com.campusconnect.neo4j.types.neo4j.Book book = new com.campusconnect.neo4j.types.neo4j.Book();
             final Author author = goodreadsBook.getAuthors().get(0);
             if (author != null) {
                 book.setAuthorName(author.getName());

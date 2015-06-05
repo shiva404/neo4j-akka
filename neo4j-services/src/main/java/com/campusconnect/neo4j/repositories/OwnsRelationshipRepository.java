@@ -1,6 +1,6 @@
 package com.campusconnect.neo4j.repositories;
 
-import com.campusconnect.neo4j.types.OwnsRelationship;
+import com.campusconnect.neo4j.types.neo4j.OwnsRelationship;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
 /**

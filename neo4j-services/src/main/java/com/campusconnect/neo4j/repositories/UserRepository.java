@@ -1,6 +1,6 @@
 package com.campusconnect.neo4j.repositories;
 
-import com.campusconnect.neo4j.types.User;
+import com.campusconnect.neo4j.types.neo4j.User;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 

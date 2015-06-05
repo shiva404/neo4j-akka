@@ -2,7 +2,7 @@ package com.campusconnect.neo4j.providers;
 
 import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
 import com.campusconnect.neo4j.exceptions.Neo4jException;
-import com.campusconnect.neo4j.types.Neo4jErrorResponse;
+import com.campusconnect.neo4j.types.web.Neo4jErrorResponse;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

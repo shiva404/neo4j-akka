@@ -1,7 +1,7 @@
 package com.campusconnect.neo4j.akka.goodreads.task;
 
 
-import com.campusconnect.neo4j.types.WishListBook;
+import com.campusconnect.neo4j.types.web.WishListBook;
 
 import java.util.List;
 

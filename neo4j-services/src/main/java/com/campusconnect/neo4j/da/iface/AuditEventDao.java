@@ -1,7 +1,7 @@
 package com.campusconnect.neo4j.da.iface;
 
-import com.campusconnect.neo4j.types.AuditEvent;
-import com.campusconnect.neo4j.types.Event;
+import com.campusconnect.neo4j.types.neo4j.AuditEvent;
+import com.campusconnect.neo4j.types.web.Event;
 
 import java.io.IOException;
 import java.util.List;

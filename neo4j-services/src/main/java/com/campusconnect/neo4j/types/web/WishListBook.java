@@ -1,7 +1,5 @@
 package com.campusconnect.neo4j.types.web;
 
-import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.WishListRelationship;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,24 +12,13 @@ public class WishListBook extends Book implements Serializable {
 
     private List<UserRecommendation> userRecommendations;
 
-    public WishListBook(Book book, WishListRelationship whishListRelationship) {
-        setId(book.getId());
-        setName(book.getName());
-        setIsbn(book.getIsbn());
-        setImageUrl(book.getImageUrl());
-        setIsbn13(book.getIsbn13());
-        setAuthorName(book.getAuthorName());
-        setDescription(book.getDescription());
-        setGoodreadsAuthorId(book.getGoodreadsAuthorId());
-        setGoodreadsId(book.getGoodreadsId());
-        setNodeId(book.getNodeId());
-        setNumberOfPages(book.getNumberOfPages());
-        setPublishedYear(book.getPublishedYear());
-        setPublisher(book.getPublisher());
-        setBookType(book.getBookType());
+    public WishListBook() {
     }
 
-    public WishListBook() {
+    public WishListBook(Book book) {
+        super(book.getId(), book.getGoodreadsId(), book.getAuthorName(), book.getGoodreadsAuthorId(), book.getName(),
+                book.getIsbn(), book.getIsbn13(), book.getPublishedYear(), book.getDescription(), book.getPublisher(),
+                book.getNumberOfPages(), book.getImageUrl());
     }
 
     public List<UserRecommendation> getUserRecommendations() {

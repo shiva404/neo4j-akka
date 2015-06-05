@@ -1,7 +1,6 @@
 package com.campusconnect.neo4j.tests.functional;
 
 import com.campusconnect.neo4j.tests.TestBase;
-import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.UserIdsPage;
 import com.campusconnect.neo4j.types.web.UsersPage;
 import com.sun.jersey.api.client.ClientResponse;
@@ -30,7 +29,7 @@ public class UserGroupRelationTest extends TestBase {
         UsersPage usersPage = clientResponseToReturnAddedUsers
                 .getEntity(UsersPage.class);
 
-        for (User user : usersPage.getUsers()) {
+        for (com.campusconnect.neo4j.types.web.User user : usersPage.getUsers()) {
             assert user.getId().equals(userIdAdmin)
                     || user.getId().equals(userId);
         }

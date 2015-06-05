@@ -9,6 +9,7 @@ import com.campusconnect.neo4j.akka.goodreads.types.Review;
 import com.campusconnect.neo4j.akka.goodreads.types.Reviews;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.mappers.WebToNeo4jMapper;
 import com.campusconnect.neo4j.types.common.GoodreadsStatus;
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.GoodreadsFriendBookRecRelation;
@@ -67,7 +68,7 @@ public class UserRecForWishlist extends UntypedActor {
                 //See what all books need to rec with user
                 List<WishListBook> wishListBooks = userRecForWishListTask.getWishListBooks();
                 if (wishListBooks != null)
-                    for (Book wishListBook : wishListBooks) {
+                    for (com.campusconnect.neo4j.types.web.Book wishListBook : wishListBooks) {
                         for (Book friendBook : books) {
                             if (wishListBook.getGoodreadsId() != null && wishListBook.getGoodreadsId().equals(friendBook.getGoodreadsId())) {
                                 if (recExists(wishListBook.getGoodreadsId(), userRecForWishListTask.getFriend().getId(), userRecForWishListTask.getUserRecommendations())) {
@@ -76,7 +77,7 @@ public class UserRecForWishlist extends UntypedActor {
                                     User user = userDao.getUser(userRecForWishListTask.getUserId());
                                     final String goodreadsId = userRecForWishListTask.getFriend().getId();
                                     User friend = userDao.getUserByGoodreadsId(goodreadsId);
-                                    bookDao.createGoodreadsFriendBookRec(new GoodreadsFriendBookRecRelation(user, wishListBook, "rec", friend != null ? friend.getId() : null, goodreadsId, userRecForWishListTask.getFriend().getImageUrl(), userRecForWishListTask.getFriend().getName()));
+                                    bookDao.createGoodreadsFriendBookRec(new GoodreadsFriendBookRecRelation(user, WebToNeo4jMapper.mapBookWebToNeo4j(wishListBook), "rec", friend != null ? friend.getId() : null, goodreadsId, userRecForWishListTask.getFriend().getImageUrl(), userRecForWishListTask.getFriend().getName()));
                                 }
                             }
                         }

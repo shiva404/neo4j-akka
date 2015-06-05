@@ -1,7 +1,5 @@
 package com.campusconnect.neo4j.types.web;
 
-import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.BorrowRelation;
 
 import java.io.Serializable;
 
@@ -22,45 +20,10 @@ public class BorrowedBook extends Book implements Serializable {
     public BorrowedBook() {
     }
 
-    public BorrowedBook(Book book, BorrowRelation borrowRelation) {
-        setId(book.getId());
-        setName(book.getName());
-        setIsbn(book.getIsbn());
-        setImageUrl(book.getImageUrl());
-        setIsbn13(book.getIsbn13());
-        setAuthorName(book.getAuthorName());
-        setDescription(book.getDescription());
-        setGoodreadsAuthorId(book.getGoodreadsAuthorId());
-        setGoodreadsId(book.getGoodreadsId());
-        setNodeId(book.getNodeId());
-        setNumberOfPages(book.getNumberOfPages());
-        setPublishedYear(book.getPublishedYear());
-        setPublisher(book.getPublisher());
-        setBookType(book.getBookType());
-        this.status = borrowRelation.getStatus();
-        this.dueDate = borrowRelation.getDueDate();
-        this.createdDate = borrowRelation.getCreatedDate();
-        this.ownerUserId = borrowRelation.getOwnerUserId();
-        this.additionalComments = borrowRelation.getAdditionalComments();
-        this.borrowDate = borrowRelation.getBorrowDate();
-        this.contractPeriodInDays = borrowRelation.getContractPeriodInDays();
-        this.lastModifiedDate = borrowRelation.getLastModifiedDate();
-    }
-
-    public BorrowedBook(String name, String isbn, String status, long dueDate, String ownerUserId, long borrowDate) {
-        super(name, isbn);
-        this.status = status;
-        this.dueDate = dueDate;
-        this.ownerUserId = ownerUserId;
-        this.borrowDate = borrowDate;
-    }
-
-    public BorrowedBook(String id, String name, String isbn, String status, long dueDate, String ownerUserId, long borrowDate) {
-        super(id, name, isbn);
-        this.status = status;
-        this.dueDate = dueDate;
-        this.ownerUserId = ownerUserId;
-        this.borrowDate = borrowDate;
+    public BorrowedBook(Book book) {
+        super(book.getId(), book.getGoodreadsId(), book.getAuthorName(), book.getGoodreadsAuthorId(), book.getName(),
+                book.getIsbn(), book.getIsbn13(), book.getPublishedYear(), book.getDescription(), book.getPublisher(),
+                book.getNumberOfPages(), book.getImageUrl());
     }
 
     public String getStatus() {

@@ -1,9 +1,5 @@
 package com.campusconnect.neo4j.types.web;
 
-
-import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.OwnsRelationship;
-
 import java.io.Serializable;
 
 /**
@@ -18,60 +14,13 @@ public class OwnedBook extends Book implements Serializable {
     private String dueDate;
     private int contractPeriodInDays;
 
-    public OwnedBook(Book book, OwnsRelationship ownsRelationship) {
-        setId(book.getId());
-        setName(book.getName());
-        setIsbn(book.getIsbn());
-        setImageUrl(book.getImageUrl());
-        setIsbn13(book.getIsbn13());
-        setAuthorName(book.getAuthorName());
-        setDescription(book.getDescription());
-        setGoodreadsAuthorId(book.getGoodreadsAuthorId());
-        setGoodreadsId(book.getGoodreadsId());
-        setNodeId(book.getNodeId());
-        setNumberOfPages(book.getNumberOfPages());
-        setPublishedYear(book.getPublishedYear());
-        setPublisher(book.getPublisher());
-        setBookType(book.getBookType());
-        this.createdDate = ownsRelationship.getCreatedDate();
-        this.status = ownsRelationship.getStatus();
-        this.lastModifiedDate = ownsRelationship.getLastModifiedDate();
-        this.borrowerId = ownsRelationship.getBorrowerId();
-        this.dueDate = ownsRelationship.getDueDate();
-    }
-
     public OwnedBook() {
     }
 
-    public OwnedBook(long createdDate, String status, long lastModifiedDate) {
-
-        this.createdDate = createdDate;
-        this.status = status;
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public OwnedBook(String name, String isbn, long createdDate, String status, long lastModifiedDate) {
-        super(name, isbn);
-        this.createdDate = createdDate;
-        this.status = status;
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public OwnedBook(String id, String name, String isbn, long createdDate, String status, long lastModifiedDate) {
-        super(id, name, isbn);
-        this.createdDate = createdDate;
-        this.status = status;
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public OwnedBook(Integer goodreadsId, String authorName, String goodreadsAuthorId, String name, String isbn, String isbn13, int publishedYear, String description, String publisher, Integer numberOfPages, String imageUrl, long createdDate, String status, long lastModifiedDate, String borrowerId, String dueDate, int contractPeriodInDays) {
-        super(goodreadsId, authorName, goodreadsAuthorId, name, isbn, isbn13, publishedYear, description, publisher, numberOfPages, imageUrl);
-        this.createdDate = createdDate;
-        this.status = status;
-        this.lastModifiedDate = lastModifiedDate;
-        this.borrowerId = borrowerId;
-        this.dueDate = dueDate;
-        this.contractPeriodInDays = contractPeriodInDays;
+    public OwnedBook(Book book) {
+        super(book.getId(), book.getGoodreadsId(), book.getAuthorName(), book.getGoodreadsAuthorId(), book.getName(),
+                book.getIsbn(), book.getIsbn13(), book.getPublishedYear(), book.getDescription(), book.getPublisher(),
+                book.getNumberOfPages(), book.getImageUrl());
     }
 
     public String getBorrowerId() {

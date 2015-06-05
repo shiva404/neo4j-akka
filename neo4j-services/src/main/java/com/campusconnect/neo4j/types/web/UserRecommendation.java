@@ -1,8 +1,5 @@
 package com.campusconnect.neo4j.types.web;
 
-import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.GoodreadsFriendBookRecRelation;
-
 /**
  * Created by sn1 on 3/29/15.
  */
@@ -18,14 +15,8 @@ public class UserRecommendation {
     public UserRecommendation() {
     }
 
-    public UserRecommendation(Book book, GoodreadsFriendBookRecRelation goodreadsFriendsRec) {
+    public UserRecommendation(Book book) {
         this.book = book;
-        this.friendGoodreadsId = goodreadsFriendsRec.getFriendGoodreadsId();
-        this.friendImageUrl = goodreadsFriendsRec.getFriendImageUrl();
-        this.friendName = goodreadsFriendsRec.getFriendName();
-        this.userId = goodreadsFriendsRec.getFriendName();
-        this.createDate = goodreadsFriendsRec.getCreatedDate();
-        this.friendId = goodreadsFriendsRec.getFriendId();
     }
 
     public String getFriendId() {

@@ -1,7 +1,5 @@
 package com.campusconnect.neo4j.types.web;
 
-import com.campusconnect.neo4j.types.neo4j.Book;
-
 import java.util.ArrayList;
 import java.util.List;
 

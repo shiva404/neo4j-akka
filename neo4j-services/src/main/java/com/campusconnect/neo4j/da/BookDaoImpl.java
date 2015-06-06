@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.*;
 
+import static com.campusconnect.neo4j.da.mapper.RelationToBookDetailsMapper.*;
+
 /**
  * Created by sn1 on 2/16/15.
  */
@@ -274,22 +276,22 @@ public class BookDaoImpl implements BookDao {
 
             Book book = neo4jTemplate.convert(bookNode, Book.class);
             if (rawWishRelationship.getType().name().equals("OWNS")) {
-                book.setBookType("OWNS");
                 OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawWishRelationship, OwnsRelationship.class);
-                book.getAdditionalProperties().putAll(ownsRelationship.getFieldsAsMap());
+                book.setBookType("OWNS");
+                book.setBookDetails(getOwnsBookDetails(ownsRelationship));
                 books.add(book);
             }
             if (rawWishRelationship.getType().name().equals("BORROWED")) {
                 book.setBookType("BORROWED");
                 BorrowRelation borrowRelation = neo4jTemplate.convert(rawWishRelationship, BorrowRelation.class);
-                book.getAdditionalProperties().putAll(borrowRelation.getFieldsAsMap());
+                book.setBookDetails(getBorrowBookDetails(borrowRelation));
                 books.add(book);
             }
             if (rawWishRelationship.getType().name().equals("WISH")) {
                 book.setBookType("WISH");
                 //find if there are any recommendations
                 List<UserRecommendation> userRecommendations = getRecommendationsForUserAndBook(book.getId(), userId);
-                book.getAdditionalProperties().put("recommendations", userRecommendations);
+                book.setBookDetails(getWishlistBookDetails(userRecommendations));
                 books.add(book);
             }
             if (rawWishRelationship.getType().name().equals("READ")) {

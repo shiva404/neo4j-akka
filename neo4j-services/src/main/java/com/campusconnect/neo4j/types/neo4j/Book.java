@@ -1,12 +1,11 @@
 package com.campusconnect.neo4j.types.neo4j;
 
+import com.campusconnect.neo4j.types.common.BookDetails;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by sn1 on 2/16/15.
@@ -32,10 +31,11 @@ public class Book implements Serializable {
     private String description;
     private String publisher;
     private Integer numberOfPages;
-
+    @Deprecated
     private String bookType;  //Owned, borrowed, wishlist
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     private String imageUrl;
+    @Deprecated
+    private BookDetails bookDetails;
 
     public Book(Integer goodreadsId, String authorName, String goodreadsAuthorId, String name, String isbn, String isbn13, int publishedYear, String description, String publisher, Integer numberOfPages, String imageUrl) {
         this.goodreadsId = goodreadsId;
@@ -81,22 +81,24 @@ public class Book implements Serializable {
         this.isbn = isbn;
     }
 
+    @Deprecated
     public String getBookType() {
         return bookType;
     }
 
+    @Deprecated
     public void setBookType(String bookType) {
         this.bookType = bookType;
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        if (additionalProperties == null)
-            additionalProperties = new HashMap<>();
-        return additionalProperties;
+    @Deprecated
+    public BookDetails getBookDetails() {
+        return bookDetails;
     }
 
-    public void setAdditionalProperties(Map<String, Object> additionalProperties) {
-        this.additionalProperties = additionalProperties;
+    @Deprecated
+    public void setBookDetails(BookDetails bookDetails) {
+        this.bookDetails = bookDetails;
     }
 
     public String getPublisher() {

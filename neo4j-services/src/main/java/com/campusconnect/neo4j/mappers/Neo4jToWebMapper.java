@@ -1,5 +1,6 @@
 package com.campusconnect.neo4j.mappers;
 
+import com.campusconnect.neo4j.types.common.BookDetails;
 import com.campusconnect.neo4j.types.web.*;
 
 import java.util.HashSet;
@@ -30,8 +31,23 @@ public class Neo4jToWebMapper {
     public static Book mapBookNeo4jToWeb(com.campusconnect.neo4j.types.neo4j.Book book) {
         if (book == null)
             return null;
-        return new Book(book.getId(), book.getGoodreadsId(), book.getAuthorName(), book.getGoodreadsAuthorId(), book.getName(), book.getIsbn(), book.getIsbn13(),
+        Book webBook = new Book(book.getId(), book.getGoodreadsId(), book.getAuthorName(), book.getGoodreadsAuthorId(), book.getName(), book.getIsbn(), book.getIsbn13(),
                 book.getPublishedYear(), book.getDescription(), book.getPublisher(), book.getNumberOfPages(), book.getImageUrl());
+
+        webBook.setBookType(book.getBookType());
+        if (book.getBookType() != null && book.getBookDetails() != null) {
+            BookDetails bookDetails = book.getBookDetails();
+            if (bookDetails instanceof AvailableBookDetails) {
+                webBook.setAvailableBookDetails((AvailableBookDetails) bookDetails);
+            } else if (bookDetails instanceof WishlistBookDetails) {
+                webBook.setWishlistBookDetails((WishlistBookDetails) bookDetails);
+            } else if (bookDetails instanceof LentBookDetails) {
+                webBook.setLentBookDetails((LentBookDetails) bookDetails);
+            } else if (bookDetails instanceof BorrowedBookDetails) {
+                webBook.setBorrowedBookDetails((BorrowedBookDetails) bookDetails);
+            }
+        }
+        return webBook;
     }
 
     public static Favourite mapFavouriteNeo4jToWeb(com.campusconnect.neo4j.types.neo4j.Favourite favourite) {

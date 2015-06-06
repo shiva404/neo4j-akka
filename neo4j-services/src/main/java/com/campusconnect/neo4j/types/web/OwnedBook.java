@@ -21,6 +21,7 @@ public class OwnedBook extends Book implements Serializable {
         super(book.getId(), book.getGoodreadsId(), book.getAuthorName(), book.getGoodreadsAuthorId(), book.getName(),
                 book.getIsbn(), book.getIsbn13(), book.getPublishedYear(), book.getDescription(), book.getPublisher(),
                 book.getNumberOfPages(), book.getImageUrl());
+        setBookType(book.getBookType());
     }
 
     public String getBorrowerId() {

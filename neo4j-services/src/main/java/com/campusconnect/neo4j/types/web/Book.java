@@ -1,8 +1,5 @@
 package com.campusconnect.neo4j.types.web;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created with IntelliJ IDEA.
  * User: sn1
@@ -23,9 +20,46 @@ public class Book {
     private String publisher;
     private Integer numberOfPages;
 
+    public AvailableBookDetails getAvailableBookDetails() {
+        return availableBookDetails;
+    }
+
+    public void setAvailableBookDetails(AvailableBookDetails availableBookDetails) {
+        this.availableBookDetails = availableBookDetails;
+    }
+
+    public BorrowedBookDetails getBorrowedBookDetails() {
+        return borrowedBookDetails;
+    }
+
+    public void setBorrowedBookDetails(BorrowedBookDetails borrowedBookDetails) {
+        this.borrowedBookDetails = borrowedBookDetails;
+    }
+
+    public LentBookDetails getLentBookDetails() {
+        return lentBookDetails;
+    }
+
+    public void setLentBookDetails(LentBookDetails lentBookDetails) {
+        this.lentBookDetails = lentBookDetails;
+    }
+
+    public WishlistBookDetails getWishlistBookDetails() {
+        return wishlistBookDetails;
+    }
+
+    public void setWishlistBookDetails(WishlistBookDetails wishlistBookDetails) {
+        this.wishlistBookDetails = wishlistBookDetails;
+    }
+
+    private AvailableBookDetails availableBookDetails;
+    private BorrowedBookDetails borrowedBookDetails;
+    private LentBookDetails lentBookDetails;
+    private WishlistBookDetails wishlistBookDetails;
+
     private String bookType;  //Owned, borrowed, wishlist
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     private String imageUrl;
+
 
     public Book() {
     }
@@ -64,16 +98,6 @@ public class Book {
 
     public void setBookType(String bookType) {
         this.bookType = bookType;
-    }
-
-    public Map<String, Object> getAdditionalProperties() {
-        if (additionalProperties == null)
-            additionalProperties = new HashMap<>();
-        return additionalProperties;
-    }
-
-    public void setAdditionalProperties(Map<String, Object> additionalProperties) {
-        this.additionalProperties = additionalProperties;
     }
 
     public String getPublisher() {

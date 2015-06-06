@@ -2,6 +2,7 @@ package com.campusconnect.neo4j.resources;
 
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.BorrowRequest;
@@ -10,6 +11,8 @@ import com.campusconnect.neo4j.types.web.SearchResult;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -124,13 +127,17 @@ public class BookResource {
     @GET
     @Path("search")
     public Response search(@QueryParam("q") final String queryString, @QueryParam("userId") final String userId) {
-        SearchResult searchResult;
+        List<Book> searchResult;
         if (userId == null) {
             searchResult = bookDao.search(queryString);
         } else {
             searchResult = bookDao.searchWithRespectToUser(userId, queryString);
         }
-        return Response.ok().entity(searchResult).build();
+        List<com.campusconnect.neo4j.types.web.Book> webBooks = new ArrayList<>();
+        for (Book book : searchResult) {
+            webBooks.add(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
+        }
+        return Response.ok().entity(new SearchResult(webBooks)).build();
     }
 
 }

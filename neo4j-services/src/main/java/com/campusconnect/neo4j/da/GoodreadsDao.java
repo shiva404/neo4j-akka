@@ -6,7 +6,6 @@ import com.campusconnect.neo4j.akka.goodreads.api.Search;
 import com.campusconnect.neo4j.akka.goodreads.mappers.BookMapper;
 import com.campusconnect.neo4j.akka.goodreads.types.*;
 import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.web.SearchResult;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class GoodreadsDao {
     }
 
 
-    public SearchResult search(String queryString) {
+    public List<Book> search(String queryString) {
         try {
             SearchResponse searchResponse = search.search(queryString);
             return formSearchResult(searchResponse);
@@ -47,7 +46,7 @@ public class GoodreadsDao {
         return null;
     }
 
-    private SearchResult formSearchResult(SearchResponse searchResponse) {
+    private List<Book> formSearchResult(SearchResponse searchResponse) {
         List<Book> searchBooks = new ArrayList<>();
         if (searchResponse.getSearch() != null)
             for (Result result : searchResponse.getSearch().getResults()) {
@@ -67,7 +66,7 @@ public class GoodreadsDao {
                     searchBooks.add(book);
                 }
             }
-        return new SearchResult(searchBooks);
+        return searchBooks;
     }
 
     public Book getBookById(String goodreadsId) throws IOException {

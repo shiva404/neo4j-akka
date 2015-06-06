@@ -2,7 +2,6 @@ package com.campusconnect.neo4j.da.iface;
 
 import com.campusconnect.neo4j.types.neo4j.*;
 import com.campusconnect.neo4j.types.web.BorrowRequest;
-import com.campusconnect.neo4j.types.web.SearchResult;
 import com.campusconnect.neo4j.types.web.UserRecommendation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +32,7 @@ public interface BookDao {
     @Transactional
     void updateBorrowedBookStatus(User user, Book book, String status, String userComment);
 
-    SearchResult search(String queryString);
+    List<Book> search(String queryString);
 
     // @Cacheable(cacheName = "bookByGRIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     Book getBookByGoodreadsId(Integer goodreadsId) throws IOException;
@@ -54,5 +53,5 @@ public interface BookDao {
 
     List<Book> getBooksRelatedUser(String userId);
 
-    SearchResult searchWithRespectToUser(String userId, String searchString);
+    List<Book> searchWithRespectToUser(String userId, String searchString);
 }

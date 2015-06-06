@@ -10,7 +10,6 @@ import com.campusconnect.neo4j.repositories.UserRecRepository;
 import com.campusconnect.neo4j.types.common.RelationTypes;
 import com.campusconnect.neo4j.types.neo4j.*;
 import com.campusconnect.neo4j.types.web.BorrowRequest;
-import com.campusconnect.neo4j.types.web.SearchResult;
 import com.campusconnect.neo4j.types.web.UserRecommendation;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
 import org.neo4j.rest.graphdb.entity.RestNode;
@@ -128,16 +127,18 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public SearchResult search(String queryString) {
+    public List<Book> search(String queryString) {
         return goodreadsDao.search(queryString);
     }
 
     @Override
-    public SearchResult searchWithRespectToUser(String userId, String searchString) {
-        SearchResult searchResult = goodreadsDao.search(searchString);
+    public List<Book> searchWithRespectToUser(String userId, String searchString) {
+        List<Book> searchBooks = goodreadsDao.search(searchString);
         List<Book> existingBooks = getBooksRelatedUser(userId);
-        List<Book> resultBooks = replaceBooksWithExistingBooks(searchResult.getBooks(), existingBooks);
-        return new SearchResult(resultBooks);
+
+        //todo: make sure already read books comes first
+
+        return replaceBooksWithExistingBooks(searchBooks, existingBooks);
     }
 
     private List<Book> replaceBooksWithExistingBooks(List<Book> books, List<Book> existingBooks) {

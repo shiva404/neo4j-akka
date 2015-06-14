@@ -30,6 +30,9 @@ public class GroupResource {
         this.userDao = userDao;
     }
 
+    public GroupResource() {
+    }
+
     @POST
     public Response createGroup(Group group, @QueryParam("userId") final String userId) {
         group.setId(UUID.randomUUID().toString());

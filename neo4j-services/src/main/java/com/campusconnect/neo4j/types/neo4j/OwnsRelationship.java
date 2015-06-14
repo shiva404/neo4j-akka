@@ -1,5 +1,6 @@
 package com.campusconnect.neo4j.types.neo4j;
 
+import com.campusconnect.neo4j.types.common.Constants;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 
 import java.util.HashMap;
@@ -8,7 +9,7 @@ import java.util.Map;
 /**
  * Created by sn1 on 2/25/15.
  */
-@RelationshipEntity(type = "OWNS")
+@RelationshipEntity(type = Constants.OWNS_RELATION)
 public class OwnsRelationship extends BookRelation {
 
     private String borrowerId;

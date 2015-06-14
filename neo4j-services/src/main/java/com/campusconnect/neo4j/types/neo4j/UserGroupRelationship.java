@@ -1,5 +1,6 @@
 package com.campusconnect.neo4j.types.neo4j;
 
+import com.campusconnect.neo4j.types.common.Constants;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.neo4j.annotation.EndNode;
@@ -10,7 +11,7 @@ import org.springframework.data.neo4j.annotation.StartNode;
 /**
  * Created by sn1 on 1/22/15.
  */
-@RelationshipEntity(type = "USER_ACCESS")
+@RelationshipEntity(type = Constants.USER_GROUP_RELATION)
 public class UserGroupRelationship {
 
     @CreatedBy

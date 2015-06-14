@@ -1,5 +1,7 @@
 package com.campusconnect.neo4j.types.web;
 
+import java.io.Serializable;
+
 /**
  * Created with IntelliJ IDEA.
  * User: sn1
@@ -7,7 +9,7 @@ package com.campusconnect.neo4j.types.web;
  * Time: 10:39 PM
  * To change this template use File | Settings | File Templates.
  */
-public class Book {
+public class Book implements Serializable {
     private String id;
     private Integer goodreadsId;
     private String authorName;

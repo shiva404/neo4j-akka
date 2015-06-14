@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.campusconnect.neo4j.da.mapper.RelationToBookDetailsMapper.*;
+import static com.campusconnect.neo4j.types.common.Constants.*;
 
 /**
  * Created by sn1 on 2/16/15.
@@ -130,13 +131,15 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public List<Book> search(String queryString) {
-        return goodreadsDao.search(queryString);
+        List<Book> search = goodreadsDao.search(queryString);
+        LOGGER.debug("got results back");
+        return search;
     }
 
     @Override
     public List<Book> searchWithRespectToUser(String userId, String searchString) {
         List<Book> searchBooks = goodreadsDao.search(searchString);
-        List<Book> existingBooks = getBooksRelatedUser(userId);
+        List<Book> existingBooks = getAllUserBooks(userId);
 
         //todo: make sure already read books comes first
 
@@ -144,21 +147,21 @@ public class BookDaoImpl implements BookDao {
     }
 
     private List<Book> replaceBooksWithExistingBooks(List<Book> books, List<Book> existingBooks) {
-        Map<Integer, Book> bookMapWithGrId = new HashMap<>(books.size());
-        for (Book book : books) {
-            bookMapWithGrId.put(book.getGoodreadsId(), book);
-        }
-        for (Book existingBook : existingBooks) {
-            for (Book book : books) {
+
+        List<Book> identifiedBooks = new ArrayList<>();
+        for (Iterator<Book> iterator = books.iterator(); iterator.hasNext(); ) {
+            Book book = iterator.next();
+            for (Book existingBook : existingBooks) {
                 if (existingBook.getGoodreadsId() != null && book.getGoodreadsId().equals(existingBook.getGoodreadsId())) {
-                    bookMapWithGrId.put(book.getGoodreadsId(), existingBook);
+                    iterator.remove();
+                    identifiedBooks.add(existingBook);
                 }
             }
         }
+        LOGGER.debug("Identified books count:" + identifiedBooks.size());
         List<Book> resultBooks = new ArrayList<>();
-        for (Book book : bookMapWithGrId.values()) {
-            resultBooks.add(book);
-        }
+        resultBooks.addAll(identifiedBooks);
+        resultBooks.addAll(books);
         return resultBooks;
     }
 
@@ -246,10 +249,11 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public List<Book> getBooksRelatedUser(String userId) {
+    public List<Book> getAllUserBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book) - [relation] - (user:User {id: {userId}}) return relation, book", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book) - [relation] - (user:User {id: {userId}}) " +
+                "return relation, book", params);
         //todo throw not found
         return getBookDetails(mapResult, userId);
     }
@@ -275,27 +279,27 @@ public class BookDaoImpl implements BookDao {
             RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
 
             Book book = neo4jTemplate.convert(bookNode, Book.class);
-            if (rawWishRelationship.getType().name().equals("OWNS")) {
+            if (rawWishRelationship.getType().name().equals(OWNS_RELATION)) {
                 OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawWishRelationship, OwnsRelationship.class);
-                book.setBookType("OWNS");
+                book.setBookType(OWNS_RELATION);
                 book.setBookDetails(getOwnsBookDetails(ownsRelationship));
                 books.add(book);
             }
-            if (rawWishRelationship.getType().name().equals("BORROWED")) {
-                book.setBookType("BORROWED");
+            if (rawWishRelationship.getType().name().equals(BORROWED_RELATION)) {
+                book.setBookType(BORROWED_RELATION);
                 BorrowRelation borrowRelation = neo4jTemplate.convert(rawWishRelationship, BorrowRelation.class);
                 book.setBookDetails(getBorrowBookDetails(borrowRelation));
                 books.add(book);
             }
-            if (rawWishRelationship.getType().name().equals("WISH")) {
-                book.setBookType("WISH");
+            if (rawWishRelationship.getType().name().equals(WISHLIST_RELATION)) {
+                book.setBookType(WISHLIST_RELATION);
                 //find if there are any recommendations
                 List<UserRecommendation> userRecommendations = getRecommendationsForUserAndBook(book.getId(), userId);
                 book.setBookDetails(getWishlistBookDetails(userRecommendations));
                 books.add(book);
             }
-            if (rawWishRelationship.getType().name().equals("READ")) {
-                book.setBookType("READ");
+            if (rawWishRelationship.getType().name().equals(READ_RELATION)) {
+                book.setBookType(READ_RELATION);
                 //find if there are any recommendations
                 books.add(book);
             }

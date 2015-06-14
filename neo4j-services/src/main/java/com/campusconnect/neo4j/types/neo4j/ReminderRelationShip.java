@@ -1,5 +1,6 @@
 package com.campusconnect.neo4j.types.neo4j;
 
+import com.campusconnect.neo4j.types.common.Constants;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.neo4j.annotation.EndNode;
@@ -7,7 +8,7 @@ import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 import org.springframework.data.neo4j.annotation.StartNode;
 
-@RelationshipEntity(type = "REMINDER_ABOUT")
+@RelationshipEntity(type = Constants.REMINDER_RELATION)
 public class ReminderRelationShip {
 
     @CreatedBy

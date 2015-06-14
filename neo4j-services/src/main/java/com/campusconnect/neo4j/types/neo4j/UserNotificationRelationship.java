@@ -1,11 +1,12 @@
 package com.campusconnect.neo4j.types.neo4j;
 
+import com.campusconnect.neo4j.types.common.Constants;
 import org.springframework.data.neo4j.annotation.EndNode;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 import org.springframework.data.neo4j.annotation.StartNode;
 
-@RelationshipEntity(type = "NOTIFICATION")
+@RelationshipEntity(type = Constants.NOTIFICATION_RELATION)
 public class UserNotificationRelationship {
 
     @GraphId

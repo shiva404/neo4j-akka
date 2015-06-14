@@ -1,11 +1,12 @@
 package com.campusconnect.neo4j.types.neo4j;
 
+import com.campusconnect.neo4j.types.common.Constants;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 
 /**
  * Created by sn1 on 4/22/15.
  */
-@RelationshipEntity(type = "READ")
+@RelationshipEntity(type = Constants.READ_RELATION)
 public class ReadRelation extends BookRelation {
     String goodreadsStatus;
 

@@ -51,7 +51,7 @@ public interface BookDao {
 
     Book getBookByGoodreadsIdWithUser(Integer goodreadsId, String userId);
 
-    List<Book> getBooksRelatedUser(String userId);
+    List<Book> getAllUserBooks(String userId);
 
     List<Book> searchWithRespectToUser(String userId, String searchString);
 }

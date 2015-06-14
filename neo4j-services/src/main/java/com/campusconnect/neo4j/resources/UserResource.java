@@ -31,10 +31,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.mapAddressNeo4jToWeb;
-import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.mapUserNeo4jToWeb;
+import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.*;
 import static com.campusconnect.neo4j.mappers.WebToNeo4jMapper.mapAddressWebToNeo4j;
 import static com.campusconnect.neo4j.mappers.WebToNeo4jMapper.mapUserWebToNeo4j;
+import static com.campusconnect.neo4j.types.common.Constants.*;
 import static com.campusconnect.neo4j.util.ErrorCodes.INVALId_ARGMENTS;
 
 /**
@@ -299,18 +299,6 @@ public class UserResource {
     }
 
     @PUT
-    @Path("{userId}/books/{bookId}/own")
-    public Response changeBookStatus(@PathParam("userId") final String userId,
-                                     @PathParam("bookId") final String bookId,
-                                     @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
-
-        User user = userDao.getUser(userId);
-        Book book = bookDao.getBook(bookId);
-        bookDao.updateOwnedBookStatus(user, book, status, null);
-        return Response.ok().build();
-    }
-
-    @PUT
     @Path("{userId}/books/wishlist/rec")
     public Response synchWishListRec(@PathParam("userId") final String userId) {
         userDao.synchWishListRec(userId);
@@ -323,13 +311,12 @@ public class UserResource {
         if (filter == null) {
             throw new Exception("filer is null");
         }
-        switch (filter) {
+        switch (filter.toLowerCase()) {
             case "owned": {
                 final List<OwnedBook> ownedBooks = userDao.getOwnedBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
-
             case "read": {
                 final List<Book> readBooks = userDao.getReadBooks(userId);
                 List<com.campusconnect.neo4j.types.web.Book> returnBooks = new ArrayList<>();
@@ -357,6 +344,26 @@ public class UserResource {
                 List<WishListBook> wishListBooks = userDao.getWishListBooks(userId);
                 WishListBooksPage wishListBooksPage = new WishListBooksPage(0, wishListBooks.size(), wishListBooks);
                 return Response.ok().entity(wishListBooksPage).build();
+            case "all":
+                List<Book> allBooks = bookDao.getAllUserBooks(userId);
+                AllBooks resultBooks = new AllBooks();
+                for (Book book : allBooks) {
+                    switch (book.getBookType()) {
+                        case OWNS_RELATION:
+                            resultBooks.getOwnedBooks().add(mapBookNeo4jToWeb(book));
+                            break;
+                        case BORROWED_RELATION:
+                            resultBooks.getBorrowedBooks().add(mapBookNeo4jToWeb(book));
+                            break;
+                        case WISHLIST_RELATION:
+                            resultBooks.getWishlistBooks().add(mapBookNeo4jToWeb(book));
+                            break;
+                        case READ_RELATION:
+                            resultBooks.getReadBooks().add(mapBookNeo4jToWeb(book));
+                            break;
+                    }
+                }
+                return Response.ok().entity(resultBooks).build();
         }
         return Response.ok().build();
     }

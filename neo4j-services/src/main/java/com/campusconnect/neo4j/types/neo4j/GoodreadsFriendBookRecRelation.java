@@ -1,11 +1,12 @@
 package com.campusconnect.neo4j.types.neo4j;
 
+import com.campusconnect.neo4j.types.common.Constants;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 
 /**
  * Created by sn1 on 3/25/15.
  */
-@RelationshipEntity(type = "GR_REC")
+@RelationshipEntity(type = Constants.GOODREADS_REC_RELATION)
 public class GoodreadsFriendBookRecRelation extends BookRelation {
 
     private String friendGoodreadsId;

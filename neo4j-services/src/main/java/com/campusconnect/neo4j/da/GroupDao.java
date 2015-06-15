@@ -31,6 +31,9 @@ public class GroupDao {
         this.neo4jTemplate = neo4jTemplate;
     }
 
+    public GroupDao() {
+    }
+
     public Group createGroup(Group group) {
 //        group.setId(UUID.randomUUID().toString());
         return groupRepository.save(group);

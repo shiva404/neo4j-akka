@@ -34,6 +34,12 @@
         <constructor-arg index="2" value="password123"/>
     </bean>
 
+    <bean class="org.neo4j.rest.graphdb.RestAPIFacade" id="restApi">
+        <constructor-arg index="0" value="${neo4j.server.url}"/>
+        <constructor-arg index="1" value="neo4j"/>
+        <constructor-arg index="2" value="password123"/>
+    </bean>
+
     <bean class="org.springframework.data.neo4j.support.Neo4jTemplate" id="neo4jTemplate" name="neo4jTemplate">
         <constructor-arg index="0" ref="graphDatabaseService"/>
     </bean>

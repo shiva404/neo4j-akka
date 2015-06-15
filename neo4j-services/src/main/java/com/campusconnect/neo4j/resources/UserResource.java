@@ -294,7 +294,7 @@ public class UserResource {
         User user = userDao.getUser(userId);
         Book book = bookDao.getBook(bookId);
         long now = System.currentTimeMillis();
-        bookDao.listBookAsRead(new ReadRelation(user, book, status, now, now, null));
+        bookDao.listBookAsRead(new ReadRelationship(user, book, status, now, now, null));
         return Response.ok().build();
     }
 

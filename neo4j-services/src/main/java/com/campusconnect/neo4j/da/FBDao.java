@@ -19,6 +19,9 @@ public class FBDao {
     private ActorRef getFriendsRouter;
     private ActorRef successListener;
 
+    public FBDao() {
+    }
+
     public FBDao(FacebookConnectionFactory facebookConnectionFactory, ActorRef getFriendsRouter, ActorRef successListener) {
         this.facebookConnectionFactory = facebookConnectionFactory;
         this.getFriendsRouter = getFriendsRouter;

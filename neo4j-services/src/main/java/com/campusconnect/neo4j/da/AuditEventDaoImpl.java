@@ -21,6 +21,9 @@ public class AuditEventDaoImpl implements AuditEventDao {
     AuditEventRepository auditEventRepository;
     ObjectMapper objectMapper = new ObjectMapper();
 
+    public AuditEventDaoImpl() {
+    }
+
 
     @Override
     public AuditEvent saveEvent(AuditEvent auditEvent) {

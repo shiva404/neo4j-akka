@@ -20,6 +20,9 @@ public class FavouriteDaoImpl implements FavouriteDao {
         this.neo4jTemplate = neo4jTemplate;
     }
 
+    public FavouriteDaoImpl() {
+    }
+
     @Override
     public Favourite createFavouriteWithGenreName(String genre) {
         return neo4jTemplate.save(new Favourite(genre));

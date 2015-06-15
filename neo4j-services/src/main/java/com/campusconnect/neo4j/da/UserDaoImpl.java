@@ -58,6 +58,9 @@ public class UserDaoImpl implements UserDao {
         this.objectMapper = new ObjectMapper();
     }
 
+    public UserDaoImpl() {
+    }
+
     public static Target createTargetToUser(User user) {
         String targetEventUserId = user.getId();
         String targetEventUserName = user.getName();
@@ -408,7 +411,7 @@ public class UserDaoImpl implements UserDao {
 
             Book book = neo4jTemplate.convert(bookNode, Book.class);
             book.setBookType("WISH");
-            GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation = neo4jTemplate.convert(rawWishRelationship, GoodreadsFriendBookRecRelation.class);
+            GoodreadsFriendBookRecRelationship goodreadsFriendBookRecRelation = neo4jTemplate.convert(rawWishRelationship, GoodreadsFriendBookRecRelationship.class);
 
             UserRecommendation userRecommendation = new UserRecommendation(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
             userRecommendation.setFriendGoodreadsId(goodreadsFriendBookRecRelation.getFriendGoodreadsId());
@@ -430,7 +433,7 @@ public class UserDaoImpl implements UserDao {
 
             Book book = neo4jTemplate.convert(bookNode, Book.class);
             book.setBookType("BORROWED");
-            BorrowRelation borrowRelationship = neo4jTemplate.convert(rawOwnsRelationship, BorrowRelation.class);
+            BorrowRelationship borrowRelationship = neo4jTemplate.convert(rawOwnsRelationship, BorrowRelationship.class);
 
             com.campusconnect.neo4j.types.web.Book webBook = Neo4jToWebMapper.mapBookNeo4jToWeb(book);
 

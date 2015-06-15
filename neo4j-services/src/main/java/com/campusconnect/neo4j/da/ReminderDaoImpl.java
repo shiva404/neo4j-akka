@@ -20,6 +20,9 @@ public class ReminderDaoImpl implements ReminderDao {
         // TODO Auto-generated constructor stub
     }
 
+    public ReminderDaoImpl() {
+    }
+
     @Override
     public Reminder createReminder(Reminder reminder) {
 

@@ -4,6 +4,8 @@ import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.EmailDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.da.mapper.BookMapper;
+import com.campusconnect.neo4j.da.mapper.RelationToBookDetailsMapper;
 import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.OwnsRelationshipRepository;
 import com.campusconnect.neo4j.repositories.UserRecRepository;
@@ -24,14 +26,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.*;
 
-import static com.campusconnect.neo4j.da.mapper.RelationToBookDetailsMapper.*;
-import static com.campusconnect.neo4j.types.common.Constants.*;
-
 /**
  * Created by sn1 on 2/16/15.
  */
 public class BookDaoImpl implements BookDao {
     private static final Logger LOGGER = LoggerFactory.getLogger(BookDaoImpl.class);
+
+    public BookDaoImpl() {
+    }
+
     @Autowired
     BookRepository bookRepository;
 
@@ -71,7 +74,7 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public void listBookAsRead(ReadRelation readRelation) {
+    public void listBookAsRead(ReadRelationship readRelation) {
         try {
             neo4jTemplate.save(readRelation);
         } catch (Exception e) {
@@ -94,7 +97,7 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public void addBookToBorrower(User borrower, Book book, BorrowRequest borrowRequest) {
-        BorrowRelation borrowRelation = new BorrowRelation(borrower, book, "progress");
+        BorrowRelationship borrowRelation = new BorrowRelationship(borrower, book, "progress");
         borrowRelation.setBorrowDate(borrowRequest.getBorrowDate());
         borrowRelation.setContractPeriodInDays(borrowRequest.getContractPeriodInDays());
         borrowRelation.setAdditionalComments(borrowRequest.getAdditionalMessage());
@@ -120,7 +123,7 @@ public class BookDaoImpl implements BookDao {
     @Override
     @Transactional
     public void updateBorrowedBookStatus(User user, Book book, String status, String userComment) {
-        BorrowRelation relationship = neo4jTemplate.getRelationshipBetween(user, book, BorrowRelation.class, RelationTypes.BORROWED.toString());
+        BorrowRelationship relationship = neo4jTemplate.getRelationshipBetween(user, book, BorrowRelationship.class, RelationTypes.BORROWED.toString());
         if (relationship == null) //todo: throw an exception
             return;
         relationship.setStatus(status);
@@ -202,7 +205,7 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public void createGoodreadsFriendBookRec(GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation) {
+    public void createGoodreadsFriendBookRec(GoodreadsFriendBookRecRelationship goodreadsFriendBookRecRelation) {
         neo4jTemplate.save(goodreadsFriendBookRecRelation);
     }
 
@@ -215,14 +218,14 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public List<UserRecommendation> getRecommendationsForUserAndBook(String bookId, String userId) {
-        List<GoodreadsFriendBookRecRelation> friendBookRecRelations = userRecRepository.getGoodreadsFriendBookRecRelations(userId, bookId);
+        List<GoodreadsFriendBookRecRelationship> friendBookRecRelations = userRecRepository.getGoodreadsFriendBookRecRelations(userId, bookId);
         List<UserRecommendation> userRecommendations = convertToUserRec(friendBookRecRelations);
         return userRecommendations;
     }
 
-    private List<UserRecommendation> convertToUserRec(List<GoodreadsFriendBookRecRelation> friendBookRecRelations) {
+    private List<UserRecommendation> convertToUserRec(List<GoodreadsFriendBookRecRelationship> friendBookRecRelations) {
         List<UserRecommendation> userRecommendations = new ArrayList<>();
-        for (GoodreadsFriendBookRecRelation friendBookRecRelation : friendBookRecRelations) {
+        for (GoodreadsFriendBookRecRelationship friendBookRecRelation : friendBookRecRelations) {
             UserRecommendation userRecommendation = new UserRecommendation();
             userRecommendation.setFriendGoodreadsId(friendBookRecRelation.getFriendGoodreadsId());
             userRecommendation.setFriendImageUrl(friendBookRecRelation.getFriendImageUrl());
@@ -277,32 +280,10 @@ public class BookDaoImpl implements BookDao {
         for (Map<String, Object> objectMap : mapResult) {
             RestNode bookNode = (RestNode) objectMap.get("book");
             RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
-
-            Book book = neo4jTemplate.convert(bookNode, Book.class);
-            if (rawWishRelationship.getType().name().equals(OWNS_RELATION)) {
-                OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawWishRelationship, OwnsRelationship.class);
-                book.setBookType(OWNS_RELATION);
-                book.setBookDetails(getOwnsBookDetails(ownsRelationship));
-                books.add(book);
-            }
-            if (rawWishRelationship.getType().name().equals(BORROWED_RELATION)) {
-                book.setBookType(BORROWED_RELATION);
-                BorrowRelation borrowRelation = neo4jTemplate.convert(rawWishRelationship, BorrowRelation.class);
-                book.setBookDetails(getBorrowBookDetails(borrowRelation));
-                books.add(book);
-            }
-            if (rawWishRelationship.getType().name().equals(WISHLIST_RELATION)) {
-                book.setBookType(WISHLIST_RELATION);
-                //find if there are any recommendations
-                List<UserRecommendation> userRecommendations = getRecommendationsForUserAndBook(book.getId(), userId);
-                book.setBookDetails(getWishlistBookDetails(userRecommendations));
-                books.add(book);
-            }
-            if (rawWishRelationship.getType().name().equals(READ_RELATION)) {
-                book.setBookType(READ_RELATION);
-                //find if there are any recommendations
-                books.add(book);
-            }
+//           EntityResultConverter entityResultConverter = new EntityResultConverter(new GenericConversionService(), neo4jTemplate);
+            Book book = BookMapper.getBookFromRestNode(bookNode);
+            book = RelationToBookDetailsMapper.setRelationDetailsToBook(rawWishRelationship, book);
+            books.add(book);
         }
         return books;
     }

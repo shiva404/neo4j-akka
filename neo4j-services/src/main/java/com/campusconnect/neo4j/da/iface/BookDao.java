@@ -18,7 +18,7 @@ public interface BookDao {
 
     void listBookAsOwns(OwnsRelationship ownsRelationship);
 
-    void listBookAsRead(ReadRelation readRelation);
+    void listBookAsRead(ReadRelationship readRelation);
 
     @Transactional
     void updateOwnedBookStatus(User user, Book book, String status, String userComment);
@@ -41,7 +41,7 @@ public interface BookDao {
 
     public void addWishBookToUser(WishListRelationship wishListRelationship);
 
-    void createGoodreadsFriendBookRec(GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation);
+    void createGoodreadsFriendBookRec(GoodreadsFriendBookRecRelationship goodreadsFriendBookRecRelation);
 
     Book getBookByIsbn(String isbn) throws IOException;
 

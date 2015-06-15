@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by sn1 on 2/25/15.
  */
 @RelationshipEntity(type = Constants.OWNS_RELATION)
-public class OwnsRelationship extends BookRelation {
+public class OwnsRelationship extends BookRelationship {
 
     private String borrowerId;
 

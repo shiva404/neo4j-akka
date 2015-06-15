@@ -13,7 +13,7 @@ import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.types.common.GoodreadsStatus;
 import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.ReadRelation;
+import com.campusconnect.neo4j.types.neo4j.ReadRelationship;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.neo4j.WishListRelationship;
 import com.sun.jersey.api.uri.UriBuilderImpl;
@@ -99,7 +99,7 @@ public class GetBooksWorker extends UntypedActor {
                     if (shelf.equals(GoodreadsStatus.TO_READ.toString())) {
                         bookDao.addWishBookToUser(new WishListRelationship(user, dbBook, "wish", now, now));
                     } else
-                        bookDao.listBookAsRead(new ReadRelation(user, dbBook, null, now, now, shelf));
+                        bookDao.listBookAsRead(new ReadRelationship(user, dbBook, null, now, now, shelf));
                 }
             }
         if (Integer.parseInt(reviews.getEnd()) == Integer.parseInt(reviews.getTotal())) {

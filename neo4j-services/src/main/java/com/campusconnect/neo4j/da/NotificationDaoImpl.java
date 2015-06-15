@@ -20,6 +20,9 @@ public class NotificationDaoImpl implements NotificationDao {
     NotificationRepository notificationRepository;
     ObjectMapper objectMapper = new ObjectMapper();
 
+    public NotificationDaoImpl() {
+    }
+
     @Override
     public NotificationEntity savenotification(
             NotificationEntity notificationEntity) {

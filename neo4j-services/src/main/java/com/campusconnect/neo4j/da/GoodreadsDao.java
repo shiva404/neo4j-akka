@@ -22,6 +22,9 @@ public class GoodreadsDao {
     private GetBook getBook;
     private GoodreadsAsynchHandler goodreadsAsynchHandler;
 
+    public GoodreadsDao() {
+    }
+
     public void setGoodreadsAsynchHandler(GoodreadsAsynchHandler goodreadsAsynchHandler) {
         this.goodreadsAsynchHandler = goodreadsAsynchHandler;
     }

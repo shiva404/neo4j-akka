@@ -115,7 +115,7 @@ public class GoodreadsAsynchHandler {
     }
 
     public void getFriendRecForUser(String userId, String goodreadsUserId, String accessToken, String accessTokenSecret) {
-        List<WishListBook> wishListBooks = userDao.getWishListBooks(userId);
+        List<WishListBook> wishListBooks = bookDao.getWishListBooks(userId);
         friendsBookSearchForWishListRouter.tell(new FriendsBookSearchForWishListTask(accessToken, accessTokenSecret, userId, goodreadsUserId, 1, wishListBooks), successListener);
     }
 

@@ -34,7 +34,7 @@ import java.util.Map;
 import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.*;
 import static com.campusconnect.neo4j.mappers.WebToNeo4jMapper.mapAddressWebToNeo4j;
 import static com.campusconnect.neo4j.mappers.WebToNeo4jMapper.mapUserWebToNeo4j;
-import static com.campusconnect.neo4j.types.common.Constants.*;
+import static com.campusconnect.neo4j.util.Constants.*;
 import static com.campusconnect.neo4j.util.ErrorCodes.INVALId_ARGMENTS;
 
 /**
@@ -313,12 +313,12 @@ public class UserResource {
         }
         switch (filter.toLowerCase()) {
             case "owned": {
-                final List<OwnedBook> ownedBooks = userDao.getOwnedBooks(userId);
+                final List<OwnedBook> ownedBooks = bookDao.getOwnedBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
             case "read": {
-                final List<Book> readBooks = userDao.getReadBooks(userId);
+                final List<Book> readBooks = bookDao.getReadBooks(userId);
                 List<com.campusconnect.neo4j.types.web.Book> returnBooks = new ArrayList<>();
                 for (Book book : readBooks)
                     returnBooks.add(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
@@ -327,21 +327,21 @@ public class UserResource {
                 return Response.ok().entity(booksPage).build();
             }
             case "available": {
-                final List<OwnedBook> ownedBooks = userDao.getAvailableBooks(userId);
+                final List<OwnedBook> ownedBooks = bookDao.getAvailableBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
             case "lent": {
-                final List<OwnedBook> ownedBooks = userDao.getLentBooks(userId);
+                final List<OwnedBook> ownedBooks = bookDao.getLentBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
             case "borrowed":
-                final List<BorrowedBook> borrowedBooks = userDao.getBorrowedBooks(userId);
+                final List<BorrowedBook> borrowedBooks = bookDao.getBorrowedBooks(userId);
                 BorrowedBooksPage borrowedBooksPage = new BorrowedBooksPage(0, borrowedBooks.size(), borrowedBooks);
                 return Response.ok().entity(borrowedBooksPage).build();
             case "wishList":
-                List<WishListBook> wishListBooks = userDao.getWishListBooks(userId);
+                List<WishListBook> wishListBooks = bookDao.getWishListBooks(userId);
                 WishListBooksPage wishListBooksPage = new WishListBooksPage(0, wishListBooks.size(), wishListBooks);
                 return Response.ok().entity(wishListBooksPage).build();
             case "all":

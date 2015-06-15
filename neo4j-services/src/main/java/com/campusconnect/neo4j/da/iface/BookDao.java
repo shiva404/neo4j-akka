@@ -1,8 +1,9 @@
 package com.campusconnect.neo4j.da.iface;
 
+import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.*;
-import com.campusconnect.neo4j.types.web.BorrowRequest;
-import com.campusconnect.neo4j.types.web.UserRecommendation;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ public interface BookDao {
     Book createBook(Book book);
 
     Book getBook(String bookId);
+
 
     void listBookAsOwns(OwnsRelationship ownsRelationship);
 
@@ -41,7 +43,7 @@ public interface BookDao {
 
     public void addWishBookToUser(WishListRelationship wishListRelationship);
 
-    void createGoodreadsFriendBookRec(GoodreadsFriendBookRecRelationship goodreadsFriendBookRecRelation);
+    void createGoodreadsFriendBookRec(GoodreadsRecRelationship goodreadsFriendBookRecRelation);
 
     Book getBookByIsbn(String isbn) throws IOException;
 
@@ -54,4 +56,20 @@ public interface BookDao {
     List<Book> getAllUserBooks(String userId);
 
     List<Book> searchWithRespectToUser(String userId, String searchString);
+
+    List<Book> getReadBooks(String userId);
+
+    List<OwnedBook> getOwnedBooks(String userId);
+
+    List<OwnedBook> getLentBooks(String userId);
+
+    List<OwnedBook> getAvailableBooks(String userId);
+
+    List<UserRecommendation> getGoodreadsUserRecommendations(String userId);
+
+    //    @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+    List<WishListBook> getWishListBooks(String userId);
+
+    //    @Cacheable(cacheName = "userBorrowedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+    List<BorrowedBook> getBorrowedBooks(String userId);
 }

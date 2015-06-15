@@ -1,7 +1,7 @@
 package com.campusconnect.neo4j.types.neo4j;
 
 
-import com.campusconnect.neo4j.types.common.Constants;
+import com.campusconnect.neo4j.util.Constants;
 import org.springframework.data.neo4j.annotation.EndNode;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;

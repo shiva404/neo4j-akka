@@ -12,7 +12,7 @@ import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.mappers.WebToNeo4jMapper;
 import com.campusconnect.neo4j.types.common.GoodreadsStatus;
 import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.GoodreadsFriendBookRecRelationship;
+import com.campusconnect.neo4j.types.neo4j.GoodreadsRecRelationship;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.UserRecommendation;
 import com.campusconnect.neo4j.types.web.WishListBook;
@@ -77,7 +77,7 @@ public class UserRecForWishlist extends UntypedActor {
                                     User user = userDao.getUser(userRecForWishListTask.getUserId());
                                     final String goodreadsId = userRecForWishListTask.getFriend().getId();
                                     User friend = userDao.getUserByGoodreadsId(goodreadsId);
-                                    bookDao.createGoodreadsFriendBookRec(new GoodreadsFriendBookRecRelationship(user, WebToNeo4jMapper.mapBookWebToNeo4j(wishListBook), "rec", friend != null ? friend.getId() : null, goodreadsId, userRecForWishListTask.getFriend().getImageUrl(), userRecForWishListTask.getFriend().getName()));
+                                    bookDao.createGoodreadsFriendBookRec(new GoodreadsRecRelationship(user, WebToNeo4jMapper.mapBookWebToNeo4j(wishListBook), "rec", friend != null ? friend.getId() : null, goodreadsId, userRecForWishListTask.getFriend().getImageUrl(), userRecForWishListTask.getFriend().getName()));
                                 }
                             }
                         }

@@ -1,4 +1,4 @@
-package com.campusconnect.neo4j.types.common;
+package com.campusconnect.neo4j.util;
 
 /**
  * Created with IntelliJ IDEA.

@@ -5,22 +5,16 @@ import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.da.iface.EmailDao;
 import com.campusconnect.neo4j.da.iface.NotificationDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.common.*;
-import com.campusconnect.neo4j.types.neo4j.Address;
 import com.campusconnect.neo4j.types.neo4j.*;
-import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.User;
-import com.campusconnect.neo4j.types.web.*;
+import com.campusconnect.neo4j.types.web.Event;
+import com.campusconnect.neo4j.types.web.Notification;
 import com.googlecode.ehcache.annotations.*;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.neo4j.rest.graphdb.entity.RestNode;
-import org.neo4j.rest.graphdb.entity.RestRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.neo4j.conversion.Result;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 
 import java.util.*;
@@ -273,70 +267,6 @@ public class UserDaoImpl implements UserDao {
         return userRepository.getFollowing(userId);
     }
 
-    @Override
-//    @Cacheable(cacheName = "userOwnedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public List<OwnedBook> getOwnedBooks(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS]->(books:Book) return books, relation", params);
-        return getOwnedBooksFromResultMap(mapResult);
-    }
-
-    @Override
-    public List<Book> getReadBooks(String userId) {
-        List<Book> books = bookRepository.getBooks(userId);
-        for (Book book : books) {
-            book.setBookType("READ");
-        }
-        return books;
-    }
-
-    @Override
-    public List<OwnedBook> getAvailableBooks(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS {status: \"available\"}]->(books:Book) return books, relation", params);
-        return getOwnedBooksFromResultMap(mapResult);
-    }
-
-    @Override
-    public List<OwnedBook> getLentBooks(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS {status: \"lent\"}]->(books:Book) return books, relation", params);
-        return getOwnedBooksFromResultMap(mapResult);
-    }
-
-    private List<OwnedBook> getOwnedBooksFromResultMap(Result<Map<String, Object>> mapResult) {
-        List<OwnedBook> ownedBooks = new ArrayList<>();
-        for (Map<String, Object> objectMap : mapResult) {
-            RestNode bookNode = (RestNode) objectMap.get("books");
-            RestRelationship rawOwnsRelationship = (RestRelationship) objectMap.get("relation");
-
-            Book book = neo4jTemplate.convert(bookNode, Book.class);
-            book.setBookType("Own");
-            OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawOwnsRelationship, OwnsRelationship.class);
-
-            com.campusconnect.neo4j.types.web.Book webBook = Neo4jToWebMapper.mapBookNeo4jToWeb(book);
-            OwnedBook ownedBook = new OwnedBook(webBook);
-            ownedBook.setCreatedDate(ownsRelationship.getCreatedDate());
-            ownedBook.setStatus(ownsRelationship.getStatus());
-            ownedBook.setLastModifiedDate(ownsRelationship.getLastModifiedDate());
-            ownedBook.setBorrowerId(ownsRelationship.getBorrowerId());
-            ownedBook.setDueDate(ownsRelationship.getDueDate());
-            ownedBooks.add(ownedBook);
-        }
-        return ownedBooks;
-    }
-
-    @Override
-//    @Cacheable(cacheName = "userBorrowedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public List<BorrowedBook> getBorrowedBooks(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:BORROWED]->(books:Book) return books, relation", params);
-        return getBorrowedBooksFromResultMap(mapResult);
-    }
 
     @Override
     public void addAddressToUser(Address address, User user) {
@@ -361,96 +291,12 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-//    @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public List<WishListBook> getWishListBooks(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:WISH]->(books:Book) return books, relation", params);
-        return getWishListBooksFromResultMap(mapResult);
-    }
-
-    @Override
     public void synchWishListRec(String userId) {
         User user = getUser(userId);
         if (user != null)
             goodreadsAsynchHandler.getFriendRecForUser(userId, user.getGoodreadsId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret());
     }
 
-    @Override
-    public List<UserRecommendation> getUserRecommendations(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:GR_REC]->(books:Book) return books, relation", params);
-        return getWishUserRecFromResultMap(mapResult);
-    }
-
-    private List<WishListBook> getWishListBooksFromResultMap(Result<Map<String, Object>> mapResult) {
-        List<WishListBook> wishListBooks = new ArrayList<>();
-        for (Map<String, Object> objectMap : mapResult) {
-            RestNode bookNode = (RestNode) objectMap.get("books");
-            RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
-
-            Book book = neo4jTemplate.convert(bookNode, Book.class);
-            book.setBookType("WISH");
-            WishListRelationship whishListRelationship = neo4jTemplate.convert(rawWishRelationship, WishListRelationship.class);
-
-            com.campusconnect.neo4j.types.web.Book webBook = Neo4jToWebMapper.mapBookNeo4jToWeb(book);
-
-            WishListBook wishListBook = new WishListBook(webBook);
-
-            wishListBooks.add(wishListBook);
-        }
-        return wishListBooks;
-    }
-
-    private List<UserRecommendation> getWishUserRecFromResultMap(Result<Map<String, Object>> mapResult) {
-        List<UserRecommendation> userRecommendations = new ArrayList<>();
-        for (Map<String, Object> objectMap : mapResult) {
-            RestNode bookNode = (RestNode) objectMap.get("books");
-            RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
-
-            Book book = neo4jTemplate.convert(bookNode, Book.class);
-            book.setBookType("WISH");
-            GoodreadsFriendBookRecRelationship goodreadsFriendBookRecRelation = neo4jTemplate.convert(rawWishRelationship, GoodreadsFriendBookRecRelationship.class);
-
-            UserRecommendation userRecommendation = new UserRecommendation(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
-            userRecommendation.setFriendGoodreadsId(goodreadsFriendBookRecRelation.getFriendGoodreadsId());
-            userRecommendation.setFriendImageUrl(goodreadsFriendBookRecRelation.getFriendImageUrl());
-            userRecommendation.setFriendName(goodreadsFriendBookRecRelation.getFriendName());
-            userRecommendation.setUserId(goodreadsFriendBookRecRelation.getFriendName());
-            userRecommendation.setCreateDate(goodreadsFriendBookRecRelation.getCreatedDate());
-            userRecommendation.setFriendId(goodreadsFriendBookRecRelation.getFriendId());
-            userRecommendations.add(userRecommendation);
-        }
-        return userRecommendations;
-    }
-
-    private List<BorrowedBook> getBorrowedBooksFromResultMap(Result<Map<String, Object>> mapResult) {
-        List<BorrowedBook> borrowedBooks = new ArrayList<>();
-        for (Map<String, Object> objectMap : mapResult) {
-            RestNode bookNode = (RestNode) objectMap.get("books");
-            RestRelationship rawOwnsRelationship = (RestRelationship) objectMap.get("relation");
-
-            Book book = neo4jTemplate.convert(bookNode, Book.class);
-            book.setBookType("BORROWED");
-            BorrowRelationship borrowRelationship = neo4jTemplate.convert(rawOwnsRelationship, BorrowRelationship.class);
-
-            com.campusconnect.neo4j.types.web.Book webBook = Neo4jToWebMapper.mapBookNeo4jToWeb(book);
-
-            BorrowedBook borrowedBook = new BorrowedBook(webBook);
-
-            borrowedBook.setStatus(borrowRelationship.getStatus());
-            borrowedBook.setDueDate(borrowRelationship.getDueDate());
-            borrowedBook.setCreatedDate(borrowRelationship.getCreatedDate());
-            borrowedBook.setOwnerUserId(borrowRelationship.getOwnerUserId());
-            borrowedBook.setAdditionalComments(borrowRelationship.getAdditionalComments());
-            borrowedBook.setBorrowDate(borrowRelationship.getBorrowDate());
-            borrowedBook.setContractPeriodInDays(borrowRelationship.getContractPeriodInDays());
-            borrowedBook.setLastModifiedDate(borrowRelationship.getLastModifiedDate());
-            borrowedBooks.add(borrowedBook);
-        }
-        return borrowedBooks;
-    }
 
     @Override
     public void setReminder(ReminderRelationShip reminderRelationShip) {

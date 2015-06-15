@@ -8,7 +8,6 @@ public class UserRecommendation {
     private String friendGoodreadsId;
     private String friendImageUrl;
     private String friendName;
-    private String userId;
     private long createDate;
     private String friendId;
 
@@ -58,14 +57,6 @@ public class UserRecommendation {
 
     public void setFriendName(String friendName) {
         this.friendName = friendName;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public long getCreateDate() {

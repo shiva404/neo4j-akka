@@ -1,13 +1,13 @@
 package com.campusconnect.neo4j.types.neo4j;
 
-import com.campusconnect.neo4j.types.common.Constants;
+import com.campusconnect.neo4j.util.Constants;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 
 /**
  * Created by sn1 on 3/25/15.
  */
 @RelationshipEntity(type = Constants.GOODREADS_REC_RELATION)
-public class GoodreadsFriendBookRecRelationship extends BookRelationship {
+public class GoodreadsRecRelationship extends BookRelationship {
 
     private String friendGoodreadsId;
     private String friendImageUrl;
@@ -15,10 +15,10 @@ public class GoodreadsFriendBookRecRelationship extends BookRelationship {
     private String friendId;
 
 
-    public GoodreadsFriendBookRecRelationship() {
+    public GoodreadsRecRelationship() {
     }
 
-    public GoodreadsFriendBookRecRelationship(User user, Book book, String status, String friendId, String friendGoodreadsId, String friendImageUrl, String friendName) {
+    public GoodreadsRecRelationship(User user, Book book, String status, String friendId, String friendGoodreadsId, String friendImageUrl, String friendName) {
 
         super(user, book, status);
         this.friendGoodreadsId = friendGoodreadsId;

@@ -18,8 +18,8 @@ import java.util.Set;
 public class FacebookClient {
     private final String url;
     private Logger LOGGER = LoggerFactory.getLogger(FacebookClient.class);
-    //    private final int connectTimeout;
-//    private final int readTimeout;
+    //    private final Integer connectTimeout;
+//    private final Integer readTimeout;
 //    private final String appKey;
     private WebResource resource;
 
@@ -56,12 +56,12 @@ public class FacebookClient {
         return facebookWebResource;
     }
 
-    public <T> T getEntity(Class<T> clazz, ClientResponse cr, int expectedHttpStatus) {
+    public <T> T getEntity(Class<T> clazz, ClientResponse cr, Integer expectedHttpStatus) {
         handleError(cr, expectedHttpStatus);
         return cr.getEntity(clazz);
     }
 
-    public void handleError(ClientResponse cr, int expected) throws FacebookException {
+    public void handleError(ClientResponse cr, Integer expected) throws FacebookException {
         if (cr.getStatus() != expected) {
             //todo handel error
         }

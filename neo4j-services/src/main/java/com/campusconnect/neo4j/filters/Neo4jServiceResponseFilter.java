@@ -31,7 +31,7 @@ public class Neo4jServiceResponseFilter implements ContainerResponseFilter {
             MDC.put(RESPONSE_CONTENT_LENGTH, response.getHttpHeaders().getFirst(HttpHeaders.CONTENT_LENGTH) != null ? response.getHttpHeaders().getFirst(HttpHeaders.CONTENT_LENGTH) : EMPTY_STRING);
             MDC.put(RESPONSE_STATUS, response.getResponse().getStatus());
             MDC.put(RESPONSE_CONTENT_TYPE, response.getMediaType() != null ? response.getMediaType().toString() : EMPTY_STRING);
-            long totalExecutionTime = perfLogHolder.getTotalExecutionTime();
+            Long totalExecutionTime = perfLogHolder.getTotalExecutionTime();
             MDC.put(EXECUTION_TIME, totalExecutionTime);
             String perfLogString = String.format("%1$s freeMem=%2$dmb totalMem=%3$dmb", perfLogHolder.getSummaryString(),
                     (Runtime.getRuntime().freeMemory() / 1000000L), (Runtime.getRuntime().maxMemory() / 1000000L));

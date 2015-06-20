@@ -16,8 +16,8 @@ public abstract class BookRelationship {
     @EndNode
     private Book book;
     private String status;
-    private long createdDate;
-    private long lastModifiedDate;
+    private Long createdDate;
+    private Long lastModifiedDate;
 
     protected BookRelationship() {
     }
@@ -28,7 +28,7 @@ public abstract class BookRelationship {
         this.status = status;
     }
 
-    protected BookRelationship(User user, Book book, String status, long createdDate, long lastModifiedDate) {
+    protected BookRelationship(User user, Book book, String status, Long createdDate, Long lastModifiedDate) {
         this.user = user;
         this.book = book;
         this.status = status;
@@ -68,19 +68,19 @@ public abstract class BookRelationship {
         this.status = status;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
-    public long getLastModifiedDate() {
+    public Long getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(long lastModifiedDate) {
+    public void setLastModifiedDate(Long lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 }

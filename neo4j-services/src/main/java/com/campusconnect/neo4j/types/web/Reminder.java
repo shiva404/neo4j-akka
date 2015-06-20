@@ -2,21 +2,21 @@ package com.campusconnect.neo4j.types.web;
 
 public class Reminder {
 
-    private long createdDate;
+    private Long createdDate;
     private String description;
-    private long lastModifiedTime;
+    private Long lastModifiedTime;
     private Long nodeId;
 
     private String reminderMessage;
 
-    private long reminderTime;
+    private Long reminderTime;
 
     private String subject;
 
     public Reminder() {
     }
 
-    public Reminder(long createdDate, String description, long lastModifiedTime, Long nodeId, String reminderMessage, long reminderTime, String subject) {
+    public Reminder(Long createdDate, String description, Long lastModifiedTime, Long nodeId, String reminderMessage, Long reminderTime, String subject) {
         this.createdDate = createdDate;
         this.description = description;
         this.lastModifiedTime = lastModifiedTime;
@@ -26,11 +26,11 @@ public class Reminder {
         this.subject = subject;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -42,11 +42,11 @@ public class Reminder {
         this.description = description;
     }
 
-    public long getLastModifiedTime() {
+    public Long getLastModifiedTime() {
         return lastModifiedTime;
     }
 
-    public void setLastModifiedTime(long lastModifiedTime) {
+    public void setLastModifiedTime(Long lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
     }
 
@@ -66,11 +66,11 @@ public class Reminder {
         this.reminderMessage = reminderMessage;
     }
 
-    public long getReminderTime() {
+    public Long getReminderTime() {
         return reminderTime;
     }
 
-    public void setReminderTime(long reminderTime) {
+    public void setReminderTime(Long reminderTime) {
         this.reminderTime = reminderTime;
     }
 

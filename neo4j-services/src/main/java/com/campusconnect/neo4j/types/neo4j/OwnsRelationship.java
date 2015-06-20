@@ -26,13 +26,13 @@ public class OwnsRelationship extends BookRelationship {
         super();
     }
 
-    public OwnsRelationship(User user, Book book, long createdDate,
-                            String status, long lastModifiedDate) {
+    public OwnsRelationship(User user, Book book, Long createdDate,
+                            String status, Long lastModifiedDate) {
         super(user, book, status, createdDate, lastModifiedDate);
     }
 
-    public OwnsRelationship(User user, Book book, long createdDate,
-                            String status, long lastModifiedDate, String goodreadsStatus) {
+    public OwnsRelationship(User user, Book book, Long createdDate,
+                            String status, Long lastModifiedDate, String goodreadsStatus) {
         super(user, book, status, createdDate, lastModifiedDate);
         this.goodreadsStatus = goodreadsStatus;
     }

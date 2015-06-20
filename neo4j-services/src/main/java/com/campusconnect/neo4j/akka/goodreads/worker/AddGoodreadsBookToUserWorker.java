@@ -31,7 +31,7 @@ public class AddGoodreadsBookToUserWorker extends UntypedActor {
 
             //todo: dont create a relation if already exists
 
-            final long now = System.currentTimeMillis();
+            final Long now = System.currentTimeMillis();
             if (addGoodreadsBookToUserTask.getShelfName().equals(GoodreadsStatus.TO_READ.toString())) {
                 bookDao.addWishBookToUser(new WishListRelationship(user, book, "wish", now, now));
             } else

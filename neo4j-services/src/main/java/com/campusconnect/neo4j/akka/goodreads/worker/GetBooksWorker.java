@@ -94,7 +94,7 @@ public class GetBooksWorker extends UntypedActor {
                     Book dbBook = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(book.getGoodreadsId().toString(), book);
 //                Book dbBook = bookDao.getBookByGoodreadsId(book.getGoodreadsId().toString());
                     //todo: dont create a relation if already exists
-                    final long now = System.currentTimeMillis();
+                    final Long now = System.currentTimeMillis();
                     String shelf = review.getShelves() != null && !review.getShelves().isEmpty() ? review.getShelves().get(0).getName() : "none";
                     if (shelf.equals(GoodreadsStatus.TO_READ.toString())) {
                         bookDao.addWishBookToUser(new WishListRelationship(user, dbBook, "wish", now, now));

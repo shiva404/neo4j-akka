@@ -24,5 +24,4 @@ public interface UserRepository extends GraphRepository<User> {
 
     @Query("match (users :User) return users limit {0}")
     List<User> getRandomUsers(int size);
-
 }

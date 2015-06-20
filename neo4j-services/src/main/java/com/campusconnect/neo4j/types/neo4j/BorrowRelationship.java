@@ -19,7 +19,7 @@ public class BorrowRelationship extends BookRelationship {
     private Long borrowDate;
     private Integer contractPeriodInDays;
 
-    public BorrowRelationship(User user, Book book, String status, long dueDate, String ownerUserId, String additionalComments, long borrowDate, int contractPeriodInDays) {
+    public BorrowRelationship(User user, Book book, String status, Long dueDate, String ownerUserId, String additionalComments, Long borrowDate, int contractPeriodInDays) {
         super(user, book, status);
         this.dueDate = dueDate;
         this.ownerUserId = ownerUserId;
@@ -36,11 +36,11 @@ public class BorrowRelationship extends BookRelationship {
         super(user, book, status);
     }
 
-    public long getBorrowDate() {
+    public Long getBorrowDate() {
         return borrowDate;
     }
 
-    public void setBorrowDate(long borrowDate) {
+    public void setBorrowDate(Long borrowDate) {
         this.borrowDate = borrowDate;
     }
 
@@ -52,11 +52,11 @@ public class BorrowRelationship extends BookRelationship {
         this.contractPeriodInDays = contractPeriodInDays;
     }
 
-    public long getDueDate() {
+    public Long getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(long dueDate) {
+    public void setDueDate(Long dueDate) {
         this.dueDate = dueDate;
     }
 

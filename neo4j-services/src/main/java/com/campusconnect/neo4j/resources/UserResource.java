@@ -262,7 +262,7 @@ public class UserResource {
         } else if (bookIdType.equals("grId")) {
             book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
         }
-        long now = System.currentTimeMillis();
+        Long now = System.currentTimeMillis();
         bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status, now));
         return Response.ok().build();
     }
@@ -280,7 +280,7 @@ public class UserResource {
         } else if (bookIdType.equals("grId")) {
             book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
         }
-        long now = System.currentTimeMillis();
+        Long now = System.currentTimeMillis();
         bookDao.addWishBookToUser(new WishListRelationship(user, book, status, now, now));
         return Response.ok().build();
     }
@@ -293,7 +293,7 @@ public class UserResource {
 
         User user = userDao.getUser(userId);
         Book book = bookDao.getBook(bookId);
-        long now = System.currentTimeMillis();
+        Long now = System.currentTimeMillis();
         bookDao.listBookAsRead(new ReadRelationship(user, book, status, now, now, null));
         return Response.ok().build();
     }
@@ -383,7 +383,7 @@ public class UserResource {
     @GET
     @Path("{userId}/friends/pending")
     public Response getPendingFriends(@PathParam("userId") final String userId) {
-        final List<User> pendingFriends = userDao.findPendingFriendReq(userId);
+        final List<User> pendingFriends = userDao.getPendingFriendReq(userId);
         List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(pendingFriends.size());
         for (User user : pendingFriends) {
             returnUsers.add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
@@ -428,7 +428,6 @@ public class UserResource {
 
         } else if (status.toLowerCase().equals("cancel")) {
             userDao.deleteFriendRequest(userId, friendUserId);
-
         }
         return Response.ok().build();
     }
@@ -443,7 +442,7 @@ public class UserResource {
 //         return Response.ok().build();
 //    }
     private void addPropertiesForCreate(User user) {
-        final long createdDate = System.currentTimeMillis();
+        final Long createdDate = System.currentTimeMillis();
         user.setCreatedDate(createdDate);
         user.setLastModifiedDate(createdDate);
         user.setGoodreadsAuthStatus(GoodreadsAuthStatus.NONE.toString());
@@ -496,7 +495,7 @@ public class UserResource {
         setReminderCreateProperties(reminder);
         Reminder createdReminder = reminderDao.createReminder(reminder);
         User reminderForUser = userDao.getUser(userId);
-        long currentTime = System.currentTimeMillis();
+        Long currentTime = System.currentTimeMillis();
         ReminderRelationShip reminderRelationShip = new ReminderRelationShip(
                 createdBy, currentTime, reminderForUser, currentTime,
                 reminderAbout, reminder);
@@ -627,8 +626,8 @@ public class UserResource {
 
     @GET
     @Path("{userId}/friends")
-    public Response findFriends(@PathParam("userId") String userId, @QueryParam("currentUserId") String currentUser) {
-        List<User> friends = userDao.findFriends(userId, currentUser);
+    public Response getFriends(@PathParam("userId") String userId, @QueryParam("currentUserId") String currentUser) {
+        List<User> friends = userDao.getFriends(userId, currentUser);
         List<com.campusconnect.neo4j.types.web.User> returnFriends = new ArrayList<>();
         for (User friend : friends) {
             returnFriends.add(Neo4jToWebMapper.mapUserNeo4jToWeb(friend));
@@ -639,7 +638,7 @@ public class UserResource {
         allFriends.setFriends(friendsPage);
 
         if (currentUser != null && !currentUser.equals(userId)) {
-            List<User> mutualFriends = userDao.findMutualFriends(currentUser, userId);
+            List<User> mutualFriends = userDao.getMutualFriends(currentUser, userId);
             List<com.campusconnect.neo4j.types.web.User> returnMutualFriends = new ArrayList<>();
             for (User friend : mutualFriends) {
                 returnMutualFriends.add(Neo4jToWebMapper.mapUserNeo4jToWeb(friend));

@@ -16,7 +16,7 @@ public class CountingService {
         counter.incrementAndGet();
     }
 
-    public int currentValue() {
+    public Integer currentValue() {
         return counter.intValue();
     }
 }

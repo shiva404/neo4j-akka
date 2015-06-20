@@ -17,7 +17,6 @@ public interface BookDao {
 
     Book getBook(String bookId);
 
-
     void listBookAsOwns(OwnsRelationship ownsRelationship);
 
     void listBookAsRead(ReadRelationship readRelation);
@@ -46,8 +45,6 @@ public interface BookDao {
     void createGoodreadsFriendBookRec(GoodreadsRecRelationship goodreadsFriendBookRecRelation);
 
     Book getBookByIsbn(String isbn) throws IOException;
-
-    List<UserRecommendation> getRecommendationsForUserAndBook(String bookId, String userId);
 
     Book getBookRelatedUser(String bookId, String userId);
 

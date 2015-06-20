@@ -9,7 +9,7 @@ import org.springframework.data.neo4j.annotation.RelationshipEntity;
 @RelationshipEntity(type = Constants.WISHLIST_RELATION)
 public class WishListRelationship extends BookRelationship {
 
-    public WishListRelationship(User user, Book book, String status, long createdDate, long lastModifiedDate) {
+    public WishListRelationship(User user, Book book, String status, Long createdDate, Long lastModifiedDate) {
         super(user, book, status, createdDate, lastModifiedDate);
     }
 

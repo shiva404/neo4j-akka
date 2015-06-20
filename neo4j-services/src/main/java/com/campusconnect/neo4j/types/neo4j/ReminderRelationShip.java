@@ -15,12 +15,12 @@ public class ReminderRelationShip {
     private String createdBy;
 
     @CreatedDate
-    private long createdDate;
+    private Long createdDate;
 
     @GraphId
     private Long id;
 
-    private long lastModified;
+    private Long lastModified;
 
     @EndNode
     private Reminder reminder;
@@ -34,8 +34,8 @@ public class ReminderRelationShip {
 
     }
 
-    public ReminderRelationShip(String createdBy, long createdDate, User reminderFor,
-                                long lastModified, String type, Reminder reminder) {
+    public ReminderRelationShip(String createdBy, Long createdDate, User reminderFor,
+                                Long lastModified, String type, Reminder reminder) {
         super();
         this.createdBy = createdBy;
         this.createdDate = createdDate;
@@ -53,11 +53,11 @@ public class ReminderRelationShip {
         this.createdBy = createdBy;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -69,11 +69,11 @@ public class ReminderRelationShip {
         this.id = id;
     }
 
-    public long getLastModified() {
+    public Long getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(long lastModified) {
+    public void setLastModified(Long lastModified) {
         this.lastModified = lastModified;
     }
 

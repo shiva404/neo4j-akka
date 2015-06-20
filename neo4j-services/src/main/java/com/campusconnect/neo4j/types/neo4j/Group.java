@@ -21,7 +21,7 @@ public class Group {
     private String id;
     private String name;
 
-    public Group(String id, String name, long createdDate, long lastModifiedTime, String lastModifiedBy) {
+    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy) {
         this.id = id;
         this.name = name;
         this.createdDate = createdDate;
@@ -31,10 +31,10 @@ public class Group {
 
     @CreatedDate
 
-    private long createdDate;
+    private Long createdDate;
 
     @LastModifiedDate
-    private long lastModifiedTime;
+    private Long lastModifiedTime;
 
     @LastModifiedBy
     private String lastModifiedBy;
@@ -43,7 +43,7 @@ public class Group {
         this.name = name;
     }
 
-    public Group(String name, long createdDate) {
+    public Group(String name, Long createdDate) {
 
         this.name = name;
         this.createdDate = createdDate;
@@ -77,19 +77,19 @@ public class Group {
         this.name = name;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
-    public long getLastModifiedTime() {
+    public Long getLastModifiedTime() {
         return lastModifiedTime;
     }
 
-    public void setLastModifiedTime(long lastModifiedTime) {
+    public void setLastModifiedTime(Long lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
     }
 

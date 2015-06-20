@@ -19,4 +19,9 @@ public class Constants {
     public static final String NOTIFICATION_RELATION = "NOTIFICATION";
     public static final String CONNECTED_RELATION = "CONNECTED";
     public static final String WISHLIST_RELATION = "WISH";
+    public static final String FRIEND_REQ_SENT = "FRIEND_REQ_SENT";
+    public static final String FRINED_REQ_APPROVAL_PENDING = "FRINED_REQ_APPROVAL_PENDING";
+
+    public static final String SELF = "SELF";
+
 }

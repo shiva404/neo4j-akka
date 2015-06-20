@@ -22,7 +22,7 @@ public class User implements Serializable {
     private Set<Address> addresses;
 
     @CreatedDate
-    private long createdDate;
+    private Long createdDate;
 
     @Indexed
     private String email;
@@ -33,7 +33,7 @@ public class User implements Serializable {
     private String goodreadsAccessTokenSecret;
     private String goodreadsAuthStatus;
     private String goodReadsSynchStatus;
-    private long lastGoodreadsSychDate;
+    private Long lastGoodreadsSychDate;
     @Indexed()
     private String goodreadsId;
     @Indexed()
@@ -41,7 +41,7 @@ public class User implements Serializable {
     @Indexed(unique = true)
     private String id;
     @LastModifiedDate
-    private long lastModifiedDate;
+    private Long lastModifiedDate;
     private String name;
     @GraphId
     private Long nodeId;
@@ -56,7 +56,7 @@ public class User implements Serializable {
 
     }
 
-    public User(Set<Address> addresses, long createdDate, String email, Set<String> favorites, String fbId, String goodreadsAccessToken, String goodreadsAccessTokenSecret, String goodreadsAuthStatus, String goodReadsSynchStatus, long lastGoodreadsSychDate, String goodreadsId, String googleId, String id, long lastModifiedDate, String name, String phone, String gender, String profileImageUrl, String workDesignation, String workLocation, String userRelation) {
+    public User(Set<Address> addresses, Long createdDate, String email, Set<String> favorites, String fbId, String goodreadsAccessToken, String goodreadsAccessTokenSecret, String goodreadsAuthStatus, String goodReadsSynchStatus, Long lastGoodreadsSychDate, String goodreadsId, String googleId, String id, Long lastModifiedDate, String name, String phone, String gender, String profileImageUrl, String workDesignation, String workLocation, String userRelation) {
         this.addresses = addresses;
         this.createdDate = createdDate;
         this.email = email;
@@ -102,11 +102,11 @@ public class User implements Serializable {
         this.goodReadsSynchStatus = goodReadsSynchStatus;
     }
 
-    public long getLastGoodreadsSychDate() {
+    public Long getLastGoodreadsSychDate() {
         return lastGoodreadsSychDate;
     }
 
-    public void setLastGoodreadsSychDate(long lastGoodreadsSychDate) {
+    public void setLastGoodreadsSychDate(Long lastGoodreadsSychDate) {
         this.lastGoodreadsSychDate = lastGoodreadsSychDate;
     }
 
@@ -134,11 +134,11 @@ public class User implements Serializable {
         this.addresses = addresses;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -206,11 +206,11 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public long getLastModifiedDate() {
+    public Long getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(long lastModifiedDate) {
+    public void setLastModifiedDate(Long lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 

@@ -7,8 +7,8 @@
 
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 						   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-						   http://www.springframework.org/schema/aop
-						   http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
 						   http://www.springframework.org/schema/context
 						   http://www.springframework.org/schema/context/spring-context-3.0.xsd
 						   http://www.springframework.org/schema/data/neo4j
@@ -16,11 +16,20 @@
 		                   http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
                            http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
+    <import resource="beans-commons.xml"/>
+    <aop:config>
+        <aop:aspect ref="advice">
+            <aop:pointcut id="loggerPointCut"
+                          expression="${service.perf.pointcut}"/>
+            <aop:around pointcut-ref="loggerPointCut" method="doTiming"/>
+        </aop:aspect>
+    </aop:config>
+
     <context:annotation-config/>
     <ehcache:annotation-driven cache-manager="ehCacheCacheManager"/>
 
     <context:component-scan base-package="com.campusconnect.neo4j.akka.facebook.worker"/>
-    <import resource="beans-commons.xml"/>
+
     <neo4j:repositories base-package="com.campusconnect.neo4j.repositories"/>
     <neo4j:config base-package="com.campusconnect.neo4j.types.neo4j" graphDatabaseService="graphDatabaseService"/>
     <!--providers-->
@@ -317,16 +326,6 @@
 
     <!--Timer advice-->
     <bean id="advice" class="com.campusconnect.neo4j.logging.TimerAdvice"/>
-
-
-    <!--point cuts configuration -->
-    <aop:config>
-        <aop:aspect ref="advice">
-            <aop:pointcut id="loggerPointCut"
-                          expression="${service.perf.pointcut}"/>
-            <aop:around pointcut-ref="loggerPointCut" method="doTiming"/>
-        </aop:aspect>
-    </aop:config>
 
     <bean id="getBooksRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
         <property name="actorSystem" ref="actorSystem"/>

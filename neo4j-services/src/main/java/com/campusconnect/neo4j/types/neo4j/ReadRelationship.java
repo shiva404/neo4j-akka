@@ -19,7 +19,7 @@ public class ReadRelationship extends BookRelationship {
         this.goodreadsStatus = goodreadsStatus;
     }
 
-    public ReadRelationship(User user, Book book, String status, long createdDate, long lastModifiedDate, String goodreadsStatus) {
+    public ReadRelationship(User user, Book book, String status, Long createdDate, Long lastModifiedDate, String goodreadsStatus) {
         super(user, book, status, createdDate, lastModifiedDate);
         this.goodreadsStatus = goodreadsStatus;
     }

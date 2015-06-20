@@ -120,7 +120,7 @@ public class ActorFactoryBean implements FactoryBean<ActorRef>, ApplicationConte
     }
 
     private static class SpringCreator implements Creator<Actor> {
-        private static final long serialVersionUID = 1L;
+        private static final Long serialVersionUID = 1L;
 
         // TODO what about serializability ?
         private ApplicationContext ctx;

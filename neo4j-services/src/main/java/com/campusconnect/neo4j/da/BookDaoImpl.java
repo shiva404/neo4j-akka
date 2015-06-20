@@ -7,7 +7,6 @@ import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.da.mapper.DBMapper;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.repositories.BookRepository;
-import com.campusconnect.neo4j.repositories.OwnsRelationshipRepository;
 import com.campusconnect.neo4j.repositories.UserRecRepository;
 import com.campusconnect.neo4j.types.common.RelationTypes;
 import com.campusconnect.neo4j.types.neo4j.Book;
@@ -41,9 +40,6 @@ public class BookDaoImpl implements BookDao {
 
     @Autowired
     BookRepository bookRepository;
-
-    @Autowired
-    OwnsRelationshipRepository ownsRelationshipRepository;
 
     @Autowired
     UserRecRepository userRecRepository;
@@ -218,27 +214,6 @@ public class BookDaoImpl implements BookDao {
         Book book = goodreadsDao.getBookByISBN(isbn);
         Book goodreadsBook = getBookByGoodreadsIdAndSaveIfNotExists(book.getGoodreadsAuthorId(), book);
         return goodreadsBook;
-    }
-
-    @Override
-    public List<UserRecommendation> getRecommendationsForUserAndBook(String bookId, String userId) {
-        List<GoodreadsRecRelationship> friendBookRecRelations = userRecRepository.getGoodreadsFriendBookRecRelations(userId, bookId);
-        List<UserRecommendation> userRecommendations = convertToUserRec(friendBookRecRelations);
-        return userRecommendations;
-    }
-
-    private List<UserRecommendation> convertToUserRec(List<GoodreadsRecRelationship> friendBookRecRelations) {
-        List<UserRecommendation> userRecommendations = new ArrayList<>();
-        for (GoodreadsRecRelationship friendBookRecRelation : friendBookRecRelations) {
-            UserRecommendation userRecommendation = new UserRecommendation();
-            userRecommendation.setFriendGoodreadsId(friendBookRecRelation.getFriendGoodreadsId());
-            userRecommendation.setFriendImageUrl(friendBookRecRelation.getFriendImageUrl());
-            userRecommendation.setFriendName(friendBookRecRelation.getFriendName());
-            userRecommendation.setFriendId(friendBookRecRelation.getFriendId());
-
-            userRecommendations.add(userRecommendation);
-        }
-        return userRecommendations;
     }
 
     @Override
@@ -422,7 +397,6 @@ public class BookDaoImpl implements BookDao {
         for (Map<String, Object> objectMap : mapResult) {
             RestNode bookNode = (RestNode) objectMap.get("books");
             RestRelationship rawBorrowRelationship = (RestRelationship) objectMap.get("relation");
-
             Book book = getBookFromRestNode(bookNode);
             setRelationDetailsToBook(rawBorrowRelationship, book);
 

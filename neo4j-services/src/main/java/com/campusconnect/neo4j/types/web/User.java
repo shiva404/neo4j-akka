@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public class User {
     private Set<Address> addresses;
-    private long createdDate;
+    private Long createdDate;
     private String email;
     private Set<String> favorites;
     private String fbId;
@@ -19,11 +19,11 @@ public class User {
     private String goodreadsAccessTokenSecret;
     private String goodreadsAuthStatus;
     private String goodReadsSynchStatus;
-    private long lastGoodreadsSychDate;
+    private Long lastGoodreadsSychDate;
     private String goodreadsId;
     private String googleId;
     private String id;
-    private long lastModifiedDate;
+    private Long lastModifiedDate;
     private String name;
     private Long nodeId;
     private String phone;
@@ -65,11 +65,11 @@ public class User {
         this.goodReadsSynchStatus = goodReadsSynchStatus;
     }
 
-    public long getLastGoodreadsSychDate() {
+    public Long getLastGoodreadsSychDate() {
         return lastGoodreadsSychDate;
     }
 
-    public void setLastGoodreadsSychDate(long lastGoodreadsSychDate) {
+    public void setLastGoodreadsSychDate(Long lastGoodreadsSychDate) {
         this.lastGoodreadsSychDate = lastGoodreadsSychDate;
     }
 
@@ -97,11 +97,11 @@ public class User {
         this.addresses = addresses;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -122,7 +122,7 @@ public class User {
     }
 
 
-    public User(Set<Address> addresses, long createdDate, String email, Set<String> favorites, String fbId, String goodreadsAccessToken, String goodreadsAccessTokenSecret, String goodreadsAuthStatus, String goodReadsSynchStatus, long lastGoodreadsSychDate, String goodreadsId, String googleId, String id, long lastModifiedDate, String name, String phone, String gender, String profileImageUrl, String workDesignation, String workLocation, String userRelation) {
+    public User(Set<Address> addresses, Long createdDate, String email, Set<String> favorites, String fbId, String goodreadsAccessToken, String goodreadsAccessTokenSecret, String goodreadsAuthStatus, String goodReadsSynchStatus, Long lastGoodreadsSychDate, String goodreadsId, String googleId, String id, Long lastModifiedDate, String name, String phone, String gender, String profileImageUrl, String workDesignation, String workLocation, String userRelation) {
         this.addresses = addresses;
         this.createdDate = createdDate;
         this.email = email;
@@ -195,11 +195,11 @@ public class User {
         this.id = id;
     }
 
-    public long getLastModifiedDate() {
+    public Long getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(long lastModifiedDate) {
+    public void setLastModifiedDate(Long lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 

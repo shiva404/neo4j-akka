@@ -1,11 +1,17 @@
 package com.campusconnect.neo4j.da.mapper;
 
+import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.types.common.BookDetails;
+import com.campusconnect.neo4j.types.common.UserRelationType;
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.GoodreadsRecRelationship;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.neo4j.UserRelation;
 import com.campusconnect.neo4j.types.web.AvailableBookDetails;
 import com.campusconnect.neo4j.types.web.BorrowedBookDetails;
+import com.campusconnect.neo4j.types.web.GroupMember;
 import com.campusconnect.neo4j.types.web.LentBookDetails;
+import com.campusconnect.neo4j.util.Constants;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
@@ -38,6 +44,74 @@ public class DBMapper {
         }
         return null;
     }
+
+    public static UserRelation getUserRelation(RestRelationship userRawRelation) {
+        if(userRawRelation.getType().name().equals(CONNECTED_RELATION)){
+            UserRelation userRelation = new UserRelation();
+            userRelation.setCreatedDate((Long) userRawRelation.getProperty("createdDate", null));
+            userRelation.setId((Long) userRawRelation.getProperty("id", null));
+            userRelation.setType((String) userRawRelation.getProperty("type", null));
+            userRelation.setUser1((User) userRawRelation.getStartNode());
+            userRelation.setUser2((User) userRawRelation.getEndNode());
+            return userRelation;
+        }
+        return null;
+    }
+
+    public static void setUserRelationFieldsToUser(RestRelationship rawUserRelation, User user) {
+        if(user != null && rawUserRelation != null && rawUserRelation.getType().name().equals(CONNECTED_RELATION)) {
+            String relationType = (String) rawUserRelation.getProperty("type", null);
+            if(relationType.equals(UserRelationType.FRIEND_REQUEST_PENDING.toString()))
+                user.setUserRelation(Constants.FRIEND_REQ_SENT);
+            else
+                user.setUserRelation(relationType);
+        }
+    }
+
+    public static GroupMember getGroupMember(User user, RestRelationship rawRelationship, String groupId) {
+        if(user != null && rawRelationship != null) {
+            String role = (String) rawRelationship.getProperty("role", null);
+            Long createdDate = (Long) rawRelationship.getProperty("createdDate", null);
+            return Neo4jToWebMapper.mapUserNeo4jToWebGroupMember(user, groupId, createdDate, role);
+        }
+        else if(user != null)
+            return Neo4jToWebMapper.mapUserNeo4jToWebGroupMember(user, groupId, 0L, null);
+        else
+            return null;
+    }
+
+    public static User getUserFromRestNode(RestNode userNode) {
+        try{
+            User user = new User();
+            user.setCreatedDate((Long) userNode.getProperty("createdDate", null));
+            user.setEmail((String) userNode.getProperty("email", null));
+            //TODO: getting fav of user
+            //user.setFavorites();
+            user.setFbId((String) userNode.getProperty("fbId", null));
+            user.setGender((String) userNode.getProperty("gender", null));
+            user.setGoodreadsAccessToken((String) userNode.getProperty("goodreadsAccessToken", null));
+            user.setGoodreadsAccessTokenSecret((String) userNode.getProperty("goodreadsAccessTokenSecret", null));
+            user.setGoodreadsAuthStatus((String) userNode.getProperty("goodreadsAuthStatus", null));
+            user.setGoodreadsId((String) userNode.getProperty("goodreadsId", null));
+            user.setGoodReadsSynchStatus((String) userNode.getProperty("goodReadsSynchStatus", null));
+            user.setGoogleId((String) userNode.getProperty("googleId", null));
+            user.setId((String) userNode.getProperty("id", null));
+            //TODO: fix this
+//            user.setLastGoodreadsSychDate((Long) userNode.getProperty("lastGoodreadsSychDate", null));
+            user.setLastModifiedDate((Long) userNode.getProperty("lastModifiedDate", null));
+            user.setName((String) userNode.getProperty("name", null));
+            user.setNodeId((Long) userNode.getProperty("nodeId", null));
+            user.setPhone((String) userNode.getProperty("phone", null));
+            user.setProfileImageUrl((String) userNode.getProperty("profileImageUrl", null));
+            user.setWorkDesignation((String) userNode.getProperty("workDesignation", null));
+            user.setWorkLocation((String) userNode.getProperty("workLocation", null));
+            return user;
+        }catch (Exception e) {
+            logger.error("Error while constructing user object:" + userNode.getProperty("id"));
+        }
+        return null;
+    }
+
 
     public static Book getBookFromRestNode(RestNode restNode) {
         try {
@@ -111,4 +185,5 @@ public class DBMapper {
     private static LentBookDetails getLentBookDetails(RestRelationship ownsRelationship) {
         return new LentBookDetails();
     }
+
 }

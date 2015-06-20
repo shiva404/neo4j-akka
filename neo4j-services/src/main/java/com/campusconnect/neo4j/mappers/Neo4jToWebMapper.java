@@ -6,14 +6,8 @@ import com.campusconnect.neo4j.types.web.*;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created with IntelliJ IDEA.
- * User: sn1
- * Date: 6/4/15
- * Time: 10:29 PM
- * To change this template use File | Settings | File Templates.
- */
 public class Neo4jToWebMapper {
+
     public static User mapUserNeo4jToWeb(com.campusconnect.neo4j.types.neo4j.User user) {
         if (user == null)
             return null;
@@ -26,6 +20,21 @@ public class Neo4jToWebMapper {
         return new User(addresses, user.getCreatedDate(), user.getEmail(), user.getFavorites(), user.getFbId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret(), user.getGoodreadsAuthStatus(),
                 user.getGoodReadsSynchStatus(), user.getLastGoodreadsSychDate(), user.getGoodreadsId(), user.getGoogleId(), user.getId(), user.getLastModifiedDate(), user.getName(), user.getPhone(), user.getGender(),
                 user.getProfileImageUrl(), user.getWorkDesignation(), user.getWorkLocation(), user.getUserRelation());
+
+    }
+
+    public static GroupMember mapUserNeo4jToWebGroupMember(com.campusconnect.neo4j.types.neo4j.User user, String groupId, Long memberSince, String role) {
+        if (user == null)
+            return null;
+        Set<Address> addresses = new HashSet<>();
+        if (user.getAddresses() != null && user.getAddresses().size() > 0) {
+            for (com.campusconnect.neo4j.types.neo4j.Address address : user.getAddresses()) {
+                addresses.add(Neo4jToWebMapper.mapAddressNeo4jToWeb(address));
+            }
+        }
+        return new GroupMember(addresses, user.getCreatedDate(), user.getEmail(), user.getFavorites(), user.getFbId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret(), user.getGoodreadsAuthStatus(),
+                user.getGoodReadsSynchStatus(), user.getLastGoodreadsSychDate(), user.getGoodreadsId(), user.getGoogleId(), user.getId(), user.getLastModifiedDate(), user.getName(), user.getPhone(), user.getGender(),
+                user.getProfileImageUrl(), user.getWorkDesignation(), user.getWorkLocation(), user.getUserRelation(), groupId, role, memberSince);
     }
 
     public static Book mapBookNeo4jToWeb(com.campusconnect.neo4j.types.neo4j.Book book) {
@@ -74,5 +83,4 @@ public class Neo4jToWebMapper {
         return new Address(address.getCity(), address.getCountry(), address.getCreatedDate(), address.getId(), address.getLandmark(), address.getLastModifiedTime(), address.getLatitude(),
                 address.getLine1(), address.getLine2(), address.getLongitude(), address.getState(), address.getType(), address.getZipCode());
     }
-
 }

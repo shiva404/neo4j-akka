@@ -1,6 +1,6 @@
 package com.campusconnect.neo4j.da.iface;
 
-import com.campusconnect.neo4j.types.Address;
+import com.campusconnect.neo4j.types.neo4j.Address;
 
 import java.util.List;
 

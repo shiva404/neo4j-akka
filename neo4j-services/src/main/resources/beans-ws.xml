@@ -3,9 +3,12 @@
        xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
        xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
        xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
 
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 						   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
 						   http://www.springframework.org/schema/context
 						   http://www.springframework.org/schema/context/spring-context-3.0.xsd
 						   http://www.springframework.org/schema/data/neo4j
@@ -13,18 +16,34 @@
 		                   http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
                            http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
 
+    <import resource="beans-commons.xml"/>
+    <aop:config>
+        <aop:aspect ref="advice">
+            <aop:pointcut id="loggerPointCut"
+                          expression="${service.perf.pointcut}"/>
+            <aop:around pointcut-ref="loggerPointCut" method="doTiming"/>
+        </aop:aspect>
+    </aop:config>
+
     <context:annotation-config/>
     <ehcache:annotation-driven cache-manager="ehCacheCacheManager"/>
 
     <context:component-scan base-package="com.campusconnect.neo4j.akka.facebook.worker"/>
-    <import resource="beans-commons.xml"/>
-    <neo4j:repositories base-package="com.campusconnect.neo4j.repositories"/>
-    <neo4j:config base-package="com.campusconnect.neo4j.types" graphDatabaseService="graphDatabaseService"/>
 
+    <neo4j:repositories base-package="com.campusconnect.neo4j.repositories"/>
+    <neo4j:config base-package="com.campusconnect.neo4j.types.neo4j" graphDatabaseService="graphDatabaseService"/>
+    <!--providers-->
     <bean class="com.campusconnect.neo4j.providers.Neo4jExceptionMapper" scope="singleton" id="exceptionMapper"/>
+    <bean class="com.campusconnect.neo4j.providers.JacksonJsonProvider" scope="singleton" id="jacksonJsonProvider"/>
 
     <bean id="graphDatabaseService"
           class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase" name="graphDatabaseService">
+        <constructor-arg index="0" value="${neo4j.server.url}"/>
+        <constructor-arg index="1" value="neo4j"/>
+        <constructor-arg index="2" value="password123"/>
+    </bean>
+
+    <bean class="org.neo4j.rest.graphdb.RestAPIFacade" id="restApi">
         <constructor-arg index="0" value="${neo4j.server.url}"/>
         <constructor-arg index="1" value="neo4j"/>
         <constructor-arg index="2" value="password123"/>
@@ -38,15 +57,10 @@
         <constructor-arg index="0" ref="neo4jTemplate"/>
     </bean>
 
+    <bean class="com.campusconnect.neo4j.resources.DiagResource" id="diagResource"/>
+    <bean class="com.campusconnect.neo4j.resources.HealthCheckResource" id="healthCheckResource"/>
+
     <bean class="com.campusconnect.neo4j.da.FavouriteDaoImpl" id="favouriteDao">
-        <constructor-arg index="0" ref="neo4jTemplate"/>
-    </bean>
-
-    <bean class="com.campusconnect.neo4j.da.CollegeDao" id="collegeDao">
-        <constructor-arg index="0" ref="neo4jTemplate"/>
-    </bean>
-
-    <bean class="com.campusconnect.neo4j.da.DepartmentDao" id="departmentDao">
         <constructor-arg index="0" ref="neo4jTemplate"/>
     </bean>
 
@@ -309,6 +323,9 @@
             </bean>
         </property>
     </bean>
+
+    <!--Timer advice-->
+    <bean id="advice" class="com.campusconnect.neo4j.logging.TimerAdvice"/>
 
     <bean id="getBooksRouter" class="com.github.sabomichal.akkaspringfactory.ActorFactoryBean">
         <property name="actorSystem" ref="actorSystem"/>

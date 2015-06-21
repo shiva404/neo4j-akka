@@ -1,7 +1,7 @@
 package com.campusconnect.neo4j.da.iface;
 
-import com.campusconnect.neo4j.types.Notification;
-import com.campusconnect.neo4j.types.NotificationEntity;
+import com.campusconnect.neo4j.types.neo4j.NotificationEntity;
+import com.campusconnect.neo4j.types.web.Notification;
 
 import java.util.List;
 

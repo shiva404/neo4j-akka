@@ -2,7 +2,7 @@ package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.da.iface.ReminderDao;
 import com.campusconnect.neo4j.repositories.ReminderRepository;
-import com.campusconnect.neo4j.types.Reminder;
+import com.campusconnect.neo4j.types.neo4j.Reminder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 
@@ -18,6 +18,9 @@ public class ReminderDaoImpl implements ReminderDao {
     public ReminderDaoImpl(Neo4jTemplate neo4jTemplate) {
         this.neo4jTemplate = neo4jTemplate;
         // TODO Auto-generated constructor stub
+    }
+
+    public ReminderDaoImpl() {
     }
 
     @Override

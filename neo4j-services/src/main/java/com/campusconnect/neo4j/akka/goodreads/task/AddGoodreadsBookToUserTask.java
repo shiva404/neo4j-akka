@@ -1,6 +1,6 @@
 package com.campusconnect.neo4j.akka.goodreads.task;
 
-import com.campusconnect.neo4j.types.Book;
+import com.campusconnect.neo4j.types.neo4j.Book;
 
 /**
  * Created by sn1 on 3/13/15.

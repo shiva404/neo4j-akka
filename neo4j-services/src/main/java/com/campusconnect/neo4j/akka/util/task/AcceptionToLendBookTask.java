@@ -1,7 +1,7 @@
 package com.campusconnect.neo4j.akka.util.task;
 
-import com.campusconnect.neo4j.types.Book;
-import com.campusconnect.neo4j.types.User;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.User;
 
 public class AcceptionToLendBookTask {
     private Book book;

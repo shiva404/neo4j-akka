@@ -1,6 +1,6 @@
 package com.campusconnect.neo4j.tests.unit.util;
 
-import com.campusconnect.neo4j.types.User;
+import com.campusconnect.neo4j.types.web.User;
 import com.campusconnect.neo4j.util.Validator;
 import org.testng.annotations.Test;
 

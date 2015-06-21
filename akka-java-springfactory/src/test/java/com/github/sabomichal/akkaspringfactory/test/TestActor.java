@@ -24,7 +24,7 @@ public class TestActor extends UntypedActor {
      */
     public static Props props() {
         return Props.create(new Creator<TestActor>() {
-            private static final long serialVersionUID = 1L;
+            private static final Long serialVersionUID = 1L;
 
             @Override
             public TestActor create() throws Exception {

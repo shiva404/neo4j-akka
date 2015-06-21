@@ -11,7 +11,11 @@ import com.campusconnect.neo4j.akka.goodreads.types.Reviews;
 import com.campusconnect.neo4j.akka.goodreads.util.ResponseUtils;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.common.GoodreadsStatus;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.ReadRelationship;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.neo4j.WishListRelationship;
 import com.sun.jersey.api.uri.UriBuilderImpl;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -68,18 +72,18 @@ public class GetBooksWorker extends UntypedActor {
         }
     }
 
-    private List<com.campusconnect.neo4j.types.Book> saveBooksList(GetBooksResponse getBooksResponse, GetBooksTask getBooksTask) throws IOException {
+    private List<Book> saveBooksList(GetBooksResponse getBooksResponse, GetBooksTask getBooksTask) throws IOException {
         final Reviews reviews = getBooksResponse.getReviews();
         if (Integer.parseInt(reviews.getEnd()) != Integer.parseInt(reviews.getTotal())) {
             getSelf().tell(new GetBooksTask(getBooksTask.getUserId(), getBooksTask.getGoodreadsUserId(), getBooksTask.getPage() + 1,
                     getBooksTask.getAccessToken(), getBooksTask.getAccessTokenSecret()), getSender());
         }
 
-        List<com.campusconnect.neo4j.types.Book> books = new ArrayList<>();
+        List<Book> books = new ArrayList<>();
         User user = userDao.getUser(getBooksTask.getUserId());
         if (reviews.getReview() != null)
             for (Review review : reviews.getReview()) {
-                com.campusconnect.neo4j.types.Book book = BookMapper.getBookFromGoodreadsBook(review.getBook());
+                Book book = BookMapper.getBookFromGoodreadsBook(review.getBook());
                 books.add(book);
 //                goodreadsAsynchHandler.getAddGoodreadsBookToUserRouter().tell(new AddGoodreadsBookToUserTask(book,
 //                                getBooksTask.getUserId(), review.getShelves() != null && !review.getShelves().isEmpty() ? review.getShelves().get(0).getName() : "none"),
@@ -90,12 +94,12 @@ public class GetBooksWorker extends UntypedActor {
                     Book dbBook = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(book.getGoodreadsId().toString(), book);
 //                Book dbBook = bookDao.getBookByGoodreadsId(book.getGoodreadsId().toString());
                     //todo: dont create a relation if already exists
-                    final long now = System.currentTimeMillis();
+                    final Long now = System.currentTimeMillis();
                     String shelf = review.getShelves() != null && !review.getShelves().isEmpty() ? review.getShelves().get(0).getName() : "none";
                     if (shelf.equals(GoodreadsStatus.TO_READ.toString())) {
                         bookDao.addWishBookToUser(new WishListRelationship(user, dbBook, "wish", now, now));
                     } else
-                        bookDao.listBookAsRead(new ReadRelation(user, dbBook, null, now, now, shelf));
+                        bookDao.listBookAsRead(new ReadRelationship(user, dbBook, null, now, now, shelf));
                 }
             }
         if (Integer.parseInt(reviews.getEnd()) == Integer.parseInt(reviews.getTotal())) {

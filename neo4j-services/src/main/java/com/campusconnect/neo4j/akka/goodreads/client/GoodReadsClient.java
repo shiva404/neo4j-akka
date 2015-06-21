@@ -20,8 +20,8 @@ import java.util.Set;
 public class GoodReadsClient {
 
     private final String url;
-    //    private final int connectTimeout;
-//    private final int readTimeout;
+    //    private final Integer connectTimeout;
+//    private final Integer readTimeout;
     private final String appKey;
     private Logger LOGGER = LoggerFactory.getLogger(GoodReadsClient.class);
     private WebResource resource;
@@ -59,12 +59,12 @@ public class GoodReadsClient {
         return goodreadsWebResource;
     }
 
-    public <T> T getEntity(Class<T> clazz, ClientResponse cr, int expectedHttpStatus) {
+    public <T> T getEntity(Class<T> clazz, ClientResponse cr, Integer expectedHttpStatus) {
         handleError(cr, expectedHttpStatus);
         return cr.getEntity(clazz);
     }
 
-    public void handleError(ClientResponse cr, int expected) throws GoodreadsException {
+    public void handleError(ClientResponse cr, Integer expected) throws GoodreadsException {
         if (cr.getStatus() != expected) {
             //todo handel error
         }

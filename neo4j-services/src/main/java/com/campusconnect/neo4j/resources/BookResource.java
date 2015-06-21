@@ -2,14 +2,19 @@ package com.campusconnect.neo4j.resources;
 
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.Book;
-import com.campusconnect.neo4j.types.BorrowRequest;
-import com.campusconnect.neo4j.types.SearchResult;
-import com.campusconnect.neo4j.types.User;
+import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.BorrowRequest;
+import com.campusconnect.neo4j.types.web.SearchResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -20,12 +25,18 @@ import java.util.UUID;
 @Consumes("application/json")
 @Produces("application/json")
 public class BookResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookResource.class);
+
     private BookDao bookDao;
     private UserDao userDao;
 
     public BookResource(BookDao bookDao, UserDao userDao) {
         this.bookDao = bookDao;
         this.userDao = userDao;
+    }
+
+    public BookResource() {
     }
 
     @POST
@@ -89,34 +100,26 @@ public class BookResource {
     }
 
     @PUT
-    @Path("{bookId}/users/{userId}/borrow")
+    @Path("{bookId}/users/{userId}")
     public Response updateStatus(@PathParam("bookId") String bookId, @PathParam("userId") String userId,
                                  @QueryParam("borrowerId") String borrowerId, @QueryParam("status") String status, @QueryParam("sharePh ") String phoneSharing, BorrowRequest borrowRequest) {
-        //locked - for user
+        //locked - for owner
         //agreed - for borrower
         //ToDo update API so that owner and borrower are in query param
         //Handle Phone number here
         Book book = bookDao.getBook(bookId);
-        User user = userDao.getUser(userId);
+        User owner = userDao.getUser(userId);
         if (status.equals("agreed")) {
             if (borrowerId != null) {
                 User borrower = userDao.getUser(borrowerId);
                 if (borrower != null)
-                    bookDao.updateBookStatusOnAgreement(user, book, borrower, borrowRequest == null ? null : borrowRequest.getAdditionalMessage());
-
-                //todo: throw error userNot found
-            } else {
-                //todo throw exception
+                    bookDao.updateBookStatusOnAgreement(owner, book, borrower, borrowRequest == null ? null : borrowRequest.getAdditionalMessage());
             }
         } else if (status.equals("success"))
             if (borrowerId != null) {
                 User borrower = userDao.getUser(borrowerId);
                 if (borrower != null)
-                    bookDao.updateBookStatusOnSuccess(user, book, borrower, borrowRequest.getAdditionalMessage());
-
-                //todo: throw error userNot found
-            } else {
-                //todo throw borrower not found
+                    bookDao.updateBookStatusOnSuccess(owner, book, borrower, borrowRequest.getAdditionalMessage());
             }
         return Response.ok().build();
     }
@@ -124,13 +127,19 @@ public class BookResource {
     @GET
     @Path("search")
     public Response search(@QueryParam("q") final String queryString, @QueryParam("userId") final String userId) {
-        SearchResult searchResult;
+        List<Book> searchResult;
         if (userId == null) {
             searchResult = bookDao.search(queryString);
         } else {
             searchResult = bookDao.searchWithRespectToUser(userId, queryString);
         }
-        return Response.ok().entity(searchResult).build();
+        List<com.campusconnect.neo4j.types.web.Book> webBooks = new ArrayList<>();
+        for (Book book : searchResult) {
+            webBooks.add(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
+        }
+        LOGGER.debug("Returning :" + webBooks.size());
+        SearchResult result = new SearchResult();
+        result.getBooks().addAll(webBooks);
+        return Response.ok().entity(result).build();
     }
-
 }

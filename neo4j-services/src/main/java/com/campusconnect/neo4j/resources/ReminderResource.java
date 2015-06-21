@@ -18,4 +18,7 @@ public class ReminderResource {
         super();
         this.reminderDao = reminderDao;
     }
+
+    public ReminderResource() {
+    }
 }

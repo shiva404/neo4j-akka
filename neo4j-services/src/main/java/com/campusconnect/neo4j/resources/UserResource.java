@@ -5,7 +5,18 @@ import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.GroupDao;
 import com.campusconnect.neo4j.da.iface.*;
 import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
+import com.campusconnect.neo4j.types.common.AuditEventType;
+import com.campusconnect.neo4j.types.common.GoodreadsAuthStatus;
+import com.campusconnect.neo4j.types.common.IdType;
+import com.campusconnect.neo4j.types.common.Target;
+import com.campusconnect.neo4j.types.neo4j.Address;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.Group;
+import com.campusconnect.neo4j.types.neo4j.*;
+import com.campusconnect.neo4j.types.neo4j.Reminder;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.*;
 import com.campusconnect.neo4j.util.Validator;
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -15,10 +26,15 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.*;
+import static com.campusconnect.neo4j.mappers.WebToNeo4jMapper.mapAddressWebToNeo4j;
+import static com.campusconnect.neo4j.mappers.WebToNeo4jMapper.mapUserWebToNeo4j;
+import static com.campusconnect.neo4j.util.Constants.*;
 import static com.campusconnect.neo4j.util.ErrorCodes.INVALId_ARGMENTS;
 
 /**
@@ -54,9 +70,14 @@ public class UserResource {
     }
 
     @POST
-    public Response createUser(@QueryParam("accessToken") final String accessToken, final User user) throws URISyntaxException {
+    public Response createUser(@QueryParam("accessToken") final String accessToken, final com.campusconnect.neo4j.types.web.User userPayload) throws URISyntaxException {
 
-        StringBuffer validateUserDataMessage = Validator.validateUserObject(user);
+        StringBuffer validateUserDataMessage = Validator.validateUserObject(userPayload);
+        if (null != validateUserDataMessage) {
+            throw new InvalidInputDataException(INVALId_ARGMENTS, validateUserDataMessage.toString());
+        }
+
+        User user = mapUserWebToNeo4j(userPayload);
 
         if (user.getEmail() != null) {
             User existingUser = userDao.getUserByEmail(user.getEmail());
@@ -65,39 +86,33 @@ public class UserResource {
                     existingUser.setFbId(user.getFbId());
                     existingUser = userDao.updateUser(existingUser.getId(), existingUser);
                 }
-
                 if (existingUser.getGoogleId() == null && user.getGoogleId() != null) {
                     existingUser.setGoogleId(user.getGoogleId());
                     existingUser = userDao.updateUser(existingUser.getId(), existingUser);
                 }
-
-
-                return Response.created(new URI("/user/" + existingUser.getId())).entity(existingUser).build();
+                com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(existingUser);
+                return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
             }
         }
-
         if (user.getFbId() != null) {
             User existingUser = userDao.getUserByFbId(user.getFbId());
             if (null != existingUser) {
-                return Response.created(new URI("/user/" + existingUser.getId())).entity(existingUser).build();
+                com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(existingUser);
+                return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
             }
         }
 
         if (user.getGoogleId() != null) {
             User existingUser = userDao.getUserByGoogleId(user.getGoogleId());
             if (null != existingUser) {
-                return Response.created(new URI("/user/" + existingUser.getId())).entity(existingUser).build();
+                com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(existingUser);
+                return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
             }
-        }
-
-
-        if (null != validateUserDataMessage) {
-            throw new InvalidInputDataException(INVALId_ARGMENTS, validateUserDataMessage.toString());
         }
         addPropertiesForCreate(user);
         User createdUser = userDao.createUser(user, accessToken);
-
-        return Response.created(new URI("/user/" + createdUser.getId())).entity(createdUser).build();
+        com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(createdUser);
+        return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
     }
 
     @PUT
@@ -109,7 +124,8 @@ public class UserResource {
         user.setLastModifiedDate(System.currentTimeMillis());
         User updatedUser = userDao.updateUser(userId, user);
         checkWhetherSynchIsNeeded(updatedUser, fields);
-        return Response.ok().entity(updatedUser).build();
+        com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(updatedUser);
+        return Response.ok().entity(returnUser).build();
     }
 
     @POST
@@ -159,7 +175,8 @@ public class UserResource {
     @Path("{userId}")
     public Response getUser(@PathParam("userId") final String userId) {
         User user = userDao.getUser(userId);
-        return Response.ok().entity(user).build();
+        com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(user);
+        return Response.ok().entity(returnUser).build();
     }
 
     @GET
@@ -169,46 +186,61 @@ public class UserResource {
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).entity(new Neo4jErrorResponse("NOT_FOUND", "client", "User is nto found with fbId : " + fbId)).build();
         }
-        return Response.ok().entity(user).build();
+        com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(user);
+        return Response.ok().entity(returnUser).build();
     }
 
     @PUT
     @Path("{userId}")
-    public Response updateUser(@PathParam("userId") final String userId, User user) {
+    public Response updateUser(@PathParam("userId") final String userId, com.campusconnect.neo4j.types.web.User userPayload) {
+        User user = mapUserWebToNeo4j(userPayload);
         user.setLastModifiedDate(System.currentTimeMillis());
         User updatedUser = userDao.updateUser(userId, user);
-        return Response.ok().entity(updatedUser).build();
+        com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(updatedUser);
+        return Response.ok().entity(returnUser).build();
     }
 
     @GET
     @Path("{userId}/addresses/{addressId}")
     public Response getAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId) {
-        Address updatedAddress = addressDao.getAddress(addressId);
-        return Response.ok().entity(updatedAddress).build();
+        Address address = addressDao.getAddress(addressId);
+        com.campusconnect.neo4j.types.web.Address returnAddress = mapAddressNeo4jToWeb(address);
+        return Response.ok().entity(returnAddress).build();
     }
 
     @GET
     @Path("{userId}/addresses")
-    public Response getAddress(@PathParam("userId") final String userId, final Address address) {
+    public Response getAddress(@PathParam("userId") final String userId) {
         List<Address> addresses = addressDao.getAddresses(userId);
-        AddressesPage addressesPage = new AddressesPage(addresses.size(), 0, addresses);
+        List<com.campusconnect.neo4j.types.web.Address> returnAddress = new ArrayList<>(addresses.size());
+        for (Address address : addresses) {
+            returnAddress.add(mapAddressNeo4jToWeb(address));
+        }
+        AddressesPage addressesPage = new AddressesPage(returnAddress.size(), 0, returnAddress);
         return Response.ok().entity(addressesPage).build();
     }
 
     @POST
     @Path("{userId}/addresses")
-    public Response addAddress(@PathParam("userId") String userId, Address address) {
+    public Response addAddress(@PathParam("userId") String userId, com.campusconnect.neo4j.types.web.Address addressPayload) {
+        Address address = mapAddressWebToNeo4j(addressPayload);
         User user = userDao.getUser(userId);
+        //create new address
         Address createdAddress = addressDao.createAddress(address, userId);
+        //Link to user
         userDao.addAddressToUser(createdAddress, user);
-        return Response.ok().entity(createdAddress).build();
+
+        com.campusconnect.neo4j.types.web.Address returnAddress = mapAddressNeo4jToWeb(createdAddress);
+        return Response.ok().entity(returnAddress).build();
     }
 
     @PUT
     @Path("{userId}/addresses/{addressId}")
-    public Response updateAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId, Address address) {
+    public Response updateAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId, com.campusconnect.neo4j.types.web.Address addressPayload) {
+        Address address = mapAddressWebToNeo4j(addressPayload);
         Address updatedAddress = addressDao.updateAddress(address, userId);
-        return Response.ok().entity(updatedAddress).build();
+        com.campusconnect.neo4j.types.web.Address returnAddress = mapAddressNeo4jToWeb(updatedAddress);
+        return Response.ok().entity(returnAddress).build();
     }
 
     @DELETE
@@ -230,7 +262,7 @@ public class UserResource {
         } else if (bookIdType.equals("grId")) {
             book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
         }
-        long now = System.currentTimeMillis();
+        Long now = System.currentTimeMillis();
         bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status, now));
         return Response.ok().build();
     }
@@ -248,7 +280,7 @@ public class UserResource {
         } else if (bookIdType.equals("grId")) {
             book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
         }
-        long now = System.currentTimeMillis();
+        Long now = System.currentTimeMillis();
         bookDao.addWishBookToUser(new WishListRelationship(user, book, status, now, now));
         return Response.ok().build();
     }
@@ -261,20 +293,8 @@ public class UserResource {
 
         User user = userDao.getUser(userId);
         Book book = bookDao.getBook(bookId);
-        long now = System.currentTimeMillis();
-        bookDao.listBookAsRead(new ReadRelation(user, book, status, now, now, null));
-        return Response.ok().build();
-    }
-
-    @PUT
-    @Path("{userId}/books/{bookId}/own")
-    public Response changeBookStatus(@PathParam("userId") final String userId,
-                                     @PathParam("bookId") final String bookId,
-                                     @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
-
-        User user = userDao.getUser(userId);
-        Book book = bookDao.getBook(bookId);
-        bookDao.updateOwnedBookStatus(user, book, status, null);
+        Long now = System.currentTimeMillis();
+        bookDao.listBookAsRead(new ReadRelationship(user, book, status, now, now, null));
         return Response.ok().build();
     }
 
@@ -291,36 +311,59 @@ public class UserResource {
         if (filter == null) {
             throw new Exception("filer is null");
         }
-        switch (filter) {
+        switch (filter.toLowerCase()) {
             case "owned": {
-                final List<OwnedBook> ownedBooks = userDao.getOwnedBooks(userId);
+                final List<OwnedBook> ownedBooks = bookDao.getOwnedBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
-
             case "read": {
-                final List<Book> readBooks = userDao.getReadBooks(userId);
-                BooksPage booksPage = new BooksPage(0, readBooks.size(), readBooks);
+                final List<Book> readBooks = bookDao.getReadBooks(userId);
+                List<com.campusconnect.neo4j.types.web.Book> returnBooks = new ArrayList<>();
+                for (Book book : readBooks)
+                    returnBooks.add(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
+
+                BooksPage booksPage = new BooksPage(0, returnBooks.size(), returnBooks);
                 return Response.ok().entity(booksPage).build();
             }
             case "available": {
-                final List<OwnedBook> ownedBooks = userDao.getAvailableBooks(userId);
+                final List<OwnedBook> ownedBooks = bookDao.getAvailableBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
             case "lent": {
-                final List<OwnedBook> ownedBooks = userDao.getLentBooks(userId);
+                final List<OwnedBook> ownedBooks = bookDao.getLentBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
             case "borrowed":
-                final List<BorrowedBook> borrowedBooks = userDao.getBorrowedBooks(userId);
+                final List<BorrowedBook> borrowedBooks = bookDao.getBorrowedBooks(userId);
                 BorrowedBooksPage borrowedBooksPage = new BorrowedBooksPage(0, borrowedBooks.size(), borrowedBooks);
                 return Response.ok().entity(borrowedBooksPage).build();
             case "wishList":
-                List<WishListBook> wishListBooks = userDao.getWishListBooks(userId);
+                List<WishListBook> wishListBooks = bookDao.getWishListBooks(userId);
                 WishListBooksPage wishListBooksPage = new WishListBooksPage(0, wishListBooks.size(), wishListBooks);
                 return Response.ok().entity(wishListBooksPage).build();
+            case "all":
+                List<Book> allBooks = bookDao.getAllUserBooks(userId);
+                AllBooks resultBooks = new AllBooks();
+                for (Book book : allBooks) {
+                    switch (book.getBookType()) {
+                        case OWNS_RELATION:
+                            resultBooks.getOwnedBooks().add(mapBookNeo4jToWeb(book));
+                            break;
+                        case BORROWED_RELATION:
+                            resultBooks.getBorrowedBooks().add(mapBookNeo4jToWeb(book));
+                            break;
+                        case WISHLIST_RELATION:
+                            resultBooks.getWishlistBooks().add(mapBookNeo4jToWeb(book));
+                            break;
+                        case READ_RELATION:
+                            resultBooks.getReadBooks().add(mapBookNeo4jToWeb(book));
+                            break;
+                    }
+                }
+                return Response.ok().entity(resultBooks).build();
         }
         return Response.ok().build();
     }
@@ -329,15 +372,23 @@ public class UserResource {
     @Path("{userId}/followers")
     public Response getFollowers(@PathParam("userId") final String userId) {
         final List<User> followers = userDao.getFollowers(userId);
-        UsersPage usersPage = new UsersPage(0, followers.size(), followers);
+        List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(followers.size());
+        for (User user : followers) {
+            returnUsers.add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+        }
+        UsersPage usersPage = new UsersPage(0, returnUsers.size(), returnUsers);
         return Response.ok().entity(usersPage).build();
     }
 
     @GET
     @Path("{userId}/friends/pending")
     public Response getPendingFriends(@PathParam("userId") final String userId) {
-        final List<User> pendingFriends = userDao.findPendingFriendReq(userId);
-        UsersPage usersPage = new UsersPage(0, pendingFriends.size(), pendingFriends);
+        final List<User> pendingFriends = userDao.getPendingFriendReq(userId);
+        List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(pendingFriends.size());
+        for (User user : pendingFriends) {
+            returnUsers.add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+        }
+        UsersPage usersPage = new UsersPage(0, returnUsers.size(), returnUsers);
         return Response.ok().entity(usersPage).build();
     }
 
@@ -345,7 +396,11 @@ public class UserResource {
     @Path("{userId}/following")
     public Response getFollowing(@PathParam("userId") final String userId) {
         final List<User> following = userDao.getFollowing(userId);
-        UsersPage usersPage = new UsersPage(0, following.size(), following);
+        List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(following.size());
+        for (User user : following) {
+            returnUsers.add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+        }
+        UsersPage usersPage = new UsersPage(0, returnUsers.size(), returnUsers);
         return Response.ok().entity(usersPage).build();
     }
 
@@ -373,7 +428,6 @@ public class UserResource {
 
         } else if (status.toLowerCase().equals("cancel")) {
             userDao.deleteFriendRequest(userId, friendUserId);
-
         }
         return Response.ok().build();
     }
@@ -388,7 +442,7 @@ public class UserResource {
 //         return Response.ok().build();
 //    }
     private void addPropertiesForCreate(User user) {
-        final long createdDate = System.currentTimeMillis();
+        final Long createdDate = System.currentTimeMillis();
         user.setCreatedDate(createdDate);
         user.setLastModifiedDate(createdDate);
         user.setGoodreadsAuthStatus(GoodreadsAuthStatus.NONE.toString());
@@ -441,7 +495,7 @@ public class UserResource {
         setReminderCreateProperties(reminder);
         Reminder createdReminder = reminderDao.createReminder(reminder);
         User reminderForUser = userDao.getUser(userId);
-        long currentTime = System.currentTimeMillis();
+        Long currentTime = System.currentTimeMillis();
         ReminderRelationShip reminderRelationShip = new ReminderRelationShip(
                 createdBy, currentTime, reminderForUser, currentTime,
                 reminderAbout, reminder);
@@ -541,35 +595,55 @@ public class UserResource {
     @Path("{userId}/search")
     public Response searchUsers(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
         List<User> users = userDao.search(searchString, userId);
-        return Response.ok().entity(new UsersPage(0, users.size(), users)).build();
+        List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(users.size());
+        for (User user : users) {
+            returnUsers.add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+        }
+        return Response.ok().entity(new UsersPage(0, returnUsers.size(), returnUsers)).build();
     }
 
     @GET
     @Path("{userId}/search/friends")
     public Response searchFriends(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
         List<User> users = userDao.searchFriends(userId, searchString);
-        return Response.ok().entity(new UsersPage(0, users.size(), users)).build();
+        List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(users.size());
+        for (User user : users) {
+            returnUsers.add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+        }
+        return Response.ok().entity(new UsersPage(0, returnUsers.size(), returnUsers)).build();
     }
 
     @GET
     @Path("random")
     public Response getRandomUsers(@QueryParam("size") @DefaultValue("10") final String size, @QueryParam("currentUserId") String currentUser) {
         List<User> userList = userDao.getRandomUsers(Integer.parseInt(size), currentUser);
-        return Response.ok().entity(new UsersPage(0, userList.size(), userList)).build();
+        List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(userList.size());
+        for (User user : userList) {
+            returnUsers.add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+        }
+        return Response.ok().entity(new UsersPage(0, returnUsers.size(), returnUsers)).build();
     }
 
     @GET
     @Path("{userId}/friends")
-    public Response findFriends(@PathParam("userId") String userId, @QueryParam("currentUserId") String currentUser) {
-        List<User> friends = userDao.findFriends(userId, currentUser);
-        FriendsPage friendsPage = new FriendsPage(0, friends.size(), friends);
+    public Response getFriends(@PathParam("userId") String userId, @QueryParam("currentUserId") String currentUser) {
+        List<User> friends = userDao.getFriends(userId, currentUser);
+        List<com.campusconnect.neo4j.types.web.User> returnFriends = new ArrayList<>();
+        for (User friend : friends) {
+            returnFriends.add(Neo4jToWebMapper.mapUserNeo4jToWeb(friend));
+        }
+        FriendsPage friendsPage = new FriendsPage(0, returnFriends.size(), returnFriends);
 
         Friends allFriends = new Friends();
         allFriends.setFriends(friendsPage);
 
         if (currentUser != null && !currentUser.equals(userId)) {
-            List<User> mutualFriends = userDao.findMutualFriends(currentUser, userId);
-            FriendsPage mutualFriendsPage = new FriendsPage(0, mutualFriends.size(), mutualFriends);
+            List<User> mutualFriends = userDao.getMutualFriends(currentUser, userId);
+            List<com.campusconnect.neo4j.types.web.User> returnMutualFriends = new ArrayList<>();
+            for (User friend : mutualFriends) {
+                returnMutualFriends.add(Neo4jToWebMapper.mapUserNeo4jToWeb(friend));
+            }
+            FriendsPage mutualFriendsPage = new FriendsPage(0, returnMutualFriends.size(), returnMutualFriends);
             allFriends.setMutualFriends(mutualFriendsPage);
         }
 

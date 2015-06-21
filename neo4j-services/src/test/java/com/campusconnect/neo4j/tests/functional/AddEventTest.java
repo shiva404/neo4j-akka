@@ -1,7 +1,11 @@
 package com.campusconnect.neo4j.tests.functional;
 
 import com.campusconnect.neo4j.tests.TestBase;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.neo4j.Address;
+import com.campusconnect.neo4j.types.web.Field;
+import com.campusconnect.neo4j.types.web.Fields;
+import com.campusconnect.neo4j.types.web.Notification;
+import com.campusconnect.neo4j.types.web.NotificationPage;
 import com.sun.jersey.api.client.ClientResponse;
 import org.testng.annotations.Test;
 

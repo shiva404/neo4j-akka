@@ -2,7 +2,11 @@ package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.repositories.AuditEventRepository;
-import com.campusconnect.neo4j.types.*;
+import com.campusconnect.neo4j.types.common.AuditEventType;
+import com.campusconnect.neo4j.types.common.IdType;
+import com.campusconnect.neo4j.types.neo4j.AuditEvent;
+import com.campusconnect.neo4j.types.web.Event;
+import com.campusconnect.neo4j.types.web.Subject;
 import com.campusconnect.neo4j.util.EventDisplayStrings;
 import com.campusconnect.neo4j.util.comparator.TimeStampComparator;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -16,6 +20,9 @@ public class AuditEventDaoImpl implements AuditEventDao {
     @Autowired
     AuditEventRepository auditEventRepository;
     ObjectMapper objectMapper = new ObjectMapper();
+
+    public AuditEventDaoImpl() {
+    }
 
 
     @Override
@@ -35,6 +42,25 @@ public class AuditEventDaoImpl implements AuditEventDao {
                 System.out.println("each event" + eachEvent);
                 Event eventDeserialised = objectMapper.readValue(eachEvent, Event.class);
                 if (eventDeserialised.isPublic()) {
+                    if (eventDeserialised.getAuditEventType().equals(AuditEventType.FRIEND.toString())) {
+                        eventDeserialised.setEventString(EventDisplayStrings.FRIEND_EVENT_STRING);
+                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.FOLLOWING.toString())) {
+                        eventDeserialised.setEventString(EventDisplayStrings.FOLLOWING_EVENT_STRING);
+                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.ADDED_ADDRESS.toString())) {
+                        eventDeserialised.setEventString(EventDisplayStrings.ADDED_ADDRESS_EVENT_STRING);
+                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.BORROWED.toString())) {
+                        eventDeserialised.setEventString(EventDisplayStrings.BORROWED_EVENT_STRING);
+                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.CREATED.toString())) {
+                        eventDeserialised.setEventString(EventDisplayStrings.CREATED_EVENT_STRING);
+                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.FOLLOWED.toString())) {
+                        eventDeserialised.setEventString(EventDisplayStrings.FOLLOWED_EVENT_STRING);
+                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.UPDATED_ADDRESS.toString())) {
+                        eventDeserialised.setEventString(EventDisplayStrings.UPDATED_ADDRESS_EVENT_STRING);
+                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.USER_UPDATED.toString())) {
+                        eventDeserialised.setEventString(EventDisplayStrings.USER_UPDATED_EVENT_STRING);
+                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.WISHLIST.toString())) {
+                        eventDeserialised.setEventString(EventDisplayStrings.WISHLIST_EVENT_STRING);
+                    }
                     eventDeserialised.setSubject(new Subject(IdType.USER_ID.toString(), auditEvent.getUserName(), "/users/" + auditEvent.getUserId(), auditEvent.getImageUrl()));
                     events.add(eventDeserialised);
                 }
@@ -63,9 +89,6 @@ public class AuditEventDaoImpl implements AuditEventDao {
     public List<Event> getFeedEvents(String userId) throws IOException {
         List<AuditEvent> followersAuditEvents = auditEventRepository.getAuditEventsForFollowers(userId);
         List<AuditEvent> friendsAuditEvents = auditEventRepository.getAuditEventsForFriends(userId);
-        String friendString = "became friend with";
-        String followingString = "began following";
-
         Map<Long, AuditEvent> mergedEvents = new HashMap<>();
 
         for (AuditEvent auditEvent : followersAuditEvents) {

@@ -4,8 +4,8 @@ import akka.actor.ActorRef;
 import com.campusconnect.neo4j.akka.goodreads.task.*;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.Book;
-import com.campusconnect.neo4j.types.WishListBook;
+import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.web.WishListBook;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -115,7 +115,7 @@ public class GoodreadsAsynchHandler {
     }
 
     public void getFriendRecForUser(String userId, String goodreadsUserId, String accessToken, String accessTokenSecret) {
-        List<WishListBook> wishListBooks = userDao.getWishListBooks(userId);
+        List<WishListBook> wishListBooks = bookDao.getWishListBooks(userId);
         friendsBookSearchForWishListRouter.tell(new FriendsBookSearchForWishListTask(accessToken, accessTokenSecret, userId, goodreadsUserId, 1, wishListBooks), successListener);
     }
 

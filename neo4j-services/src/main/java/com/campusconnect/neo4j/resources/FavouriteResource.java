@@ -1,50 +1,48 @@
 package com.campusconnect.neo4j.resources;
 
-import java.util.List;
-import java.util.UUID;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-
-import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.FavouriteDao;
-import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.Book;
-import com.campusconnect.neo4j.types.Favourite;
-import com.campusconnect.neo4j.types.FavouritePage;
+import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
+import com.campusconnect.neo4j.types.neo4j.Favourite;
+import com.campusconnect.neo4j.types.web.FavouritePage;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Path("/favourites")
 @Consumes("application/json")
 @Produces("application/json")
 public class FavouriteResource {
-		
-	   private FavouriteDao favouriteDao;
+
+    private FavouriteDao favouriteDao;
 
 
-	    public FavouriteResource(FavouriteDao favouriteDao) {
-	        this.favouriteDao = favouriteDao;
-	    }
-	    
-	    
-	    @POST
-	    public Response createFavourite(Favourite favourite) {
-	      
-	        Favourite createdFavourite = favouriteDao.createFavourite(favourite);
-	        return Response.created(null).entity(createdFavourite).build();
-	    }
+    public FavouriteResource(FavouriteDao favouriteDao) {
+        this.favouriteDao = favouriteDao;
+    }
 
-	    @GET
-	    public Response getFavourites() {
-	        List<Favourite> favourites = favouriteDao.getFavourites();
-	        return Response.ok().entity(new FavouritePage(favourites.size(), 0, favourites)).build();
-	    }
-	
-	
+    public FavouriteResource() {
+    }
+
+
+    @POST
+    public Response createFavourite(Favourite favourite) {
+
+        Favourite createdFavourite = favouriteDao.createFavourite(favourite);
+        return Response.created(null).entity(createdFavourite).build();
+    }
+
+    @GET
+    public Response getFavourites() {
+        List<Favourite> favourites = favouriteDao.getFavourites();
+        List<com.campusconnect.neo4j.types.web.Favourite> webFavourites = new ArrayList<>();
+        for (Favourite favourite : favourites)
+            webFavourites.add(Neo4jToWebMapper.mapFavouriteNeo4jToWeb(favourite));
+
+        return Response.ok().entity(new FavouritePage(webFavourites.size(), 0, webFavourites)).build();
+    }
+
+
 }

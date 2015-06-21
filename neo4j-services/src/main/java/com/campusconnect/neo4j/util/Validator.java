@@ -1,6 +1,6 @@
 package com.campusconnect.neo4j.util;
 
-import com.campusconnect.neo4j.types.User;
+import com.campusconnect.neo4j.types.web.User;
 
 public class Validator {
 

@@ -1,6 +1,6 @@
 package com.campusconnect.neo4j.cache;
 
-import com.campusconnect.neo4j.types.User;
+import com.campusconnect.neo4j.types.neo4j.User;
 import com.googlecode.ehcache.annotations.key.CacheKeyGenerator;
 import org.aopalliance.intercept.MethodInvocation;
 

@@ -1,6 +1,7 @@
 package com.campusconnect.neo4j.types.neo4j;
 
 
+import com.campusconnect.neo4j.util.Constants;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 
 import java.util.HashMap;
@@ -9,8 +10,8 @@ import java.util.Map;
 /**
  * Created by sn1 on 2/26/15.
  */
-@RelationshipEntity(type = "BORROWED")
-public class BorrowRelation extends BookRelation {
+@RelationshipEntity(type = Constants.BORROWED_RELATION)
+public class BorrowRelationship extends BookRelationship {
 
     private Long dueDate;
     private String ownerUserId;
@@ -18,7 +19,7 @@ public class BorrowRelation extends BookRelation {
     private Long borrowDate;
     private Integer contractPeriodInDays;
 
-    public BorrowRelation(User user, Book book, String status, long dueDate, String ownerUserId, String additionalComments, long borrowDate, int contractPeriodInDays) {
+    public BorrowRelationship(User user, Book book, String status, Long dueDate, String ownerUserId, String additionalComments, Long borrowDate, int contractPeriodInDays) {
         super(user, book, status);
         this.dueDate = dueDate;
         this.ownerUserId = ownerUserId;
@@ -27,19 +28,19 @@ public class BorrowRelation extends BookRelation {
         this.contractPeriodInDays = contractPeriodInDays;
     }
 
-    public BorrowRelation() {
+    public BorrowRelationship() {
 
     }
 
-    public BorrowRelation(User user, Book book, String status) {
+    public BorrowRelationship(User user, Book book, String status) {
         super(user, book, status);
     }
 
-    public long getBorrowDate() {
+    public Long getBorrowDate() {
         return borrowDate;
     }
 
-    public void setBorrowDate(long borrowDate) {
+    public void setBorrowDate(Long borrowDate) {
         this.borrowDate = borrowDate;
     }
 
@@ -51,11 +52,11 @@ public class BorrowRelation extends BookRelation {
         this.contractPeriodInDays = contractPeriodInDays;
     }
 
-    public long getDueDate() {
+    public Long getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(long dueDate) {
+    public void setDueDate(Long dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -78,9 +79,9 @@ public class BorrowRelation extends BookRelation {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof BorrowRelation)) return false;
+        if (!(o instanceof BorrowRelationship)) return false;
 
-        BorrowRelation that = (BorrowRelation) o;
+        BorrowRelationship that = (BorrowRelationship) o;
 
         if (borrowDate != that.borrowDate) return false;
         if (contractPeriodInDays != that.contractPeriodInDays) return false;

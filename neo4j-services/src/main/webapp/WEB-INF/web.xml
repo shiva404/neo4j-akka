@@ -20,11 +20,15 @@
 
         <init-param>
             <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-            <param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
+            <param-value>
+                com.sun.jersey.api.container.filter.LoggingFilter;com.campusconnect.neo4j.filters.Neo4jServiceRequestFilter
+            </param-value>
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-            <param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
+            <param-value>
+                com.sun.jersey.api.container.filter.LoggingFilter;com.campusconnect.neo4j.filters.Neo4jServiceResponseFilter
+            </param-value>
         </init-param>
 
         <init-param>
@@ -33,7 +37,6 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-
 
     <servlet-mapping>
         <servlet-name>Service</servlet-name>

@@ -27,6 +27,9 @@ public class AddressDaoImpl implements AddressDao {
     @Autowired
     private AuditEventDao auditEventDao;
 
+    public AddressDaoImpl() {
+    }
+
     @Override
     public List<Address> getAddresses(String userId) {
         return addressRepository.getAddressForUser(userId);

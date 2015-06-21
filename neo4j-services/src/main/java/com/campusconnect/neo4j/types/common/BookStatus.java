@@ -9,8 +9,9 @@ package com.campusconnect.neo4j.types.common;
  */
 public enum BookStatus {
     AVAILABLE,
-    BORROW_INIT,
+    BORROW_IN_PROGRESS,
     BORROW_LOCK,
     BORROWED,
     LENT,
+    OWNS,
 }

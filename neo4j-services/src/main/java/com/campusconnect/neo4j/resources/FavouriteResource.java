@@ -23,6 +23,9 @@ public class FavouriteResource {
         this.favouriteDao = favouriteDao;
     }
 
+    public FavouriteResource() {
+    }
+
 
     @POST
     public Response createFavourite(Favourite favourite) {

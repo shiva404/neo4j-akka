@@ -6,6 +6,8 @@ import com.campusconnect.neo4j.akka.goodreads.api.Search;
 import com.campusconnect.neo4j.akka.goodreads.mappers.BookMapper;
 import com.campusconnect.neo4j.akka.goodreads.types.*;
 import com.campusconnect.neo4j.types.neo4j.Book;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,9 +17,13 @@ import java.util.List;
  * Created by sn1 on 3/4/15.
  */
 public class GoodreadsDao {
+    private static Logger logger = LoggerFactory.getLogger(GoodreadsDao.class);
     private Search search;
     private GetBook getBook;
     private GoodreadsAsynchHandler goodreadsAsynchHandler;
+
+    public GoodreadsDao() {
+    }
 
     public void setGoodreadsAsynchHandler(GoodreadsAsynchHandler goodreadsAsynchHandler) {
         this.goodreadsAsynchHandler = goodreadsAsynchHandler;
@@ -41,9 +47,9 @@ public class GoodreadsDao {
             SearchResponse searchResponse = search.search(queryString);
             return formSearchResult(searchResponse);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error while connecting to goodreads", e);
         }
-        return null;
+        return new ArrayList<>();//return empty array list
     }
 
     private List<Book> formSearchResult(SearchResponse searchResponse) {

@@ -34,6 +34,7 @@ public class Search {
     }
 
     public SearchResponse search(String searchString) throws IOException {
+
         ClientResponse clientResponse = goodReadsClient.path("search/index.xml").addAppKeyQueryParam().queryParam("q", searchString).header(getDefaultHeaders()).get(ClientResponse.class);
         XMLSerializer xmlSerializer = new XMLSerializer();
         String theString = IOUtils.toString(clientResponse.getEntityInputStream());

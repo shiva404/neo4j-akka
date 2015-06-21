@@ -7,7 +7,7 @@ import org.springframework.data.neo4j.annotation.StartNode;
 /**
  * Created by sn1 on 3/21/15.
  */
-public abstract class BookRelation {
+public abstract class BookRelationship {
     @GraphId
     private Long id;
 
@@ -16,19 +16,19 @@ public abstract class BookRelation {
     @EndNode
     private Book book;
     private String status;
-    private long createdDate;
-    private long lastModifiedDate;
+    private Long createdDate;
+    private Long lastModifiedDate;
 
-    protected BookRelation() {
+    protected BookRelationship() {
     }
 
-    protected BookRelation(User user, Book book, String status) {
+    protected BookRelationship(User user, Book book, String status) {
         this.user = user;
         this.book = book;
         this.status = status;
     }
 
-    protected BookRelation(User user, Book book, String status, long createdDate, long lastModifiedDate) {
+    protected BookRelationship(User user, Book book, String status, Long createdDate, Long lastModifiedDate) {
         this.user = user;
         this.book = book;
         this.status = status;
@@ -68,19 +68,19 @@ public abstract class BookRelation {
         this.status = status;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
-    public long getLastModifiedDate() {
+    public Long getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(long lastModifiedDate) {
+    public void setLastModifiedDate(Long lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 }

@@ -1,10 +1,9 @@
 package com.campusconnect.neo4j.da.iface;
 
-import com.campusconnect.neo4j.types.neo4j.*;
-import com.campusconnect.neo4j.types.web.BorrowedBook;
-import com.campusconnect.neo4j.types.web.OwnedBook;
-import com.campusconnect.neo4j.types.web.UserRecommendation;
-import com.campusconnect.neo4j.types.web.WishListBook;
+import com.campusconnect.neo4j.types.neo4j.Address;
+import com.campusconnect.neo4j.types.neo4j.ReminderRelationShip;
+import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.neo4j.UserRelation;
 
 import java.util.List;
 
@@ -20,27 +19,13 @@ public interface UserDao {
 
     User createUser(User user, String accessToken);
 
-    List<Book> getReadBooks(String userId);
-
-    List<OwnedBook> getAvailableBooks(String userId);
-
-    List<BorrowedBook> getBorrowedBooks(String userId);
-
     List<User> getFollowers(String userId);
 
     List<User> getFollowing(String userId);
 
-    List<OwnedBook> getLentBooks(String userId);
-
-    List<OwnedBook> getOwnedBooks(String userId);
-
     User getUser(String userId);
 
     User getUserByFbId(String fbId);
-
-    List<UserRecommendation> getUserRecommendations(String userId);
-
-    List<WishListBook> getWishListBooks(String userId);
 
     void synchWishListRec(String userId);
 
@@ -56,20 +41,22 @@ public interface UserDao {
 
     List<User> searchFriends(String userId, String searchString);
 
-    List<User> findFriends(String userId, String currentUser);
+    List<User> getFriends(String userId, String currentUser);
 
-    List<User> findMutualFriends(String userId, String mutualFriends);
+    List<User> getMutualFriends(String userId, String mutualFriends);
 
     void createFriendRelationWithPending(User user, User user2);
 
     void deleteFriendRequest(String userId, String friendUserId);
 
-
     List<User> getRandomUsers(int size, String userID);
 
     List<User> search(String searchString, String userId);
 
-    List<User> findPendingFriendReq(String userId);
+    List<User> getPendingFriendReq(String userId);
 
     List<UserRelation> getUsersRelationShip(User user, User fellowUser);
+
+    List<User> getRelatedUsers(String loggedInUser);
+
 }

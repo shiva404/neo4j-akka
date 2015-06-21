@@ -1,5 +1,6 @@
 package com.campusconnect.neo4j.types.neo4j;
 
+import com.campusconnect.neo4j.util.Constants;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 
 import java.util.HashMap;
@@ -8,8 +9,8 @@ import java.util.Map;
 /**
  * Created by sn1 on 2/25/15.
  */
-@RelationshipEntity(type = "OWNS")
-public class OwnsRelationship extends BookRelation {
+@RelationshipEntity(type = Constants.OWNS_RELATION)
+public class OwnsRelationship extends BookRelationship {
 
     private String borrowerId;
 
@@ -25,13 +26,13 @@ public class OwnsRelationship extends BookRelation {
         super();
     }
 
-    public OwnsRelationship(User user, Book book, long createdDate,
-                            String status, long lastModifiedDate) {
+    public OwnsRelationship(User user, Book book, Long createdDate,
+                            String status, Long lastModifiedDate) {
         super(user, book, status, createdDate, lastModifiedDate);
     }
 
-    public OwnsRelationship(User user, Book book, long createdDate,
-                            String status, long lastModifiedDate, String goodreadsStatus) {
+    public OwnsRelationship(User user, Book book, Long createdDate,
+                            String status, Long lastModifiedDate, String goodreadsStatus) {
         super(user, book, status, createdDate, lastModifiedDate);
         this.goodreadsStatus = goodreadsStatus;
     }

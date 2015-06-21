@@ -5,16 +5,14 @@ import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.da.iface.EmailDao;
 import com.campusconnect.neo4j.da.iface.NotificationDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
-import com.campusconnect.neo4j.repositories.BookRepository;
+import com.campusconnect.neo4j.da.mapper.DBMapper;
 import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.common.*;
-import com.campusconnect.neo4j.types.neo4j.Address;
 import com.campusconnect.neo4j.types.neo4j.*;
-import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.User;
-import com.campusconnect.neo4j.types.web.*;
+import com.campusconnect.neo4j.types.web.Event;
+import com.campusconnect.neo4j.types.web.Notification;
+import com.campusconnect.neo4j.util.Constants;
 import com.googlecode.ehcache.annotations.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
@@ -25,6 +23,8 @@ import org.springframework.data.neo4j.support.Neo4jTemplate;
 
 import java.util.*;
 
+import static com.campusconnect.neo4j.da.utils.FilterHelper.replaceUsersWithExistingFriends;
+
 /**
  * Created by sn1 on 1/19/15.
  */
@@ -34,8 +34,7 @@ public class UserDaoImpl implements UserDao {
 
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    BookRepository bookRepository;
+
     @Autowired
     UserRelationRepository userRelationRepository;
 
@@ -56,6 +55,9 @@ public class UserDaoImpl implements UserDao {
     public UserDaoImpl(Neo4jTemplate neo4jTemplate) {
         this.neo4jTemplate = neo4jTemplate;
         this.objectMapper = new ObjectMapper();
+    }
+
+    public UserDaoImpl() {
     }
 
     public static Target createTargetToUser(User user) {
@@ -119,7 +121,9 @@ public class UserDaoImpl implements UserDao {
     @Override
     @Cacheable(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public User getUser(String userId) {
-        return userRepository.findBySchemaPropertyValue("id", userId);
+        User user = userRepository.findBySchemaPropertyValue("id", userId);
+        user.setUserRelation(Constants.SELF);
+        return user;
     }
 
     @Override
@@ -144,16 +148,20 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> search(String searchString, String userId) {
         List<User> users = userRepository.searchUsers(String.format(SEARCH_STRING, searchString));
-        List<User> friends = findFriends(userId, userId);
-        friends.addAll(findPendingFriendReq(userId));
-        return replaceBooksWithExistingFriends(users, friends);
+        if(userId != null) {
+            List<User> friends = getRelatedUsers(userId);
+            User currentUser = getUser(userId);
+            friends.add(currentUser);
+            return replaceUsersWithExistingFriends(users, friends);
+        }
+        return users;
     }
 
     @Override
-    public List<User> findPendingFriendReq(String userId) {
+    public List<User> getPendingFriendReq(String userId) {
         List<User> pendingFriends = userRelationRepository.getPendingFriendRequests(userId);
         for (User user : pendingFriends) {
-            user.setUserRelation(UserRelationType.FRIEND_REQUEST_PENDING.toString());
+            user.setUserRelation(Constants.FRINED_REQ_APPROVAL_PENDING);
         }
         return pendingFriends;
     }
@@ -164,26 +172,63 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    //todo: cache this
+    public List<User> getRelatedUsers(String loggedInUser) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", loggedInUser);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (currentUser:User {id: {userId}})-[relation:" + Constants.CONNECTED_RELATION + "]->(user:User) return user, relation", params);
+
+        List<User> users = getUsersFromResultMap(mapResult);
+        List<User> pendingApprovalFriends = getPendingFriendReq(loggedInUser);
+        users = replaceUsersWithExistingFriends(users, pendingApprovalFriends);
+        return users;
+    }
+
+    private List<User> getUsersFromResultMap(Result<Map<String, Object>> mapResult) {
+        List<User> users = new ArrayList<>();
+        for (Map<String, Object> objectMap : mapResult) {
+            RestNode userNode = (RestNode) objectMap.get("user");
+            RestRelationship userRawRelation = (RestRelationship) objectMap.get("relation");
+
+            User user = DBMapper.getUserFromRestNode(userNode);
+            //set all the relations to the user
+            DBMapper.setUserRelationFieldsToUser(userRawRelation, user);
+            users.add(user);
+        }
+        return users;
+    }
+
+    @Override
     public List<User> searchFriends(String userId, String searchString) {
         List<User> users = userRepository.searchFriends(userId, String.format(SEARCH_STRING, searchString));
-        List<User> friends = findFriends(userId, userId);
-        friends.addAll(findPendingFriendReq(userId));
-        return replaceBooksWithExistingFriends(users, friends);
+        List<User> friends = getRelatedUsers(userId);
+        return replaceUsersWithExistingFriends(users, friends);
     }
 
     @Override
     public List<User> getRandomUsers(int size, String userId) {
         List<User> users = userRepository.getRandomUsers(size);
-        List<User> friends = findFriends(userId, userId);
-        friends.addAll(findPendingFriendReq(userId));
-        return replaceBooksWithExistingFriends(users, friends);
+        removeCurrentUserFromList(users, userId);
+        List<User> friends = getRelatedUsers(userId);
+        return replaceUsersWithExistingFriends(users, friends);
+    }
+
+    private void removeCurrentUserFromList(List<User> users, String userId) {
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User user = iterator.next();
+            // Do something
+            if(user.getId().equals(userId)){
+                iterator.remove();
+            }
+        }
     }
 
     @Override
 //    @TriggersRemove(cacheName = "userFollowing", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public void createFollowingRelation(@PartialCacheKey User user, User follower) {
 
-        long now = System.currentTimeMillis();
+        Long now = System.currentTimeMillis();
         UserRelation userRelation = new UserRelation(user, follower, now, UserRelationType.FOLLOWING.toString());
         neo4jTemplate.save(userRelation);
 
@@ -200,7 +245,7 @@ public class UserDaoImpl implements UserDao {
 
     public void confirmFriendRelation(@PartialCacheKey User user, User friend) {
 
-        //	long now = System.currentTimeMillis();
+        //	Long now = System.currentTimeMillis();
         List<UserRelation> existingRelation = userRelationRepository.getUsersRelationship(user.getId(), friend.getId());
 
         UserRelation relation;
@@ -259,7 +304,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    @Cacheable(cacheName = "userFollowers", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
+    //@Cacheable(cacheName = "userFollowers", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public List<User> getFollowers(String userId) {
         return userRepository.getFollowers(userId);
     }
@@ -270,70 +315,6 @@ public class UserDaoImpl implements UserDao {
         return userRepository.getFollowing(userId);
     }
 
-    @Override
-//    @Cacheable(cacheName = "userOwnedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public List<OwnedBook> getOwnedBooks(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS]->(books:Book) return books, relation", params);
-        return getOwnedBooksFromResultMap(mapResult);
-    }
-
-    @Override
-    public List<Book> getReadBooks(String userId) {
-        List<Book> books = bookRepository.getBooks(userId);
-        for (Book book : books) {
-            book.setBookType("READ");
-        }
-        return books;
-    }
-
-    @Override
-    public List<OwnedBook> getAvailableBooks(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS {status: \"available\"}]->(books:Book) return books, relation", params);
-        return getOwnedBooksFromResultMap(mapResult);
-    }
-
-    @Override
-    public List<OwnedBook> getLentBooks(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS {status: \"lent\"}]->(books:Book) return books, relation", params);
-        return getOwnedBooksFromResultMap(mapResult);
-    }
-
-    private List<OwnedBook> getOwnedBooksFromResultMap(Result<Map<String, Object>> mapResult) {
-        List<OwnedBook> ownedBooks = new ArrayList<>();
-        for (Map<String, Object> objectMap : mapResult) {
-            RestNode bookNode = (RestNode) objectMap.get("books");
-            RestRelationship rawOwnsRelationship = (RestRelationship) objectMap.get("relation");
-
-            Book book = neo4jTemplate.convert(bookNode, Book.class);
-            book.setBookType("Own");
-            OwnsRelationship ownsRelationship = neo4jTemplate.convert(rawOwnsRelationship, OwnsRelationship.class);
-
-            com.campusconnect.neo4j.types.web.Book webBook = Neo4jToWebMapper.mapBookNeo4jToWeb(book);
-            OwnedBook ownedBook = new OwnedBook(webBook);
-            ownedBook.setCreatedDate(ownsRelationship.getCreatedDate());
-            ownedBook.setStatus(ownsRelationship.getStatus());
-            ownedBook.setLastModifiedDate(ownsRelationship.getLastModifiedDate());
-            ownedBook.setBorrowerId(ownsRelationship.getBorrowerId());
-            ownedBook.setDueDate(ownsRelationship.getDueDate());
-            ownedBooks.add(ownedBook);
-        }
-        return ownedBooks;
-    }
-
-    @Override
-//    @Cacheable(cacheName = "userBorrowedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public List<BorrowedBook> getBorrowedBooks(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:BORROWED]->(books:Book) return books, relation", params);
-        return getBorrowedBooksFromResultMap(mapResult);
-    }
 
     @Override
     public void addAddressToUser(Address address, User user) {
@@ -358,96 +339,12 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-//    @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public List<WishListBook> getWishListBooks(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:WISH]->(books:Book) return books, relation", params);
-        return getWishListBooksFromResultMap(mapResult);
-    }
-
-    @Override
     public void synchWishListRec(String userId) {
         User user = getUser(userId);
         if (user != null)
             goodreadsAsynchHandler.getFriendRecForUser(userId, user.getGoodreadsId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret());
     }
 
-    @Override
-    public List<UserRecommendation> getUserRecommendations(String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:GR_REC]->(books:Book) return books, relation", params);
-        return getWishUserRecFromResultMap(mapResult);
-    }
-
-    private List<WishListBook> getWishListBooksFromResultMap(Result<Map<String, Object>> mapResult) {
-        List<WishListBook> wishListBooks = new ArrayList<>();
-        for (Map<String, Object> objectMap : mapResult) {
-            RestNode bookNode = (RestNode) objectMap.get("books");
-            RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
-
-            Book book = neo4jTemplate.convert(bookNode, Book.class);
-            book.setBookType("WISH");
-            WishListRelationship whishListRelationship = neo4jTemplate.convert(rawWishRelationship, WishListRelationship.class);
-
-            com.campusconnect.neo4j.types.web.Book webBook = Neo4jToWebMapper.mapBookNeo4jToWeb(book);
-
-            WishListBook wishListBook = new WishListBook(webBook);
-
-            wishListBooks.add(wishListBook);
-        }
-        return wishListBooks;
-    }
-
-    private List<UserRecommendation> getWishUserRecFromResultMap(Result<Map<String, Object>> mapResult) {
-        List<UserRecommendation> userRecommendations = new ArrayList<>();
-        for (Map<String, Object> objectMap : mapResult) {
-            RestNode bookNode = (RestNode) objectMap.get("books");
-            RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
-
-            Book book = neo4jTemplate.convert(bookNode, Book.class);
-            book.setBookType("WISH");
-            GoodreadsFriendBookRecRelation goodreadsFriendBookRecRelation = neo4jTemplate.convert(rawWishRelationship, GoodreadsFriendBookRecRelation.class);
-
-            UserRecommendation userRecommendation = new UserRecommendation(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
-            userRecommendation.setFriendGoodreadsId(goodreadsFriendBookRecRelation.getFriendGoodreadsId());
-            userRecommendation.setFriendImageUrl(goodreadsFriendBookRecRelation.getFriendImageUrl());
-            userRecommendation.setFriendName(goodreadsFriendBookRecRelation.getFriendName());
-            userRecommendation.setUserId(goodreadsFriendBookRecRelation.getFriendName());
-            userRecommendation.setCreateDate(goodreadsFriendBookRecRelation.getCreatedDate());
-            userRecommendation.setFriendId(goodreadsFriendBookRecRelation.getFriendId());
-            userRecommendations.add(userRecommendation);
-        }
-        return userRecommendations;
-    }
-
-    private List<BorrowedBook> getBorrowedBooksFromResultMap(Result<Map<String, Object>> mapResult) {
-        List<BorrowedBook> borrowedBooks = new ArrayList<>();
-        for (Map<String, Object> objectMap : mapResult) {
-            RestNode bookNode = (RestNode) objectMap.get("books");
-            RestRelationship rawOwnsRelationship = (RestRelationship) objectMap.get("relation");
-
-            Book book = neo4jTemplate.convert(bookNode, Book.class);
-            book.setBookType("BORROWED");
-            BorrowRelation borrowRelationship = neo4jTemplate.convert(rawOwnsRelationship, BorrowRelation.class);
-
-            com.campusconnect.neo4j.types.web.Book webBook = Neo4jToWebMapper.mapBookNeo4jToWeb(book);
-
-            BorrowedBook borrowedBook = new BorrowedBook(webBook);
-
-            borrowedBook.setStatus(borrowRelationship.getStatus());
-            borrowedBook.setDueDate(borrowRelationship.getDueDate());
-            borrowedBook.setCreatedDate(borrowRelationship.getCreatedDate());
-            borrowedBook.setOwnerUserId(borrowRelationship.getOwnerUserId());
-            borrowedBook.setAdditionalComments(borrowRelationship.getAdditionalComments());
-            borrowedBook.setBorrowDate(borrowRelationship.getBorrowDate());
-            borrowedBook.setContractPeriodInDays(borrowRelationship.getContractPeriodInDays());
-            borrowedBook.setLastModifiedDate(borrowRelationship.getLastModifiedDate());
-            borrowedBooks.add(borrowedBook);
-        }
-        return borrowedBooks;
-    }
 
     @Override
     public void setReminder(ReminderRelationShip reminderRelationShip) {
@@ -457,46 +354,28 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> findFriends(String userId, String currentUser) {
-        List<User> friends = userRelationRepository.getFriends(userId);
-        if (currentUser == null) {
+    public List<User> getFriends(String queryUserId, String currentUserId) {
+        List<User> friends = userRelationRepository.getFriends(queryUserId);
+        if (currentUserId == null) {
             return friends;
-        } else if (currentUser.equals(userId)) {
+        } else if (currentUserId.equals(queryUserId)) {
             for (User user : friends) {
                 user.setUserRelation(UserRelationType.FRIEND.toString());
             }
             return friends;
         } else {
-            List<User> userFriends = userRelationRepository.getFriends(currentUser);
+            List<User> userFriends = userRelationRepository.getFriends(currentUserId);
+            User currentUser = getUser(currentUserId);
+            friends.add(currentUser);
             for (User user : userFriends) {
                 user.setUserRelation(UserRelationType.FRIEND.toString());
             }
-            return replaceBooksWithExistingFriends(friends, userFriends);
+            return replaceUsersWithExistingFriends(friends, userFriends);
         }
     }
-
-    private List<User> replaceBooksWithExistingFriends(List<User> friends, List<User> userExistingFriends) {
-        Map<String, User> friendsMapWithId = new HashMap<>(friends.size());
-        for (User user : friends) {
-            friendsMapWithId.put(user.getId(), user);
-        }
-        for (User existingUser : userExistingFriends) {
-            for (User user : friends) {
-                if (user.getId().equals(existingUser.getId())) {
-                    friendsMapWithId.put(user.getId(), existingUser);
-                }
-            }
-        }
-        List<User> resultUser = new ArrayList<>();
-        for (User user : friendsMapWithId.values()) {
-            resultUser.add(user);
-        }
-        return resultUser;
-    }
-
 
     @Override
-    public List<User> findMutualFriends(String currentUser, String userId) {
+    public List<User> getMutualFriends(String currentUser, String userId) {
         List<User> mutualFriends = userRelationRepository.getMutualFriends(currentUser, userId);
         for (User user : mutualFriends) {
             user.setUserRelation(UserRelationType.FRIEND.toString());
@@ -549,7 +428,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void deleteFriendRequest(String userId, String friendUserId) {
-        //UserRelation userRelation = userRelationRepository.getUsersRelationship(userId, friendUserId);
+        //UserRelation userRelation = userRelationRepository.getUsersRelationship(queryUserId, friendUserId);
         User user = getUser(userId);
         User friend = getUser(friendUserId);
         neo4jTemplate.deleteRelationshipBetween(user, friend, "CONNECTED");
@@ -569,7 +448,6 @@ public class UserDaoImpl implements UserDao {
 
     private int checkUserRelationExists(List<UserRelation> existingRelation,
                                         String type) {
-
         for (int i = 0; i < existingRelation.size(); i++) {
             if (existingRelation.get(i).getType().equals(type)) {
                 return i;

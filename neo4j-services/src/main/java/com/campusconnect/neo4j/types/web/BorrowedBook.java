@@ -8,13 +8,13 @@ import java.io.Serializable;
  */
 public class BorrowedBook extends Book implements Serializable {
     private String status;
-    private long dueDate;
-    private long createdDate;
+    private Long dueDate;
+    private Long createdDate;
     private String ownerUserId;
     private String additionalComments;
-    private long borrowDate;
+    private Long borrowDate;
     private int contractPeriodInDays;
-    private long lastModifiedDate;
+    private Long lastModifiedDate;
 
 
     public BorrowedBook() {
@@ -35,19 +35,19 @@ public class BorrowedBook extends Book implements Serializable {
         this.status = status;
     }
 
-    public long getDueDate() {
+    public Long getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(long dueDate) {
+    public void setDueDate(Long dueDate) {
         this.dueDate = dueDate;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -67,11 +67,11 @@ public class BorrowedBook extends Book implements Serializable {
         this.additionalComments = additionalComments;
     }
 
-    public long getBorrowDate() {
+    public Long getBorrowDate() {
         return borrowDate;
     }
 
-    public void setBorrowDate(long borrowDate) {
+    public void setBorrowDate(Long borrowDate) {
         this.borrowDate = borrowDate;
     }
 
@@ -83,11 +83,11 @@ public class BorrowedBook extends Book implements Serializable {
         this.contractPeriodInDays = contractPeriodInDays;
     }
 
-    public long getLastModifiedDate() {
+    public Long getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(long lastModifiedDate) {
+    public void setLastModifiedDate(Long lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 }

@@ -2,14 +2,13 @@ package com.campusconnect.neo4j.resources;
 
 import com.campusconnect.neo4j.da.GroupDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.da.utils.FilterHelper;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.types.common.AccessRoles;
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.Group;
 import com.campusconnect.neo4j.types.neo4j.User;
-import com.campusconnect.neo4j.types.web.BooksPage;
-import com.campusconnect.neo4j.types.web.UserIdsPage;
-import com.campusconnect.neo4j.types.web.UsersPage;
+import com.campusconnect.neo4j.types.web.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -28,6 +27,9 @@ public class GroupResource {
     public GroupResource(GroupDao groupDao, UserDao userDao) {
         this.groupDao = groupDao;
         this.userDao = userDao;
+    }
+
+    public GroupResource() {
     }
 
     @POST
@@ -56,7 +58,7 @@ public class GroupResource {
     }
 
     @PUT
-    @Path("{groupID}")
+    @Path("{groupId}")
     public Response updateGroup(@PathParam("groupId") final String groupId,
                                 Group group) {
         //Todo Add the user who updated Group (last updated by)
@@ -66,7 +68,7 @@ public class GroupResource {
     }
 
     private Group setGroupCreateProperties(Group group, String userId) {
-        long createdDate = System.currentTimeMillis();
+        Long createdDate = System.currentTimeMillis();
         group.setCreatedDate(createdDate);
         group.setLastModifiedTime(createdDate);
         group.setLastModifiedBy(userId);
@@ -82,6 +84,19 @@ public class GroupResource {
         return Response.created(null).build();
     }
 
+    @GET
+    @Path("{groupId}/search/users")
+    public Response search(@PathParam("groupId") String groupId, @QueryParam("q") String searchString) {
+        List<User> users = userDao.search(searchString, null);
+        List<GroupMember> groupMembers = groupDao.getMembers(groupId, null);
+        List<GroupMember> searchedUsers = new ArrayList<>();
+        for (User user : users) {
+            searchedUsers.add(Neo4jToWebMapper.mapUserNeo4jToWebGroupMember(user, null, null, null));
+        }
+        List<GroupMember> resultGroupMembers = FilterHelper.groupMembersMergeWithMembers(searchedUsers, groupMembers);
+        return Response.ok().entity(new GroupMembersPage(resultGroupMembers, resultGroupMembers.size(), 0)).build();
+    }
+
     @POST
     @Path("{groupId}/users/bulk")
     public Response addUsers(@PathParam("groupId") final String groupId,
@@ -89,7 +104,6 @@ public class GroupResource {
                              final UserIdsPage userIdsPage) {
         // Todo validate user exist
         // Todo CreatedBy is of Admin or Write USER_ACCESS
-        Long currentTime = System.currentTimeMillis();
         for (String userId : userIdsPage.getUserIds()) {
             User user = userDao.getUser(userId);
             groupDao.addUser(groupId, userId, AccessRoles.READ.toString(), createdBy);
@@ -99,14 +113,10 @@ public class GroupResource {
 
     @GET
     @Path("{groupId}/users")
-    public Response getUsers(@PathParam("groupId") final String groupId) {
-        List<User> users = groupDao.getUsers(groupId);
-        List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(users.size());
-        for (User user : users) {
-            returnUsers.add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
-        }
-        UsersPage usersListPage = new UsersPage(0, returnUsers.size(), returnUsers);
-        return Response.ok().entity(usersListPage).build();
+    public Response getUsers(@PathParam("groupId") final String groupId, @QueryParam("loggedInUser") String loggedInUser) {
+        List<GroupMember> users = groupDao.getMembers(groupId, loggedInUser);
+        GroupMembersPage groupMembers = new GroupMembersPage(users, users.size(), 0);
+        return Response.ok().entity(groupMembers).build();
     }
 
     @GET

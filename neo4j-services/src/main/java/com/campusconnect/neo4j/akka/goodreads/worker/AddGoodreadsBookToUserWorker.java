@@ -6,7 +6,7 @@ import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.types.common.GoodreadsStatus;
 import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.ReadRelation;
+import com.campusconnect.neo4j.types.neo4j.ReadRelationship;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.neo4j.WishListRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +31,11 @@ public class AddGoodreadsBookToUserWorker extends UntypedActor {
 
             //todo: dont create a relation if already exists
 
-            final long now = System.currentTimeMillis();
+            final Long now = System.currentTimeMillis();
             if (addGoodreadsBookToUserTask.getShelfName().equals(GoodreadsStatus.TO_READ.toString())) {
                 bookDao.addWishBookToUser(new WishListRelationship(user, book, "wish", now, now));
             } else
-                bookDao.listBookAsRead(new ReadRelation(user, book, null, now, now, addGoodreadsBookToUserTask.getShelfName()));
+                bookDao.listBookAsRead(new ReadRelationship(user, book, null, now, now, addGoodreadsBookToUserTask.getShelfName()));
         }
     }
 }

@@ -9,10 +9,10 @@ import java.util.List;
  * Created by sn1 on 3/22/15.
  */
 public class FriendsBookSearchForWishListTask extends GoodreadsTask {
-    private int page;
+    private Integer page;
     private List<WishListBook> wishListBooks;
 
-    public FriendsBookSearchForWishListTask(String accessToken, String accessSecret, String userId, String goodreadsId, int page, List<WishListBook> wishListBooks) {
+    public FriendsBookSearchForWishListTask(String accessToken, String accessSecret, String userId, String goodreadsId, Integer page, List<WishListBook> wishListBooks) {
         super(accessToken, accessSecret, userId, goodreadsId);
         this.page = page;
         this.wishListBooks = wishListBooks;
@@ -22,11 +22,11 @@ public class FriendsBookSearchForWishListTask extends GoodreadsTask {
         super(accessToken, accessSecret, userId, goodreadsId);
     }
 
-    public int getPage() {
+    public Integer getPage() {
         return page;
     }
 
-    public void setPage(int page) {
+    public void setPage(Integer page) {
         this.page = page;
     }
 

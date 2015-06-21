@@ -9,13 +9,13 @@ public class BorrowRequest {
     private String ownerUserId;
     private String borrowerUserId;
     private int contractPeriodInDays;
-    private long borrowDate;
+    private Long borrowDate;
     private String additionalMessage;
 
     public BorrowRequest() {
     }
 
-    public BorrowRequest(String ownerUserId, String borrowerUserId, int contractPeriodInDays, long borrowDate, String additionalMessage) {
+    public BorrowRequest(String ownerUserId, String borrowerUserId, int contractPeriodInDays, Long borrowDate, String additionalMessage) {
 
         this.ownerUserId = ownerUserId;
         this.borrowerUserId = borrowerUserId;
@@ -50,11 +50,11 @@ public class BorrowRequest {
         this.contractPeriodInDays = contractPeriodInDays;
     }
 
-    public long getBorrowDate() {
+    public Long getBorrowDate() {
         return borrowDate;
     }
 
-    public void setBorrowDate(long borrowDate) {
+    public void setBorrowDate(Long borrowDate) {
         this.borrowDate = borrowDate;
     }
 

@@ -16,6 +16,9 @@ public class EmailDaoImpl implements EmailDao {
         this.neo4jAsynchHandler = neo4jAsynchHandler;
     }
 
+    public EmailDaoImpl() {
+    }
+
     @Override
     public void sendBorrowBookInitEmail(User fromUser, User toUser, Book book) {
         neo4jAsynchHandler.sendBorrowInitEmail(fromUser, toUser, book);

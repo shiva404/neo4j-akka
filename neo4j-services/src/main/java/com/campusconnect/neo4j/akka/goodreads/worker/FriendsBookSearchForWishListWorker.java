@@ -10,6 +10,7 @@ import com.campusconnect.neo4j.akka.goodreads.types.Friends;
 import com.campusconnect.neo4j.akka.goodreads.types.GetFriendsResponse;
 import com.campusconnect.neo4j.akka.goodreads.types.User;
 import com.campusconnect.neo4j.akka.goodreads.util.ResponseUtils;
+import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.types.web.UserRecommendation;
 import com.sun.jersey.api.uri.UriBuilderImpl;
@@ -40,6 +41,9 @@ public class FriendsBookSearchForWishListWorker extends UntypedActor {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private BookDao bookDao;
+
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof FriendsBookSearchForWishListTask) {
@@ -59,7 +63,7 @@ public class FriendsBookSearchForWishListWorker extends UntypedActor {
 
 
             if (friends != null && Integer.parseInt(friends.getTotal()) != 0) {
-                List<UserRecommendation> existingRecommendations = userDao.getUserRecommendations(getFriendsTask.getUserId());
+                List<UserRecommendation> existingRecommendations = bookDao.getGoodreadsUserRecommendations(getFriendsTask.getUserId());
 
                 if (Integer.parseInt(friends.getEnd()) != Integer.parseInt(friends.getTotal())) {
                     logger.info("fired friends request again for page:" + (getFriendsTask.getPage() + 1));

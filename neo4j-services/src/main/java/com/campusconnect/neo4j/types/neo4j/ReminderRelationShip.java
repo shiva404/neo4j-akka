@@ -1,5 +1,6 @@
 package com.campusconnect.neo4j.types.neo4j;
 
+import com.campusconnect.neo4j.util.Constants;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.neo4j.annotation.EndNode;
@@ -7,19 +8,19 @@ import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 import org.springframework.data.neo4j.annotation.StartNode;
 
-@RelationshipEntity(type = "REMINDER_ABOUT")
+@RelationshipEntity(type = Constants.REMINDER_RELATION)
 public class ReminderRelationShip {
 
     @CreatedBy
     private String createdBy;
 
     @CreatedDate
-    private long createdDate;
+    private Long createdDate;
 
     @GraphId
     private Long id;
 
-    private long lastModified;
+    private Long lastModified;
 
     @EndNode
     private Reminder reminder;
@@ -33,8 +34,8 @@ public class ReminderRelationShip {
 
     }
 
-    public ReminderRelationShip(String createdBy, long createdDate, User reminderFor,
-                                long lastModified, String type, Reminder reminder) {
+    public ReminderRelationShip(String createdBy, Long createdDate, User reminderFor,
+                                Long lastModified, String type, Reminder reminder) {
         super();
         this.createdBy = createdBy;
         this.createdDate = createdDate;
@@ -52,11 +53,11 @@ public class ReminderRelationShip {
         this.createdBy = createdBy;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -68,11 +69,11 @@ public class ReminderRelationShip {
         this.id = id;
     }
 
-    public long getLastModified() {
+    public Long getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(long lastModified) {
+    public void setLastModified(Long lastModified) {
         this.lastModified = lastModified;
     }
 

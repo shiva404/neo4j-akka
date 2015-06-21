@@ -7,9 +7,9 @@ import java.io.Serializable;
  */
 public class OwnedBook extends Book implements Serializable {
 
-    private long createdDate;
+    private Long createdDate;
     private String status;
-    private long lastModifiedDate;
+    private Long lastModifiedDate;
     private String borrowerId;
     private String dueDate;
     private int contractPeriodInDays;
@@ -48,11 +48,11 @@ public class OwnedBook extends Book implements Serializable {
         this.contractPeriodInDays = contractPeriodInDays;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -64,11 +64,11 @@ public class OwnedBook extends Book implements Serializable {
         this.status = status;
     }
 
-    public long getLastModifiedDate() {
+    public Long getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(long lastModifiedDate) {
+    public void setLastModifiedDate(Long lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 }

@@ -1,5 +1,6 @@
 package com.campusconnect.neo4j.types.neo4j;
 
+import com.campusconnect.neo4j.util.Constants;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.neo4j.annotation.EndNode;
@@ -10,21 +11,21 @@ import org.springframework.data.neo4j.annotation.StartNode;
 /**
  * Created by sn1 on 1/22/15.
  */
-@RelationshipEntity(type = "USER_ACCESS")
+@RelationshipEntity(type = Constants.USER_GROUP_RELATION)
 public class UserGroupRelationship {
 
     @CreatedBy
     private String createdBy;
 
     @CreatedDate
-    private long createdDate;
+    private Long createdDate;
     @EndNode
     private Group group;
 
     @GraphId
     private Long id;
 
-    private long lastModified;
+    private Long lastModified;
 
     private String role;
 
@@ -34,8 +35,8 @@ public class UserGroupRelationship {
     public UserGroupRelationship() {
     }
 
-    public UserGroupRelationship(String createdBy, long createdDate,
-                                 Group group, long lastModified, String role, User user) {
+    public UserGroupRelationship(String createdBy, Long createdDate,
+                                 Group group, Long lastModified, String role, User user) {
         super();
         this.createdBy = createdBy;
         this.createdDate = createdDate;
@@ -59,11 +60,11 @@ public class UserGroupRelationship {
         this.createdBy = createdBy;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -75,11 +76,11 @@ public class UserGroupRelationship {
         this.group = group;
     }
 
-    public long getLastModified() {
+    public Long getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(long lastModified) {
+    public void setLastModified(Long lastModified) {
         this.lastModified = lastModified;
     }
 

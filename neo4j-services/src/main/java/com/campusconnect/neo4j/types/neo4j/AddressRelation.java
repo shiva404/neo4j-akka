@@ -1,6 +1,7 @@
 package com.campusconnect.neo4j.types.neo4j;
 
 
+import com.campusconnect.neo4j.util.Constants;
 import org.springframework.data.neo4j.annotation.EndNode;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
@@ -9,7 +10,7 @@ import org.springframework.data.neo4j.annotation.StartNode;
 /**
  * Created by sn1 on 2/23/15.
  */
-@RelationshipEntity(type = "addresses")
+@RelationshipEntity(type = Constants.ADDRESSES_RELATION)
 public class AddressRelation {
     @GraphId
     Long id;

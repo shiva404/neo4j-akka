@@ -5,11 +5,11 @@ public class Address {
 
     private String country;
 
-    private long createdDate;
+    private Long createdDate;
 
     private Long id;
     private String landmark;
-    private long lastModifiedTime;
+    private Long lastModifiedTime;
     private String latitude;
     private String line1;
     private String line2;
@@ -22,7 +22,7 @@ public class Address {
 
     }
 
-    public Address(String city, String country, long createdDate, Long id, String landmark, long lastModifiedTime, String latitude, String line1, String line2, String longitude, String state, String type, String zipCode) {
+    public Address(String city, String country, Long createdDate, Long id, String landmark, Long lastModifiedTime, String latitude, String line1, String line2, String longitude, String state, String type, String zipCode) {
         this.city = city;
         this.country = country;
         this.createdDate = createdDate;
@@ -65,11 +65,11 @@ public class Address {
         this.country = country;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -89,11 +89,11 @@ public class Address {
         this.landmark = landmark;
     }
 
-    public long getLastModifiedTime() {
+    public Long getLastModifiedTime() {
         return lastModifiedTime;
     }
 
-    public void setLastModifiedTime(long lastModifiedTime) {
+    public void setLastModifiedTime(Long lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
     }
 

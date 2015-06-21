@@ -1,6 +1,7 @@
 package com.campusconnect.neo4j.types.neo4j;
 
 
+import com.campusconnect.neo4j.util.Constants;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.neo4j.annotation.EndNode;
 import org.springframework.data.neo4j.annotation.GraphId;
@@ -10,7 +11,7 @@ import org.springframework.data.neo4j.annotation.StartNode;
 /**
  * Created by sn1 on 1/19/15.
  */
-@RelationshipEntity(type = "CONNECTED")
+@RelationshipEntity(type = Constants.CONNECTED_RELATION)
 public class UserRelation {
     @GraphId
     private Long id;
@@ -20,9 +21,9 @@ public class UserRelation {
     private User user2;
     private String type;
     @CreatedDate
-    private long createdDate;
+    private Long createdDate;
 
-    public UserRelation(User user1, User user2, long createdDate, String type) {
+    public UserRelation(User user1, User user2, Long createdDate, String type) {
         this.type = type;
         this.user1 = user1;
         this.user2 = user2;
@@ -40,11 +41,11 @@ public class UserRelation {
         this.type = type;
     }
 
-    public long getCreatedDate() {
+    public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(long createdDate) {
+    public void setCreatedDate(Long createdDate) {
         this.createdDate = createdDate;
     }
 

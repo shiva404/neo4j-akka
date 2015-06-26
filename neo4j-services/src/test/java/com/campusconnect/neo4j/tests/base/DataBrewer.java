@@ -1,8 +1,7 @@
 package com.campusconnect.neo4j.tests.base;
 
 import com.campusconnect.neo4j.types.common.AddressType;
-import com.campusconnect.neo4j.types.neo4j.*;
-import com.campusconnect.neo4j.types.web.BorrowRequest;
+import com.campusconnect.neo4j.types.web.*;
 import com.github.javafaker.Faker;
 
 import java.util.HashSet;
@@ -87,7 +86,7 @@ public class DataBrewer {
     public static Reminder getFakeReminder(String subject) {
 
         Long currentTime = System.currentTimeMillis();
-        return new Reminder(currentTime, currentTime, subject, faker.lorem().fixedString(20), "desc", currentTime);
+        return new Reminder(currentTime, faker.lorem().fixedString(20), currentTime, null, faker.lorem().fixedString(20), currentTime, "Subject,");
     }
 
     public static Favourite getFakeFavourites(String genre) {

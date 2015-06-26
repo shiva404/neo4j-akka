@@ -10,6 +10,7 @@ package com.campusconnect.neo4j.util;
 public class Constants {
     public static final String OWNS_RELATION = "OWNS";
     public static final String BORROWED_RELATION = "BORROWED";
+    public static final String CURRENTLY_READING_RELATION = "CURRENTLYREADING";
     public static final String ADDRESSES_RELATION = "addresses";
     public static final String GOODREADS_REC_RELATION = "GR_REC";
     public static final String READ_RELATION = "READ";

@@ -3,7 +3,7 @@ package com.campusconnect.neo4j.types.web;
 /**
  * Created by sn1 on 3/29/15.
  */
-public class UserRecommendation {
+public class GoodreadsUserRecommendation {
     private Book book;
     private String friendGoodreadsId;
     private String friendImageUrl;
@@ -11,10 +11,10 @@ public class UserRecommendation {
     private Long createDate;
     private String friendId;
 
-    public UserRecommendation() {
+    public GoodreadsUserRecommendation() {
     }
 
-    public UserRecommendation(Book book) {
+    public GoodreadsUserRecommendation(Book book) {
         this.book = book;
     }
 

@@ -86,12 +86,12 @@ public class GroupResource {
 
     @GET
     @Path("{groupId}/search/users")
-    public Response search(@PathParam("groupId") String groupId, @QueryParam("q") String searchString) {
-        List<User> users = userDao.search(searchString, null);
+    public Response searchMembers(@PathParam("groupId") String groupId, @QueryParam("q") String searchString) {
+        List<User> searchUsers = userDao.search(searchString, null);
         List<GroupMember> groupMembers = groupDao.getMembers(groupId, null);
         List<GroupMember> searchedUsers = new ArrayList<>();
-        for (User user : users) {
-            searchedUsers.add(Neo4jToWebMapper.mapUserNeo4jToWebGroupMember(user, null, null, null));
+        for (User user : searchUsers) {
+            searchedUsers.add(Neo4jToWebMapper.mapUserNeo4jToWebGroupMember(user, null, null, null, null));
         }
         List<GroupMember> resultGroupMembers = FilterHelper.groupMembersMergeWithMembers(searchedUsers, groupMembers);
         return Response.ok().entity(new GroupMembersPage(resultGroupMembers, resultGroupMembers.size(), 0)).build();

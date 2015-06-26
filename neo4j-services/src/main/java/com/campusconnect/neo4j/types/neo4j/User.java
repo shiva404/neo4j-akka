@@ -50,6 +50,7 @@ public class User implements Serializable {
     private String profileImageUrl;
     private String workDesignation;
     private String workLocation;
+    @Deprecated
     private String userRelation;
 
     public User() {
@@ -86,10 +87,12 @@ public class User implements Serializable {
         this.email = email;
     }
 
+    @Deprecated
     public String getUserRelation() {
         return userRelation;
     }
 
+    @Deprecated
     public void setUserRelation(String userRelation) {
         this.userRelation = userRelation;
     }

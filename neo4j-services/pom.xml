@@ -15,7 +15,7 @@
     </parent>
 
     <properties>
-        <springframework.version>4.0.7.RELEASE</springframework.version>
+        <springframework.version>4.1.2.RELEASE</springframework.version>
         <jersey.version>1.17</jersey.version>
     </properties>
 
@@ -73,9 +73,17 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-asm</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
-
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -84,6 +92,10 @@
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -97,6 +109,10 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-asm</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -108,6 +124,10 @@
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -121,6 +141,10 @@
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -216,6 +240,10 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-asm</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -227,6 +255,10 @@
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -281,6 +313,10 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-asm</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -310,6 +346,10 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-asm</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -335,12 +375,24 @@
             <groupId>org.springframework.social</groupId>
             <artifactId>spring-social-web</artifactId>
             <version>1.1.0.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.social</groupId>
             <artifactId>spring-social-facebook</artifactId>
             <version>2.0.0.M1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

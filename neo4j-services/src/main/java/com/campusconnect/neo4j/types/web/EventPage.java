@@ -4,7 +4,7 @@ import java.util.List;
 
 public class EventPage {
 
-    List<Event> userEvent;
+    private List<Event> events;
     private int offset;
     private int size;
 
@@ -12,11 +12,11 @@ public class EventPage {
         // TODO Auto-generated constructor stub
     }
 
-    public EventPage(int offset, int size, List<Event> userEvent) {
+    public EventPage(int offset, int size, List<Event> events) {
         super();
         this.offset = offset;
         this.size = size;
-        this.userEvent = userEvent;
+        this.events = events;
     }
 
     public int getOffset() {
@@ -35,12 +35,12 @@ public class EventPage {
         this.size = size;
     }
 
-    public List<Event> getUserEvent() {
-        return userEvent;
+    public List<Event> getEvents() {
+        return events;
     }
 
-    public void setUserEvent(List<Event> userEvent) {
-        this.userEvent = userEvent;
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 
 }

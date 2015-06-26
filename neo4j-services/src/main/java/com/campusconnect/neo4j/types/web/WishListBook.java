@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class WishListBook extends Book implements Serializable {
 
-    private List<UserRecommendation> userRecommendations;
+    private List<GoodreadsUserRecommendation> goodreadsUserRecommendations;
 
     public WishListBook() {
     }
@@ -22,9 +22,9 @@ public class WishListBook extends Book implements Serializable {
         setBookType(book.getBookType());
     }
 
-    public List<UserRecommendation> getUserRecommendations() {
-        if (userRecommendations == null)
-            userRecommendations = new ArrayList<>();
-        return userRecommendations;
+    public List<GoodreadsUserRecommendation> getGoodreadsUserRecommendations() {
+        if (goodreadsUserRecommendations == null)
+            goodreadsUserRecommendations = new ArrayList<>();
+        return goodreadsUserRecommendations;
     }
 }

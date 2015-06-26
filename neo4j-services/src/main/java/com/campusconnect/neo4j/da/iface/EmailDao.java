@@ -12,5 +12,9 @@ public interface EmailDao {
     public void sendAcceptedToLendBookEmail(User owner, User borrower, Book book);
 
     public void sendFriendRequestEmail(User user, User friend);
+    
+    public void sendRejectedToLendBookEmail(User owner, User borrower, Book book,String message);
+    
+    public void sendSuccessfulBookTransactionEmail(User owner,User borrower,Book book);
 
 }

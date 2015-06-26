@@ -4,14 +4,19 @@ import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.types.neo4j.BorrowRelationship;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.BorrowRequest;
+import com.campusconnect.neo4j.types.web.HistoryEvent;
+import com.campusconnect.neo4j.types.web.HistoryEventPage;
 import com.campusconnect.neo4j.types.web.SearchResult;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,13 +120,25 @@ public class BookResource {
                 if (borrower != null)
                     bookDao.updateBookStatusOnAgreement(owner, book, borrower, borrowRequest == null ? null : borrowRequest.getAdditionalMessage());
             }
-        } else if (status.equals("success"))
+        } else if (status.equals("success")){
             if (borrowerId != null) {
                 User borrower = userDao.getUser(borrowerId);
                 if (borrower != null)
                     bookDao.updateBookStatusOnSuccess(owner, book, borrower, borrowRequest.getAdditionalMessage());
             }
-        return Response.ok().build();
+        }
+            else if(status.equals("reject"))
+            {
+            	if(borrowerId !=null)
+            	{
+            		User borrower = userDao.getUser(borrowerId);
+            		if(borrower!=null)
+            		{            
+            			bookDao.deleteBorrowRequest(borrowerId, bookId, userId,borrowRequest.getAdditionalMessage());
+            		}
+            	}
+            }
+           return Response.ok().build();
     }
 
     @GET
@@ -141,5 +158,14 @@ public class BookResource {
         SearchResult result = new SearchResult();
         result.getBooks().addAll(webBooks);
         return Response.ok().entity(result).build();
+    }
+    
+    @GET
+    @Path("{bookId}/users/{userId}/history")
+    public Response bookHistory(@PathParam("bookId") String bookId, @PathParam("userId") String userId)
+    {
+    	List<HistoryEvent> historyEvents = bookDao.getBookHistory(bookId, userId);
+    	HistoryEventPage historyEventPage = new HistoryEventPage(historyEvents,0,historyEvents.size());
+    	return Response.ok().entity(historyEventPage).build();
     }
 }

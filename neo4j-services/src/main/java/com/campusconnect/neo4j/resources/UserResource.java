@@ -18,11 +18,13 @@ import com.campusconnect.neo4j.types.neo4j.Reminder;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.*;
 import com.campusconnect.neo4j.util.Validator;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -297,6 +299,19 @@ public class UserResource {
         bookDao.listBookAsRead(new ReadRelationship(user, book, status, now, now, null));
         return Response.ok().build();
     }
+    
+    @POST
+    @Path("{userId}/books/{bookId}/currentlyReading")
+    public Response addBookToCurrentReadingList(@PathParam("userId") final String userId,
+                                      @PathParam("bookId") final String bookId,
+                                      @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
+
+        User user = userDao.getUser(userId);
+        Book book = bookDao.getBook(bookId);
+        Long now = System.currentTimeMillis();
+        bookDao.listBookAsCurrentlyReading(new CurrentlyReadingRelationShip(user, book, status, now, now));
+        return Response.ok().build();
+    }
 
     @PUT
     @Path("{userId}/books/wishlist/rec")
@@ -344,6 +359,11 @@ public class UserResource {
                 List<WishListBook> wishListBooks = bookDao.getWishListBooks(userId);
                 WishListBooksPage wishListBooksPage = new WishListBooksPage(0, wishListBooks.size(), wishListBooks);
                 return Response.ok().entity(wishListBooksPage).build();
+            case "currentlyreading":
+            List<CurrentlyReadingBook> currentlyReadingBooks = bookDao.getCurrentlyReadingBook(userId);
+            CurrentlyReadingBooksPage currentlyReadingBooksPage = new CurrentlyReadingBooksPage(0, currentlyReadingBooks.size(), currentlyReadingBooks);
+            return Response.ok().entity(currentlyReadingBooksPage).build();
+            
             case "all":
                 List<Book> allBooks = bookDao.getAllUserBooks(userId);
                 AllBooks resultBooks = new AllBooks();

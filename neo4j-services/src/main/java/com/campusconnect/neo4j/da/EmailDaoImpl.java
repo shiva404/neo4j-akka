@@ -28,6 +28,11 @@ public class EmailDaoImpl implements EmailDao {
     public void sendAcceptedToLendBookEmail(User owner, User borrower, Book book) {
         neo4jAsynchHandler.sendAcceptToLendBookEmail(owner, borrower, book);
     }
+    
+    @Override
+    public void sendRejectedToLendBookEmail(User owner, User borrower, Book book,String message) {
+        neo4jAsynchHandler.sendRejectToLendBookEmail(owner, borrower, book,message);
+    }
 
     @Override
     public void sendFriendRequestEmail(User user, User friend) {
@@ -35,4 +40,11 @@ public class EmailDaoImpl implements EmailDao {
         neo4jAsynchHandler.sendFriendRequestEmail(user, friend);
 
     }
+
+	@Override
+	public void sendSuccessfulBookTransactionEmail(User owner, User borrower,
+			Book book) {
+		neo4jAsynchHandler.sendSuccessfullBookTransactionBookEmail(owner, borrower, book);
+		
+	}
 }

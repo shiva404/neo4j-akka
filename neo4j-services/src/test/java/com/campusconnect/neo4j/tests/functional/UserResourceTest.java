@@ -1,7 +1,7 @@
 package com.campusconnect.neo4j.tests.functional;
 
 import com.campusconnect.neo4j.tests.TestBase;
-import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
+import com.campusconnect.neo4j.tests.base.DataBrewer;
 import com.campusconnect.neo4j.types.common.AddressType;
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.User;

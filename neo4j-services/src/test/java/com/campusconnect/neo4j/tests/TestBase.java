@@ -1,6 +1,6 @@
 package com.campusconnect.neo4j.tests;
 
-import com.campusconnect.neo4j.tests.functional.base.GlassFishResourceProvider;
+import com.campusconnect.neo4j.tests.base.GlassFishResourceProvider;
 import com.github.javafaker.Faker;
 import com.sun.jersey.api.client.WebResource;
 

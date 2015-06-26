@@ -1,4 +1,4 @@
-package com.campusconnect.neo4j.tests.functional.base;
+package com.campusconnect.neo4j.tests.base;
 
 import com.campusconnect.neo4j.types.common.AddressType;
 import com.campusconnect.neo4j.types.neo4j.*;

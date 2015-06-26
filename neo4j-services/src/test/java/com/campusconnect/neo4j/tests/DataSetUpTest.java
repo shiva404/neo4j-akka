@@ -1,8 +1,8 @@
 package com.campusconnect.neo4j.tests;
 
+import com.campusconnect.neo4j.tests.base.DataBrewer;
 import com.campusconnect.neo4j.tests.functional.GroupResourceTest;
 import com.campusconnect.neo4j.tests.functional.UserResourceTest;
-import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
 import com.campusconnect.neo4j.types.common.ReminderAbout;
 import com.campusconnect.neo4j.types.neo4j.Reminder;
 import com.campusconnect.neo4j.types.web.BorrowRequest;
@@ -22,10 +22,10 @@ public class DataSetUpTest extends TestBase {
 
 //        String userId3 = UserResourceTest.createKnowUserWithGoogleId(
 //                "Shiva Kumar", "shiva.n404@gmail.com", "105609898189858031660");
-    	
-    	
-    	String userId3 = UserResourceTest.createKnowUserWithGoogleId(
-            "Namitha Hugar", "namics08@gmail.comm", "118244923848234911918");
+
+
+        String userId3 = UserResourceTest.createKnowUserWithGoogleId(
+                "Namitha Hugar", "namics08@gmail.comm", "118244923848234911918");
 
         // createUser2
         String userId2 = UserResourceTest.createUser();

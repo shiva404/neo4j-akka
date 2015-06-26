@@ -1,6 +1,6 @@
 package com.campusconnect.neo4j.tests;
 
-import com.campusconnect.neo4j.tests.functional.base.ResourceProvider;
+import com.campusconnect.neo4j.tests.functional.base.GlassFishResourceProvider;
 import com.github.javafaker.Faker;
 import com.sun.jersey.api.client.WebResource;
 
@@ -14,7 +14,7 @@ public class TestBase {
     public static WebResource resource;
 
     static {
-        ResourceProvider provider = new ResourceProvider();
+        GlassFishResourceProvider provider = new GlassFishResourceProvider();
         resource = provider.getResource();
     }
 

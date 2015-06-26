@@ -12,7 +12,7 @@ import com.campusconnect.neo4j.akka.goodreads.types.User;
 import com.campusconnect.neo4j.akka.goodreads.util.ResponseUtils;
 import com.campusconnect.neo4j.da.iface.BookDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
-import com.campusconnect.neo4j.types.web.UserRecommendation;
+import com.campusconnect.neo4j.types.web.GoodreadsUserRecommendation;
 import com.sun.jersey.api.uri.UriBuilderImpl;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -63,7 +63,7 @@ public class FriendsBookSearchForWishListWorker extends UntypedActor {
 
 
             if (friends != null && Integer.parseInt(friends.getTotal()) != 0) {
-                List<UserRecommendation> existingRecommendations = bookDao.getGoodreadsUserRecommendations(getFriendsTask.getUserId());
+                List<GoodreadsUserRecommendation> existingRecommendations = bookDao.getGoodreadsUserRecommendations(getFriendsTask.getUserId());
 
                 if (Integer.parseInt(friends.getEnd()) != Integer.parseInt(friends.getTotal())) {
                     logger.info("fired friends request again for page:" + (getFriendsTask.getPage() + 1));

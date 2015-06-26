@@ -23,7 +23,7 @@ public class Neo4jToWebMapper {
 
     }
 
-    public static GroupMember mapUserNeo4jToWebGroupMember(com.campusconnect.neo4j.types.neo4j.User user, String groupId, Long memberSince, String role) {
+    public static GroupMember mapUserNeo4jToWebGroupMember(com.campusconnect.neo4j.types.neo4j.User user, String groupId, String groupName, Long memberSince, String role) {
         if (user == null)
             return null;
         Set<Address> addresses = new HashSet<>();
@@ -34,7 +34,7 @@ public class Neo4jToWebMapper {
         }
         return new GroupMember(addresses, user.getCreatedDate(), user.getEmail(), user.getFavorites(), user.getFbId(), user.getGoodreadsAccessToken(), user.getGoodreadsAccessTokenSecret(), user.getGoodreadsAuthStatus(),
                 user.getGoodReadsSynchStatus(), user.getLastGoodreadsSychDate(), user.getGoodreadsId(), user.getGoogleId(), user.getId(), user.getLastModifiedDate(), user.getName(), user.getPhone(), user.getGender(),
-                user.getProfileImageUrl(), user.getWorkDesignation(), user.getWorkLocation(), user.getUserRelation(), groupId, role, memberSince);
+                user.getProfileImageUrl(), user.getWorkDesignation(), user.getWorkLocation(), user.getUserRelation(), groupId, groupName, role, memberSince);
     }
 
     public static Book mapBookNeo4jToWeb(com.campusconnect.neo4j.types.neo4j.Book book) {

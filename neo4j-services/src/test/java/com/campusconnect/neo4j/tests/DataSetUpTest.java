@@ -242,7 +242,7 @@ public class DataSetUpTest extends TestBase {
         assert clientResponse.getStatus() == 200;
 
         clientResponse = resource.path("users").path(userId1).path("books")
-                .path(book3).path("own").type("application/json")
+                .path(book3).path("own").queryParam("status", "available").type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 

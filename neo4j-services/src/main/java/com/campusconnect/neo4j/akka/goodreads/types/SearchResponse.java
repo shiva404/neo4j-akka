@@ -39,7 +39,7 @@ public class SearchResponse {
     }
 
     /**
-     * @return The search
+     * @return The searchMemebers
      */
     @JsonProperty("search")
     public Search getSearch() {
@@ -47,7 +47,7 @@ public class SearchResponse {
     }
 
     /**
-     * @param search The search
+     * @param search The searchMemebers
      */
     @JsonProperty("search")
     public void setSearch(Search search) {

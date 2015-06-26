@@ -17,6 +17,7 @@ import com.campusconnect.neo4j.types.neo4j.*;
 import com.campusconnect.neo4j.types.neo4j.Reminder;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.*;
+import com.campusconnect.neo4j.util.StringUtils;
 import com.campusconnect.neo4j.util.Validator;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -256,7 +257,7 @@ public class UserResource {
     @Path("{userId}/books/{bookId}/own")
     public Response addBook(@PathParam("userId") final String userId,
                             @PathParam("bookId") final String bookId,
-                            @QueryParam("status") @DefaultValue("none") final String status, @QueryParam("idType") String bookIdType) throws Exception {
+                            @QueryParam("status") @DefaultValue("AVAILABLE") final String status, @QueryParam("idType") String bookIdType) throws Exception {
         User user = userDao.getUser(userId);
         Book book = null;
         if (bookIdType == null || bookIdType.equals("id")) {
@@ -265,7 +266,7 @@ public class UserResource {
             book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
         }
         Long now = System.currentTimeMillis();
-        bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status, now));
+        bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status.toUpperCase(), now));
         return Response.ok().build();
     }
 
@@ -642,6 +643,21 @@ public class UserResource {
             returnUsers.add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
         }
         return Response.ok().entity(new UsersPage(0, returnUsers.size(), returnUsers)).build();
+    }
+
+    @GET
+    @Path("{userId}/friends/rec")
+    public Response getFriendsRec(@PathParam("userId") String userId, @QueryParam("size") @DefaultValue("10") final String size, @QueryParam("includeFriends") @DefaultValue("false") final String includeFriends) {
+        //validations
+        boolean isIncludeFriends = StringUtils.getBoolean(includeFriends);
+        Integer sizeValue = StringUtils.getIntegerValue(size, 10);
+        List<FriendRecommendation> friendRecommendations;
+        if(isIncludeFriends) {
+            friendRecommendations = userDao.getFriendsRecWithFriends(userId, size);
+        } else {
+            friendRecommendations = userDao.getFriendsRecWithCount(userId, size);
+        }
+        return Response.ok().entity(new FriendRecommendationsPage(friendRecommendations, friendRecommendations.size(), 0)).build();
     }
 
     @GET

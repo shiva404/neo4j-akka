@@ -2,6 +2,7 @@ package com.campusconnect.neo4j.da.iface;
 
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.*;
+import com.campusconnect.neo4j.types.neo4j.Group;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.*;
 
@@ -65,7 +66,7 @@ public interface BookDao {
 
     List<OwnedBook> getAvailableBooks(String userId);
 
-    List<UserRecommendation> getGoodreadsUserRecommendations(String userId);
+    List<GoodreadsUserRecommendation> getGoodreadsUserRecommendations(String userId);
 
     //    @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     List<WishListBook> getWishListBooks(String userId);
@@ -80,4 +81,6 @@ public interface BookDao {
     
     void deleteBorrowRequest(String borrowerId,String bookId,String ownerId,String message);
     
+
+    List<Book> getWishlistBooks(String userId);
 }

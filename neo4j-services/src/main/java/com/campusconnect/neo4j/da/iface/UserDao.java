@@ -4,6 +4,7 @@ import com.campusconnect.neo4j.types.neo4j.Address;
 import com.campusconnect.neo4j.types.neo4j.ReminderRelationShip;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.neo4j.UserRelation;
+import com.campusconnect.neo4j.types.web.FriendRecommendation;
 
 import java.util.List;
 
@@ -59,4 +60,7 @@ public interface UserDao {
 
     List<User> getRelatedUsers(String loggedInUser);
 
+    List<FriendRecommendation> getFriendsRecWithCount(String userId, String size);
+
+    List<FriendRecommendation> getFriendsRecWithFriends(String userId, String size);
 }

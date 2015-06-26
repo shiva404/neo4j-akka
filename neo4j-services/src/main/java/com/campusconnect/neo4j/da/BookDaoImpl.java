@@ -7,6 +7,7 @@ import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.da.mapper.DBMapper;
 import com.campusconnect.neo4j.da.utils.HistoryEventHelper;
 import com.campusconnect.neo4j.da.utils.TargetHelper;
+import com.campusconnect.neo4j.da.utils.Queries;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.UserRecRepository;
@@ -15,6 +16,7 @@ import com.campusconnect.neo4j.types.common.BookStatus;
 import com.campusconnect.neo4j.types.common.RelationTypes;
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.*;
+import com.campusconnect.neo4j.types.neo4j.Group;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.*;
 import com.campusconnect.neo4j.util.Constants;
@@ -32,8 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.*;
 
-import static com.campusconnect.neo4j.da.mapper.DBMapper.getBookFromRestNode;
-import static com.campusconnect.neo4j.da.mapper.DBMapper.setRelationDetailsToBook;
+import static com.campusconnect.neo4j.da.mapper.DBMapper.*;
 
 /**
  * Created by sn1 on 2/16/15.
@@ -88,6 +89,86 @@ public class BookDaoImpl implements BookDao {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public List<Book> getWishlistBooks(String userId) {
+        List<Book> wishlistRecOnFriends = getWishlistRecOnFriends(userId);
+        wishlistRecOnFriends.addAll(getWishlistRecOnGroups(userId));
+        return wishlistRecOnFriends;
+    }
+
+    private List<Book> getWishlistRecOnFriends(String userId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(Queries.GET_WISHLIST_REC_FRIENDS, params);
+        return getWishListBookAndUserFromResultMap(mapResult);
+    }
+
+    private List<Book> getWishlistRecOnGroups(String userId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(Queries.GET_WISHLIST_GROUP, params);
+        return getWishListBookGroupAndFriendFromResultMap(mapResult);
+    }
+
+    private List<Book> getWishListBookGroupAndFriendFromResultMap(Result<Map<String, Object>> mapResult) {
+        List<Book> books = new ArrayList<>();
+        for (Map<String, Object> objectMap : mapResult) {
+            RestNode bookNode = (RestNode) objectMap.get("book");
+            RestNode userNode = (RestNode) objectMap.get("friend");
+            RestNode groupNode = (RestNode) objectMap.get("group");
+
+            User user = getUserFromRestNode(userNode);
+            Book book = getBookFromRestNode(bookNode);
+            Group group = getGroupFromRestNode(groupNode);
+            GroupMember groupMember = Neo4jToWebMapper.mapUserNeo4jToWebGroupMember(user, group.getId(), group.getName(), group.getCreatedDate(), null);
+            boolean appended = false;
+            for(Book listedBook : books) {
+                if(listedBook.getId().equals(book.getId())){
+                    WishlistBookDetails wishlistBookDetails = (WishlistBookDetails) listedBook.getBookDetails();
+                    //fixme: role been passed as null
+                    wishlistBookDetails.getGroupMembers().add(groupMember);
+                    appended = true;
+                    break;
+                }
+            }
+            if(!appended){
+                WishlistBookDetails wishlistBookDetails = new WishlistBookDetails();
+                wishlistBookDetails.getGroupMembers().add(groupMember);
+                book.setBookDetails(wishlistBookDetails);
+            }
+            books.add(book);
+        }
+        return books;
+    }
+
+    private List<Book> getWishListBookAndUserFromResultMap(Result<Map<String, Object>> mapResult) {
+        List<Book> books = new ArrayList<>();
+        for (Map<String, Object> objectMap : mapResult) {
+            RestNode bookNode = (RestNode) objectMap.get("book");
+            RestNode userNode = (RestNode) objectMap.get("friend");
+            User user =getUserFromRestNode(userNode);
+            Book book = getBookFromRestNode(bookNode);
+
+            boolean appended = false;
+            for(Book listedBook : books) {
+                if(listedBook.getId().equals(book.getId())){
+                    WishlistBookDetails wishlistBookDetails = (WishlistBookDetails) listedBook.getBookDetails();
+                    wishlistBookDetails.getUsers().add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+                    appended = true;
+                }
+            }
+            if(!appended){
+                WishlistBookDetails wishlistBookDetails = new WishlistBookDetails();
+                wishlistBookDetails.getUsers().add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+                book.setBookDetails(wishlistBookDetails);
+            }
+            books.add(book);
+        }
+        return books;
+    }
+
+
 
     @Override
     @Transactional
@@ -199,7 +280,7 @@ public class BookDaoImpl implements BookDao {
                 return book;
             }
         } catch (Exception e) {
-            //Todo : if exception is not found search in goodreads
+            //Todo : if exception is not found searchMemebers in goodreads
             //return goodreadsDao.getBookById(goodreadsId);
         }
         return null;
@@ -284,7 +365,7 @@ public class BookDaoImpl implements BookDao {
 
 
     @Override
-    public List<UserRecommendation> getGoodreadsUserRecommendations(String userId) {
+    public List<GoodreadsUserRecommendation> getGoodreadsUserRecommendations(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:GR_REC]->(books:Book) return books, relation", params);
@@ -404,8 +485,8 @@ public class BookDaoImpl implements BookDao {
         return currentlyReadingBooks;
     }
     
-    private List<UserRecommendation> getWishUserRecFromResultMap(Result<Map<String, Object>> mapResult) {
-        List<UserRecommendation> userRecommendations = new ArrayList<>();
+    private List<GoodreadsUserRecommendation> getWishUserRecFromResultMap(Result<Map<String, Object>> mapResult) {
+        List<GoodreadsUserRecommendation> goodreadsUserRecommendations = new ArrayList<>();
         for (Map<String, Object> objectMap : mapResult) {
             RestNode bookNode = (RestNode) objectMap.get("books");
             RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
@@ -414,15 +495,15 @@ public class BookDaoImpl implements BookDao {
             book.setBookType("WISH");
             GoodreadsRecRelationship goodreadsRecRelation = DBMapper.getGoodreadsRecRelationship(rawWishRelationship);
 
-            UserRecommendation userRecommendation = new UserRecommendation(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
-            userRecommendation.setFriendGoodreadsId(goodreadsRecRelation.getFriendGoodreadsId());
-            userRecommendation.setFriendImageUrl(goodreadsRecRelation.getFriendImageUrl());
-            userRecommendation.setFriendName(goodreadsRecRelation.getFriendName());
-            userRecommendation.setCreateDate(goodreadsRecRelation.getCreatedDate());
-            userRecommendation.setFriendId(goodreadsRecRelation.getFriendId());
-            userRecommendations.add(userRecommendation);
+            GoodreadsUserRecommendation goodreadsUserRecommendation = new GoodreadsUserRecommendation(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
+            goodreadsUserRecommendation.setFriendGoodreadsId(goodreadsRecRelation.getFriendGoodreadsId());
+            goodreadsUserRecommendation.setFriendImageUrl(goodreadsRecRelation.getFriendImageUrl());
+            goodreadsUserRecommendation.setFriendName(goodreadsRecRelation.getFriendName());
+            goodreadsUserRecommendation.setCreateDate(goodreadsRecRelation.getCreatedDate());
+            goodreadsUserRecommendation.setFriendId(goodreadsRecRelation.getFriendId());
+            goodreadsUserRecommendations.add(goodreadsUserRecommendation);
         }
-        return userRecommendations;
+        return goodreadsUserRecommendations;
     }
 
     private List<BorrowedBook> getBorrowedBooksFromResultMap(Result<Map<String, Object>> mapResult) {

@@ -1,24 +1,18 @@
 package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
-import com.campusconnect.neo4j.da.iface.AuditEventDao;
-import com.campusconnect.neo4j.da.iface.EmailDao;
-import com.campusconnect.neo4j.da.iface.NotificationDao;
-import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.da.iface.*;
 import com.campusconnect.neo4j.da.mapper.DBMapper;
 import com.campusconnect.neo4j.da.utils.Queries;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
-import com.campusconnect.neo4j.da.utils.TargetHelper;
 import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
 import com.campusconnect.neo4j.types.common.*;
 import com.campusconnect.neo4j.types.neo4j.*;
 import com.campusconnect.neo4j.types.web.Event;
+import com.campusconnect.neo4j.types.web.FriendRecommendation;
 import com.campusconnect.neo4j.types.web.Notification;
 import com.campusconnect.neo4j.util.Constants;
-import com.campusconnect.neo4j.types.neo4j.Address;
-import com.campusconnect.neo4j.types.neo4j.User;
-import com.campusconnect.neo4j.types.web.*;
 import com.googlecode.ehcache.annotations.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
@@ -40,6 +34,9 @@ public class UserDaoImpl implements UserDao {
     String SEARCH_STRING = "(?i)%1$s.*";
 
     @Autowired
+    ReminderDao reminderDao;
+
+    @Autowired
     UserRepository userRepository;
 
     @Autowired
@@ -50,6 +47,9 @@ public class UserDaoImpl implements UserDao {
 
     @Autowired
     AuditEventDao auditEventDao;
+
+    @Autowired
+    AddressDao addressDao;
 
     @Autowired
     NotificationDao notificationDao;
@@ -156,7 +156,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> search(String searchString, String userId) {
         List<User> users = userRepository.searchUsers(String.format(SEARCH_STRING, searchString));
-        if(userId != null) {
+        if (userId != null) {
             List<User> friends = getRelatedUsers(userId);
             User currentUser = getUser(userId);
             friends.add(currentUser);
@@ -209,14 +209,14 @@ public class UserDaoImpl implements UserDao {
             User friendOfFriend = DBMapper.getUserFromRestNode(friendOfFriendNode);
             User friend = DBMapper.getUserFromRestNode(friendNode);
             boolean appended = false;
-            for(FriendRecommendation friendRecommendation : friendRecommendations) {
-                if(friendRecommendation.getUser().getId().equals(friendOfFriend.getId())){
+            for (FriendRecommendation friendRecommendation : friendRecommendations) {
+                if (friendRecommendation.getUser().getId().equals(friendOfFriend.getId())) {
                     friendRecommendation.getMutualFriends().add(Neo4jToWebMapper.mapUserNeo4jToWeb(friend));
-                    friendRecommendation.setSize(friendRecommendation.getSize()+1);
+                    friendRecommendation.setSize(friendRecommendation.getSize() + 1);
                     appended = true;
                 }
             }
-            if(!appended){
+            if (!appended) {
                 FriendRecommendation friendRecommendation = new FriendRecommendation();
                 friendRecommendation.setUser(Neo4jToWebMapper.mapUserNeo4jToWeb(friendOfFriend));
                 friendRecommendation.getMutualFriends().add(Neo4jToWebMapper.mapUserNeo4jToWeb(friend));
@@ -233,6 +233,20 @@ public class UserDaoImpl implements UserDao {
         params.put("userId", userId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query(Queries.GET_FRIEND_REC_WITH_FRIENDS, params);
         return getFriendsRecWithFriendsFromMap(mapResult);
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        User user = getUser(userId);
+        //delete notifications of the user
+        notificationDao.deleteNotificationOfUser(userId);
+        //delete events of the user
+        auditEventDao.deleteAuditEventsOfUser(userId);
+        //delete address of the user
+        addressDao.deleteAddressOfUser(user);
+        //Delete reminders
+        reminderDao.deleteRemindersOfUser(userId);
+        neo4jTemplate.delete(user);
     }
 
     private List<FriendRecommendation> getFriendsRecWithCountFromMap(Result<Map<String, Object>> mapResult) {
@@ -282,7 +296,7 @@ public class UserDaoImpl implements UserDao {
         while (iterator.hasNext()) {
             User user = iterator.next();
             // Do something
-            if(user.getId().equals(userId)){
+            if (user.getId().equals(userId)) {
                 iterator.remove();
             }
         }
@@ -328,7 +342,7 @@ public class UserDaoImpl implements UserDao {
                     Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend, System.currentTimeMillis(), true);
                     Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
 
-                    Notification beFriendNotification = new Notification(targetNotification, currentTime,Constants.FRIEND_REQUEST_ACCEPTED_NOTIFICATION);
+                    Notification beFriendNotification = new Notification(targetNotification, currentTime, Constants.FRIEND_REQUEST_ACCEPTED_NOTIFICATION);
                     auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
                     auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
                     notificationDao.addNotification(user.getId(), beFriendNotification);
@@ -483,13 +497,13 @@ public class UserDaoImpl implements UserDao {
                     UserRelationType.FRIEND_REQUEST_PENDING.toString());
             neo4jTemplate.save(userRelation);
             emailDao.sendFriendRequestEmail(user, friend);
-         //send notification to friend
+            //send notification to friend
             String targetNotificationstring = user.getName();
             String targetNoitficationUrl = "/users/" + user.getId();
-           Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " sent you a friend request", targetNoitficationUrl);
-           
-           Notification sentFriendRequestNotification = new Notification(targetNotification, System.currentTimeMillis(),Constants.FRIEND_REQUEST_SENT_NOTIFICATION);
-           notificationDao.addNotification(friend.getId(), sentFriendRequestNotification);
+            Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " sent you a friend request", targetNoitficationUrl);
+
+            Notification sentFriendRequestNotification = new Notification(targetNotification, System.currentTimeMillis(), Constants.FRIEND_REQUEST_SENT_NOTIFICATION);
+            notificationDao.addNotification(friend.getId(), sentFriendRequestNotification);
         }
     }
 

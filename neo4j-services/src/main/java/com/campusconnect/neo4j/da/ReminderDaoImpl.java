@@ -41,9 +41,7 @@ public class ReminderDaoImpl implements ReminderDao {
 
     @Override
     public Reminder getReminder(String reminderId) {
-
         return reminderRepository.findOne(Long.parseLong(reminderId));
-
     }
 
     @Override
@@ -55,6 +53,13 @@ public class ReminderDaoImpl implements ReminderDao {
     @Override
     public List<Reminder> getAllReminders(String userId) {
         return reminderRepository.getAllReminders(userId);
+    }
+
+    @Override
+    public void deleteRemindersOfUser(String userId) {
+        List<Reminder> allReminders = reminderRepository.getAllReminders(userId);
+        for (Reminder reminder : allReminders)
+            reminderRepository.delete(reminder);
     }
 
 }

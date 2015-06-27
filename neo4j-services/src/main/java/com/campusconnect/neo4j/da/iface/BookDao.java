@@ -2,10 +2,8 @@ package com.campusconnect.neo4j.da.iface;
 
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.*;
-import com.campusconnect.neo4j.types.neo4j.Group;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.*;
-
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -22,7 +20,7 @@ public interface BookDao {
     void listBookAsOwns(OwnsRelationship ownsRelationship);
 
     void listBookAsRead(ReadRelationship readRelation);
-    
+
     void listBookAsCurrentlyReading(CurrentlyReadingRelationShip currentlyReadingRelationship);
 
     @Transactional
@@ -40,9 +38,9 @@ public interface BookDao {
     List<Book> search(String queryString);
 
     // @Cacheable(cacheName = "bookByGRIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    Book getBookByGoodreadsId(Integer goodreadsId) throws IOException;
+    Book getBookByGoodreadsId(Integer goodreadsId);
 
-    public Book getBookByGoodreadsIdAndSaveIfNotExists(String goodreadsId, Book book);
+    public Book getBookByGoodreadsIdAndSaveIfNotExists(Integer goodreadsId, Book book);
 
     public void addWishBookToUser(WishListRelationship wishListRelationship);
 
@@ -70,17 +68,17 @@ public interface BookDao {
 
     //    @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     List<WishListBook> getWishListBooks(String userId);
-    
+
     List<CurrentlyReadingBook> getCurrentlyReadingBook(String userId);
 
     //    @Cacheable(cacheName = "userBorrowedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     List<BorrowedBook> getBorrowedBooks(String userId);
-    
+
     // Return history of books
-    List<HistoryEvent> getBookHistory(String bookId,String UserId);
-    
-    void deleteBorrowRequest(String borrowerId,String bookId,String ownerId,String message);
-    
+    List<HistoryEvent> getBookHistory(String bookId, String UserId);
+
+    void deleteBorrowRequest(String borrowerId, String bookId, String ownerId, String message);
+
 
     List<Book> getWishlistBooks(String userId);
 }

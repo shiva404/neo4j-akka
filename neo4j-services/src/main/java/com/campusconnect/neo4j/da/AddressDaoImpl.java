@@ -7,6 +7,7 @@ import com.campusconnect.neo4j.types.common.AuditEventType;
 import com.campusconnect.neo4j.types.common.IdType;
 import com.campusconnect.neo4j.types.common.Target;
 import com.campusconnect.neo4j.types.neo4j.Address;
+import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.Event;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
@@ -72,5 +73,12 @@ public class AddressDaoImpl implements AddressDao {
     @TriggersRemove(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public void deleteAddress(String addressId, @PartialCacheKey String userId) {
         addressRepository.delete(Long.parseLong(addressId));
+    }
+
+    @Override
+    public void deleteAddressOfUser(User user) {
+        List<Address> addresses = addressRepository.getAddressForUser(user.getId());
+        for (Address address : addresses)
+            addressRepository.delete(address);
     }
 }

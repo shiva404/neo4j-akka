@@ -34,6 +34,11 @@ public class UserResourceTest extends TestBase {
         return userId;
     }
 
+    public static void deleteUser(String userId) {
+        ClientResponse clientResponse = resource.path("users").path(userId).type("application/json").delete(ClientResponse.class);
+        assert clientResponse.getStatus() == 200;
+    }
+
     public static String createBook() {
         ClientResponse createBookClientResponse = resource.path("books").type("application/json").entity(DataBrewer.getFakeBook()).post(ClientResponse.class);
         return createBookClientResponse.getEntity(Book.class).getId();

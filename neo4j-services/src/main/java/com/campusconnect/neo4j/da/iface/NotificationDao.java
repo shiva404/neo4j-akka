@@ -17,5 +17,5 @@ public interface NotificationDao {
 
     void moveNotification(String userId);
 
-
+    void deleteNotificationOfUser(String userId);
 }

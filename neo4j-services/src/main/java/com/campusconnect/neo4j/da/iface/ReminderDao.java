@@ -17,4 +17,6 @@ public interface ReminderDao {
     List<Reminder> getAllReminders(String userId);
 
 
+    void deleteRemindersOfUser(String userId);
+
 }

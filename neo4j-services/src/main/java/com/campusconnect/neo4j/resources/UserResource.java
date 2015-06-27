@@ -13,19 +13,17 @@ import com.campusconnect.neo4j.types.common.Target;
 import com.campusconnect.neo4j.types.neo4j.Address;
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.Group;
-import com.campusconnect.neo4j.types.neo4j.*;
 import com.campusconnect.neo4j.types.neo4j.Reminder;
+import com.campusconnect.neo4j.types.neo4j.*;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.*;
 import com.campusconnect.neo4j.util.StringUtils;
 import com.campusconnect.neo4j.util.Validator;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -211,6 +209,14 @@ public class UserResource {
         return Response.ok().entity(returnAddress).build();
     }
 
+    @PUT
+    @Path("{userId}/books/wishlist/rec")
+    public Response synchWishListRec(@PathParam("userId") final String userId) {
+        userDao.synchWishListRec(userId);
+        return Response.ok().build();
+    }
+
+
     @GET
     @Path("{userId}/addresses")
     public Response getAddress(@PathParam("userId") final String userId) {
@@ -253,73 +259,6 @@ public class UserResource {
         return Response.ok().build();
     }
 
-    @POST
-    @Path("{userId}/books/{bookId}/own")
-    public Response addBook(@PathParam("userId") final String userId,
-                            @PathParam("bookId") final String bookId,
-                            @QueryParam("status") @DefaultValue("AVAILABLE") final String status, @QueryParam("idType") String bookIdType) throws Exception {
-        User user = userDao.getUser(userId);
-        Book book = null;
-        if (bookIdType == null || bookIdType.equals("id")) {
-            book = bookDao.getBook(bookId);
-        } else if (bookIdType.equals("grId")) {
-            book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
-        }
-        Long now = System.currentTimeMillis();
-        bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status.toUpperCase(), now));
-        return Response.ok().build();
-    }
-
-    @POST
-    @Path("{userId}/books/{bookId}/wish")
-    public Response addBookToWishList(@PathParam("userId") final String userId,
-                                      @PathParam("bookId") final String bookId,
-                                      @QueryParam("status") @DefaultValue("none") final String status, @QueryParam("idType") String bookIdType) throws Exception {
-
-        User user = userDao.getUser(userId);
-        Book book = null;
-        if (bookIdType == null || bookIdType.equals("id")) {
-            book = bookDao.getBook(bookId);
-        } else if (bookIdType.equals("grId")) {
-            book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
-        }
-        Long now = System.currentTimeMillis();
-        bookDao.addWishBookToUser(new WishListRelationship(user, book, status, now, now));
-        return Response.ok().build();
-    }
-
-    @POST
-    @Path("{userId}/books/{bookId}/read")
-    public Response addBookToReadList(@PathParam("userId") final String userId,
-                                      @PathParam("bookId") final String bookId,
-                                      @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
-
-        User user = userDao.getUser(userId);
-        Book book = bookDao.getBook(bookId);
-        Long now = System.currentTimeMillis();
-        bookDao.listBookAsRead(new ReadRelationship(user, book, status, now, now, null));
-        return Response.ok().build();
-    }
-    
-    @POST
-    @Path("{userId}/books/{bookId}/currentlyReading")
-    public Response addBookToCurrentReadingList(@PathParam("userId") final String userId,
-                                      @PathParam("bookId") final String bookId,
-                                      @QueryParam("status") @DefaultValue("none") final String status) throws Exception {
-
-        User user = userDao.getUser(userId);
-        Book book = bookDao.getBook(bookId);
-        Long now = System.currentTimeMillis();
-        bookDao.listBookAsCurrentlyReading(new CurrentlyReadingRelationShip(user, book, status, now, now));
-        return Response.ok().build();
-    }
-
-    @PUT
-    @Path("{userId}/books/wishlist/rec")
-    public Response synchWishListRec(@PathParam("userId") final String userId) {
-        userDao.synchWishListRec(userId);
-        return Response.ok().build();
-    }
 
     @GET
     @Path("{userId}/books")
@@ -328,12 +267,12 @@ public class UserResource {
             throw new Exception("filer is null");
         }
         switch (filter.toLowerCase()) {
-            case "owned": {
+            case OWNS_RELATION: {
                 final List<OwnedBook> ownedBooks = bookDao.getOwnedBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
-            case "read": {
+            case READ_RELATION: {
                 final List<Book> readBooks = bookDao.getReadBooks(userId);
                 List<com.campusconnect.neo4j.types.web.Book> returnBooks = new ArrayList<>();
                 for (Book book : readBooks)
@@ -342,30 +281,30 @@ public class UserResource {
                 BooksPage booksPage = new BooksPage(0, returnBooks.size(), returnBooks);
                 return Response.ok().entity(booksPage).build();
             }
-            case "available": {
+            case AVAILABLE: {
                 final List<OwnedBook> ownedBooks = bookDao.getAvailableBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
-            case "lent": {
+            case LENT: {
                 final List<OwnedBook> ownedBooks = bookDao.getLentBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
                 return Response.ok().entity(ownedBooksPage).build();
             }
-            case "borrowed":
+            case BORROWED:
                 final List<BorrowedBook> borrowedBooks = bookDao.getBorrowedBooks(userId);
                 BorrowedBooksPage borrowedBooksPage = new BorrowedBooksPage(0, borrowedBooks.size(), borrowedBooks);
                 return Response.ok().entity(borrowedBooksPage).build();
-            case "wishList":
+            case WISHLIST_RELATION:
                 List<WishListBook> wishListBooks = bookDao.getWishListBooks(userId);
                 WishListBooksPage wishListBooksPage = new WishListBooksPage(0, wishListBooks.size(), wishListBooks);
                 return Response.ok().entity(wishListBooksPage).build();
-            case "currentlyreading":
-            List<CurrentlyReadingBook> currentlyReadingBooks = bookDao.getCurrentlyReadingBook(userId);
-            CurrentlyReadingBooksPage currentlyReadingBooksPage = new CurrentlyReadingBooksPage(0, currentlyReadingBooks.size(), currentlyReadingBooks);
-            return Response.ok().entity(currentlyReadingBooksPage).build();
-            
-            case "all":
+            case CURRENTLY_READING_RELATION:
+                List<CurrentlyReadingBook> currentlyReadingBooks = bookDao.getCurrentlyReadingBook(userId);
+                CurrentlyReadingBooksPage currentlyReadingBooksPage = new CurrentlyReadingBooksPage(0, currentlyReadingBooks.size(), currentlyReadingBooks);
+                return Response.ok().entity(currentlyReadingBooksPage).build();
+
+            case ALL:
                 List<Book> allBooks = bookDao.getAllUserBooks(userId);
                 AllBooks resultBooks = new AllBooks();
                 for (Book book : allBooks) {
@@ -652,7 +591,7 @@ public class UserResource {
         boolean isIncludeFriends = StringUtils.getBoolean(includeFriends);
         Integer sizeValue = StringUtils.getIntegerValue(size, 10);
         List<FriendRecommendation> friendRecommendations;
-        if(isIncludeFriends) {
+        if (isIncludeFriends) {
             friendRecommendations = userDao.getFriendsRecWithFriends(userId, size);
         } else {
             friendRecommendations = userDao.getFriendsRecWithCount(userId, size);
@@ -682,7 +621,13 @@ public class UserResource {
             FriendsPage mutualFriendsPage = new FriendsPage(0, returnMutualFriends.size(), returnMutualFriends);
             allFriends.setMutualFriends(mutualFriendsPage);
         }
-
         return Response.ok().entity(allFriends).build();
+    }
+
+    @DELETE
+    @Path("{userId}")
+    public Response deleteUser(@PathParam("userId") String userId) {
+        userDao.deleteUser(userId);
+        return Response.ok().build();
     }
 }

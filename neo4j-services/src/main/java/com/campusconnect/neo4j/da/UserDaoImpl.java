@@ -328,7 +328,7 @@ public class UserDaoImpl implements UserDao {
                     Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend, System.currentTimeMillis(), true);
                     Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
 
-                    Notification beFriendNotification = new Notification(targetNotification, currentTime);
+                    Notification beFriendNotification = new Notification(targetNotification, currentTime,Constants.FRIEND_REQUEST_ACCEPTED_NOTIFICATION);
                     auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
                     auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
                     notificationDao.addNotification(user.getId(), beFriendNotification);
@@ -483,8 +483,13 @@ public class UserDaoImpl implements UserDao {
                     UserRelationType.FRIEND_REQUEST_PENDING.toString());
             neo4jTemplate.save(userRelation);
             emailDao.sendFriendRequestEmail(user, friend);
-            // Notification friendRequestRecievedNotification = new
-            // Notification(target, timeStamp)
+         //send notification to friend
+            String targetNotificationstring = user.getName();
+            String targetNoitficationUrl = "/users/" + user.getId();
+           Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " sent you a friend request", targetNoitficationUrl);
+           
+           Notification sentFriendRequestNotification = new Notification(targetNotification, System.currentTimeMillis(),Constants.FRIEND_REQUEST_SENT_NOTIFICATION);
+           notificationDao.addNotification(friend.getId(), sentFriendRequestNotification);
         }
     }
 

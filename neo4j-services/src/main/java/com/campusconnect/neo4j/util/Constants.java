@@ -22,6 +22,14 @@ public class Constants {
     public static final String WISHLIST_RELATION = "WISH";
     public static final String FRIEND_REQ_SENT = "FRIEND_REQ_SENT";
     public static final String FRINED_REQ_APPROVAL_PENDING = "FRINED_REQ_APPROVAL_PENDING";
+    public static final String ADDRESS_TYPE_HOME = "HOME";
+    public static final String ADDRESS_TYPE_WORK = "WORK";
+    public static final String ADDRESS_TYPE_OTHER = "OTHER";
+    public static final String FRIEND_REQUEST_SENT_NOTIFICATION = "FRIEND_REQUEST_SENT"; 
+    public static final String FRIEND_REQUEST_ACCEPTED_NOTIFICATION = "FRIEND_REQUEST_ACCEPTED"; 
+    
+    
+    
 
     public static final String SELF = "SELF";
 

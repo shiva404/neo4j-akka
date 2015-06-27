@@ -18,6 +18,7 @@ public class NotificationDaoImpl implements NotificationDao {
 
     @Autowired
     NotificationRepository notificationRepository;
+
     ObjectMapper objectMapper = new ObjectMapper();
 
     public NotificationDaoImpl() {
@@ -101,6 +102,14 @@ public class NotificationDaoImpl implements NotificationDao {
         freshNotificationEntity.getNotifications().clear();
         savenotification(freshNotificationEntity);
 
+    }
+
+    @Override
+    public void deleteNotificationOfUser(String userId) {
+        List<NotificationEntity> allNotifications = notificationRepository.getAllNotificationForUser(userId);
+        for (NotificationEntity notificationEntity : allNotifications) {
+            notificationRepository.delete(notificationEntity);
+        }
     }
 
 }

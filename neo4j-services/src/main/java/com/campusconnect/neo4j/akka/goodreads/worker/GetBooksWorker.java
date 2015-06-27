@@ -91,7 +91,7 @@ public class GetBooksWorker extends UntypedActor {
 
                 Book bookByGoodreadsIdWithUser = bookDao.getBookByGoodreadsIdWithUser(book.getGoodreadsId(), getBooksTask.getUserId());
                 if (bookByGoodreadsIdWithUser == null || bookByGoodreadsIdWithUser.getBookType() == null) {
-                    Book dbBook = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(book.getGoodreadsId().toString(), book);
+                    Book dbBook = bookDao.getBookByGoodreadsIdAndSaveIfNotExists(book.getGoodreadsId(), book);
 //                Book dbBook = bookDao.getBookByGoodreadsId(book.getGoodreadsId().toString());
                     //todo: dont create a relation if already exists
                     final Long now = System.currentTimeMillis();

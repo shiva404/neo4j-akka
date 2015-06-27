@@ -23,9 +23,11 @@ public class Book implements Serializable {
 
     private String authorName;
     private String goodreadsAuthorId;
-
     private String name;
+
+    @Indexed
     private String isbn;
+    @Indexed
     private String isbn13;
     private int publishedYear;
     private String description;

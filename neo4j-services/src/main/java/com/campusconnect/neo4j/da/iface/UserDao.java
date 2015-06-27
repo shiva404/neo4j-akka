@@ -63,4 +63,6 @@ public interface UserDao {
     List<FriendRecommendation> getFriendsRecWithCount(String userId, String size);
 
     List<FriendRecommendation> getFriendsRecWithFriends(String userId, String size);
+
+    void deleteUser(String userId);
 }

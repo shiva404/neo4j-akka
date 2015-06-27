@@ -17,5 +17,4 @@ public interface NotificationRepository extends GraphRepository<NotificationEnti
 
     @Query(value = "MATCH (user:User {id:{0}})-[:NOTIFICATION {type:{1}}]-(notificationEntity:NotificationEntity) return notificationEntity")
     NotificationEntity getPastNotificationForUser(String userId, String type);
-
 }

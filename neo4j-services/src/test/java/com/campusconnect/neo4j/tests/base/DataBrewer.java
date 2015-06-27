@@ -21,11 +21,11 @@ public class DataBrewer {
     }
 
     public static Book getFakeBook() {
-        return new Book(faker.name().name(), UUID.randomUUID().toString());
+        return new Book("Book " + faker.name().name(), UUID.randomUUID().toString());
     }
 
     public static Group getFakeGroup() {
-        return new Group(faker.name().name());
+        return new Group("Group " + faker.name().name());
     }
 
     public static User getFakeUserWithAddress() {

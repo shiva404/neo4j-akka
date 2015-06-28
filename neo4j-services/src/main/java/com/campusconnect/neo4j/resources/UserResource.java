@@ -21,7 +21,7 @@ import com.campusconnect.neo4j.util.StringUtils;
 import com.campusconnect.neo4j.util.Validator;
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-
+import com.campusconnect.neo4j.util.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -387,20 +387,18 @@ public class UserResource {
             //TODO:notification to user about acceptance
 
         } else if (status.toLowerCase().equals("cancel")) {
-            userDao.deleteFriendRequest(userId, friendUserId);
+            userDao.deleteFriendRequest(userId, friendUserId,Constants.FRIEND_REQUEST_CANCEL_DELETE);
         }
         return Response.ok().build();
     }
+    
+    @DELETE
+    @Path("{userId}/friend/{friendUserId}")
+    public Response unFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId) {
+            userDao.deleteFriendRequest(userId, friendUserId,Constants.FRIEND_UNFRIEND_DELETE);
+        return Response.ok().build();
+    }
 
-    //    @PUT
-//    @Path("{userId}/favourites")
-//    public Response setFavourites(@PathParam("userId") final String userId,final Favourites favourites)
-//    {
-//    	 User user = userDao.getUser(userId);
-//    	 user.setFavorites(favourites.getFavourites());
-//    	 userDao.updateUser(userId, user);
-//         return Response.ok().build();
-//    }
     private void addPropertiesForCreate(User user) {
         final Long createdDate = System.currentTimeMillis();
         user.setCreatedDate(createdDate);

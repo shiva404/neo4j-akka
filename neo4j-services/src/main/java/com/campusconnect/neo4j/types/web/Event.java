@@ -8,7 +8,7 @@ public class Event {
     private String eventString;
 
     private boolean isPublic;
-
+    
     private Subject subject;
     private Target target;
     private Long timeStamp;

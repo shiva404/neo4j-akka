@@ -2,6 +2,8 @@ package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.da.iface.AddressDao;
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
+import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.da.utils.TargetHelper;
 import com.campusconnect.neo4j.repositories.AddressRepository;
 import com.campusconnect.neo4j.types.common.AuditEventType;
 import com.campusconnect.neo4j.types.common.IdType;
@@ -13,6 +15,8 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
+import com.campusconnect.neo4j.util.*;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,6 +31,8 @@ public class AddressDaoImpl implements AddressDao {
 
     @Autowired
     private AuditEventDao auditEventDao;
+    @Autowired
+    private UserDao userDao;
 
     public AddressDaoImpl() {
     }
@@ -72,7 +78,11 @@ public class AddressDaoImpl implements AddressDao {
     @Override
     @TriggersRemove(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public void deleteAddress(String addressId, @PartialCacheKey String userId) {
+    	
         addressRepository.delete(Long.parseLong(addressId));
+     //   Event event = new Event(Constants.ADDRESS_DELETED_EVENT,TargetHelper.  , System.currentTimeMillis(), true);
+        
+        //TODO: add internal Event
     }
 
     @Override

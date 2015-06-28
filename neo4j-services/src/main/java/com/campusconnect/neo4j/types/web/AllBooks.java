@@ -15,12 +15,20 @@ public class AllBooks {
     private List<Book> borrowedBooks;
     private List<Book> ownedBooks;
     private List<Book> wishlistBooks;
+    private List<Book> currentlyReadingBooks;
 
     public List<Book> getReadBooks() {
         if (readBooks == null) {
             readBooks = new ArrayList<>();
         }
         return readBooks;
+    }
+
+    public List<Book> getCurrentlyReadingBooks() {
+        if (currentlyReadingBooks == null) {
+            currentlyReadingBooks = new ArrayList<>();
+        }
+        return currentlyReadingBooks;
     }
 
     public List<Book> getBorrowedBooks() {

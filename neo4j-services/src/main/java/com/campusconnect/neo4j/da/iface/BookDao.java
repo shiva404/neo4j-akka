@@ -48,7 +48,7 @@ public interface BookDao {
 
     Book getBookByIsbn(String isbn) throws IOException;
 
-    Book getBookRelatedUser(String bookId, String userId);
+    Book getBooksRelatedUser(String bookId, String userId);
 
     Book getBookByGoodreadsIdWithUser(Integer goodreadsId, String userId);
 

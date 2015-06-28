@@ -15,7 +15,6 @@ import com.campusconnect.neo4j.types.web.FriendRecommendation;
 import com.campusconnect.neo4j.types.web.Notification;
 import com.campusconnect.neo4j.util.Constants;
 import com.googlecode.ehcache.annotations.*;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
@@ -163,7 +162,7 @@ public class UserDaoImpl implements UserDao {
     public List<User> getPendingFriendReq(String userId) {
         List<User> pendingFriends = userRelationRepository.getPendingFriendRequests(userId);
         for (User user : pendingFriends) {
-            user.setUserRelation(Constants.FRINED_REQ_APPROVAL_PENDING);
+            user.setUserRelation(Constants.FRIEND_REQ_APPROVAL_PENDING);
         }
         return pendingFriends;
     }
@@ -240,6 +239,7 @@ public class UserDaoImpl implements UserDao {
         addressDao.deleteAddressOfUser(user);
         //Delete reminders
         reminderDao.deleteRemindersOfUser(userId);
+
         neo4jTemplate.delete(user);
     }
 
@@ -484,7 +484,6 @@ public class UserDaoImpl implements UserDao {
                 throw new IllegalArgumentException(
                         "You have already sent a friend Request");
             }
-
         } else {
             UserRelation userRelation = new UserRelation(user, friend,
                     System.currentTimeMillis(),
@@ -492,9 +491,9 @@ public class UserDaoImpl implements UserDao {
             neo4jTemplate.save(userRelation);
             emailDao.sendFriendRequestEmail(user, friend);
             //send notification to friend
-            String targetNotificationstring = user.getName();
-            String targetNoitficationUrl = "/users/" + user.getId();
-            Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " sent you a friend request", targetNoitficationUrl);
+            String targetNotificationString = user.getName();
+            String targetNotificationUrl = "/users/" + user.getId();
+            Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationString + " sent you a friend request", targetNotificationUrl);
 
             Notification sentFriendRequestNotification = new Notification(targetNotification, System.currentTimeMillis(), Constants.FRIEND_REQUEST_SENT_NOTIFICATION);
             notificationDao.addNotification(friend.getId(), sentFriendRequestNotification);
@@ -502,13 +501,14 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void deleteFriendRequest(String userId, String friendUserId,String deletetype) {
+    public void deleteFriendRequest(String userId, String friendUserId, String deletetype) {
         List<UserRelation> userRelations = userRelationRepository.getUsersRelationship(userId, friendUserId);
-        for(UserRelation userRelation : userRelations) {
+        for (UserRelation userRelation : userRelations) {
             neo4jTemplate.delete(userRelation);
         }
         //TODO: internal event according to delete type
     }
+
     private void deleteRelationExceptIndex(List<UserRelation> existingRelation,
                                            int index) {
         int count = 0;
@@ -526,9 +526,7 @@ public class UserDaoImpl implements UserDao {
             if (existingRelation.get(i).getType().equals(type)) {
                 return i;
             }
-
         }
         return -1;
     }
-
 }

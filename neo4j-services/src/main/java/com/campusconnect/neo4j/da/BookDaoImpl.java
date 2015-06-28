@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.campusconnect.neo4j.da.mapper.DBMapper.*;
+import static com.campusconnect.neo4j.da.utils.Queries.*;
 import static com.campusconnect.neo4j.util.Constants.*;
 
 /**
@@ -63,6 +64,7 @@ public class BookDaoImpl implements BookDao {
         this.emailDao = emailDao;
         this.userDao = userDao;
     }
+
 
     @Override
     public Book createBook(Book book) {
@@ -319,7 +321,7 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public Book getBookRelatedUser(String bookId, String userId) {
+    public Book getBooksRelatedUser(String bookId, String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("bookId", bookId);
@@ -336,8 +338,7 @@ public class BookDaoImpl implements BookDao {
     public List<Book> getAllUserBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book) - [relation] - (user:User {id: {userId}}) " +
-                "return relation, book", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(GET_ALL_BOOKS_QUERY, params);
         //todo throw not found
         return getBookDetails(mapResult, userId);
     }
@@ -349,7 +350,7 @@ public class BookDaoImpl implements BookDao {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("goodreadsId", goodreadsId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book {goodreadsId: {goodreadsId}}) - [relation] - (user:User {id: {userId}}) return relation, book", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(GET_BOOK_BY_GRID_USER_QUERY, params);
         //todo throw not found
         List<Book> books = getBookDetails(mapResult, userId);
         if (books.size() > 0) {
@@ -370,12 +371,11 @@ public class BookDaoImpl implements BookDao {
         return books;
     }
 
-
     @Override
     public List<GoodreadsUserRecommendation> getGoodreadsUserRecommendations(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:GR_REC]->(books:Book) return books, relation", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(GOODREADS_USER_REC_QUERY, params);
         return getWishUserRecFromResultMap(mapResult);
     }
 
@@ -385,7 +385,7 @@ public class BookDaoImpl implements BookDao {
     public List<WishListBook> getWishListBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:WISH]->(books:Book) return books, relation", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(WISHLIST_BOOKS_QUERY, params);
         return getWishListBooksFromResultMap(mapResult);
     }
 
@@ -393,7 +393,7 @@ public class BookDaoImpl implements BookDao {
     public List<Book> getReadBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[:READ]->(books:Book) return books", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(READ_BOOKS_QUERY, params);
         return getBooksFromResultMap(mapResult);
 
     }
@@ -403,7 +403,7 @@ public class BookDaoImpl implements BookDao {
     public List<OwnedBook> getOwnedBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS]->(books:Book) return books, relation", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(OWNED_BOOKS_BOOKS, params);
         return getOwnedBooksFromResultMap(mapResult);
     }
 
@@ -411,7 +411,7 @@ public class BookDaoImpl implements BookDao {
     public List<OwnedBook> getAvailableBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS {status: \"available\"}]->(books:Book) return books, relation", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(AVAILABLE_BOOKS_QUERY, params);
         return getOwnedBooksFromResultMap(mapResult);
     }
 
@@ -419,7 +419,7 @@ public class BookDaoImpl implements BookDao {
     public List<OwnedBook> getLentBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:OWNS {status: \"lent\"}]->(books:Book) return books, relation", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(LENT_BOOKS_QUERY, params);
         return getOwnedBooksFromResultMap(mapResult);
     }
 
@@ -444,7 +444,7 @@ public class BookDaoImpl implements BookDao {
     public List<BorrowedBook> getBorrowedBooks(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[relation:BORROWED]->(books:Book) return books, relation", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(BORROWED_BOOKS_QUERY, params);
         return getBorrowedBooksFromResultMap(mapResult);
     }
 
@@ -580,12 +580,7 @@ public class BookDaoImpl implements BookDao {
     public List<CurrentlyReadingBook> getCurrentlyReadingBook(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match (users:User {id: {userId}})-[:CURRENTLYREADING]->(books:Book) return books", params);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(CURRENTLY_READING_BOOKS_QUERY, params);
         return getCurrentlyReadingBookFromResultMap(mapResult);
-
     }
 }
-    
-    
-
-

@@ -1,5 +1,7 @@
 package com.campusconnect.neo4j.da.utils;
 
+import static com.campusconnect.neo4j.util.Constants.AVAILABLE;
+
 /**
  * Created with IntelliJ IDEA.
  * User: sn1
@@ -10,9 +12,9 @@ package com.campusconnect.neo4j.da.utils;
 public class Queries {
 
     public static final String GET_FRIEND_REC_ONLY_COUNT = "MATCH (currentUser:User { id: {userId}})-[:CONNECTED*2..2]-(friend_of_friend:User) " +
-    "WHERE NOT (currentUser)-[:CONNECTED]-(friend_of_friend) " +
-    "RETURN friend_of_friend, COUNT(*) as count "+
-    "ORDER BY COUNT(*) DESC , friend_of_friend";
+            "WHERE NOT (currentUser)-[:CONNECTED]-(friend_of_friend) " +
+            "RETURN friend_of_friend, COUNT(*) as count " +
+            "ORDER BY COUNT(*) DESC , friend_of_friend";
 
     public static final String GET_FRIEND_REC_WITH_FRIENDS = "MATCH (currentUser:User { id: {userId}})-[:CONNECTED]- (friend:User) - [:CONNECTED] - (friend_of_friend:User) " +
             "WHERE NOT (currentUser)-[:CONNECTED]-(friend_of_friend) " +
@@ -27,5 +29,16 @@ public class Queries {
             "WHERE (user)-[:USER_ACCESS]-(group) " +
             "return book,friend,group";
 
+
+    public static final String OWNED_BOOKS_BOOKS = "match (users:User {id: {userId}})-[relation:OWNS]->(books:Book) return books, relation";
+    public static final String AVAILABLE_BOOKS_QUERY = "match (users:User {id: {userId}})-[relation:OWNS {status: \"" + AVAILABLE + "\"}]->(books:Book) return books, relation";
+    public static final String LENT_BOOKS_QUERY = "match (users:User {id: {userId}})-[relation:OWNS {status: \"lent\"}]->(books:Book) return books, relation";
+    public static final String READ_BOOKS_QUERY = "match (users:User {id: {userId}})-[:READ]->(books:Book) return books";
+    public static final String WISHLIST_BOOKS_QUERY = "match (users:User {id: {userId}})-[relation:WISH]->(books:Book) return books, relation";
+    public static final String GOODREADS_USER_REC_QUERY = "match (users:User {id: {userId}})-[relation:GR_REC]->(books:Book) return books, relation";
+    public static final String GET_BOOK_BY_GRID_USER_QUERY = "match(book:Book {goodreadsId: {goodreadsId}}) - [relation] - (user:User {id: {userId}}) return relation, book";
+    public static final String GET_ALL_BOOKS_QUERY = "match(book:Book) - [relation] - (user:User {id: {userId}}) return relation, book";
+    public static final String BORROWED_BOOKS_QUERY = "match (users:User {id: {userId}})-[relation:BORROWED]->(books:Book) return books, relation";
+    public static final String CURRENTLY_READING_BOOKS_QUERY = "match (users:User {id: {userId}})-[:CURRENTLY_READING]->(books:Book) return books";
 
 }

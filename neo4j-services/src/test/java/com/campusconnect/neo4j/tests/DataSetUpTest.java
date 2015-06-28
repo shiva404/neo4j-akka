@@ -12,6 +12,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static com.campusconnect.neo4j.util.Constants.*;
+
 /**
  * Created by sn1 on 5/7/15.
  */
@@ -236,8 +238,9 @@ public class DataSetUpTest extends TestBase {
         GroupPage groupPage = clientResponse.getEntity(GroupPage.class);
         // assert groupPage.getSize() == 2;
 
-        clientResponse = resource.path("users").path(userId1).path("books")
-                .path(book2).path("wish").type("application/json")
+        //Add books to user
+        clientResponse = resource.path("books")
+                .path(book2).path("users").path(userId1).queryParam(LISTING_TYPE_QPARAM, WISHLIST).queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 

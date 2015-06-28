@@ -39,6 +39,6 @@ public class Queries {
     public static final String GET_BOOK_BY_GRID_USER_QUERY = "match(book:Book {goodreadsId: {goodreadsId}}) - [relation] - (user:User {id: {userId}}) return relation, book";
     public static final String GET_ALL_BOOKS_QUERY = "match(book:Book) - [relation] - (user:User {id: {userId}}) return relation, book";
     public static final String BORROWED_BOOKS_QUERY = "match (users:User {id: {userId}})-[relation:BORROWED]->(books:Book) return books, relation";
-    public static final String CURRENTLY_READING_BOOKS_QUERY = "match (users:User {id: {userId}})-[:CURRENTLY_READING]->(books:Book) return books";
+    public static final String CURRENTLY_READING_BOOKS_QUERY = "match (users:User {id: {userId}})-[relation:CURRENTLY_READING]->(books:Book) return books, relation";
 
 }

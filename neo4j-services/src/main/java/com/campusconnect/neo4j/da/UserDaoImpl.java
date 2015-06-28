@@ -4,6 +4,7 @@ import com.campusconnect.neo4j.akka.goodreads.GoodreadsAsynchHandler;
 import com.campusconnect.neo4j.da.iface.*;
 import com.campusconnect.neo4j.da.mapper.DBMapper;
 import com.campusconnect.neo4j.da.utils.Queries;
+import com.campusconnect.neo4j.da.utils.TargetHelper;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
@@ -14,6 +15,7 @@ import com.campusconnect.neo4j.types.web.FriendRecommendation;
 import com.campusconnect.neo4j.types.web.Notification;
 import com.campusconnect.neo4j.util.Constants;
 import com.googlecode.ehcache.annotations.*;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
@@ -66,14 +68,6 @@ public class UserDaoImpl implements UserDao {
     }
 
     public UserDaoImpl() {
-    }
-
-    public static Target createTargetToUser(User user) {
-        String targetEventUserId = user.getId();
-        String targetEventUserName = user.getName();
-        String targetEventUrl = "users/" + targetEventUserId;
-        return new Target(IdType.USER_ID.toString(), targetEventUserName,
-                targetEventUrl);
     }
 
     @Override
@@ -312,7 +306,7 @@ public class UserDaoImpl implements UserDao {
 
         try {
             Long currentTime = System.currentTimeMillis();
-            Target targetforAuditEvent = createTargetToUser(follower);
+            Target targetforAuditEvent = TargetHelper.createTargetToUser(follower);
             Event followedUSerEvent = new Event(AuditEventType.FOLLOWING.toString(), targetforAuditEvent, currentTime, true);
             auditEventDao.addEvent(user.getId(), followedUSerEvent);
 
@@ -336,8 +330,8 @@ public class UserDaoImpl implements UserDao {
                     String targetNotificationUserId = friend.getId();
                     String targetNoitficationUrl = "users/" + targetNotificationUserId;
                     String targetNotificationstring = friend.getName();
-                    Target targetEventUser = createTargetToUser(friend);
-                    Target targetEventFriend = createTargetToUser(user);
+                    Target targetEventUser = TargetHelper.createTargetToUser(friend);
+                    Target targetEventFriend = TargetHelper.createTargetToUser(user);
                     Event beFriendUserEvent1 = new Event(AuditEventType.FRIEND.toString(), targetEventUser, System.currentTimeMillis(), true);
                     Event beFriendUserEvent2 = new Event(AuditEventType.FRIEND.toString(), targetEventFriend, System.currentTimeMillis(), true);
                     Target targetNotification = new Target(IdType.USER_ID.toString(), targetNotificationstring + " accepted your friend request", targetNoitficationUrl);
@@ -442,7 +436,7 @@ public class UserDaoImpl implements UserDao {
         } else {
             List<User> userFriends = userRelationRepository.getFriends(currentUserId);
             User currentUser = getUser(currentUserId);
-            friends.add(currentUser);
+            userFriends.add(currentUser);
             for (User user : userFriends) {
                 user.setUserRelation(UserRelationType.FRIEND.toString());
             }
@@ -508,14 +502,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void deleteFriendRequest(String userId, String friendUserId) {
-        //UserRelation userRelation = userRelationRepository.getUsersRelationship(queryUserId, friendUserId);
-        User user = getUser(userId);
-        User friend = getUser(friendUserId);
-        neo4jTemplate.deleteRelationshipBetween(user, friend, "CONNECTED");
-
+    public void deleteFriendRequest(String userId, String friendUserId,String deletetype) {
+        List<UserRelation> userRelations = userRelationRepository.getUsersRelationship(userId, friendUserId);
+        for(UserRelation userRelation : userRelations) {
+            neo4jTemplate.delete(userRelation);
+        }
+        //TODO: internal event according to delete type
     }
-
     private void deleteRelationExceptIndex(List<UserRelation> existingRelation,
                                            int index) {
         int count = 0;

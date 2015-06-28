@@ -34,6 +34,7 @@ public class Constants {
     public static final String BORROWED = "BORROWED";
     public static final String BORROW_LOCK = "BORROW_LOCK";
     public static final String BORROW_IN_PROGRESS = "BORROW_IN_PROGRESS";
+    
 
     public static final String ALL = "ALL";
 
@@ -42,5 +43,10 @@ public class Constants {
     public static final String BORROW_AGREED = "agreed";
     public static final String BORROW_SUCCESS = "success";
     public static final String BORROW_REJECT = "reject";
+    
+    public static final String ADDRESS_DELETED_EVENT = "ADDRESS_DELETED";
+    
+    public static final String FRIEND_REQUEST_CANCEL_DELETE= "FRIEND_REQUEST_CANCEL_DELETE";
+    public static final String FRIEND_UNFRIEND_DELETE= "FRIEND_REQUEST_CANCEL_DELETE";
 
 }

@@ -48,7 +48,7 @@ public interface UserDao {
 
     void createFriendRelationWithPending(User user, User user2);
 
-    void deleteFriendRequest(String userId, String friendUserId);
+    void deleteFriendRequest(String userId, String friendUserId,String deleteType);
 
     List<User> getRandomUsers(int size, String userID);
 

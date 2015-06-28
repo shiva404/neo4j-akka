@@ -52,12 +52,12 @@ public class BookResource {
     @GET
     @Path("{bookId}")
     public Response getBook(@PathParam("bookId") String bookId,
-                            @QueryParam("loggedInUser") final String loggedInUser,
-                            @QueryParam("idType") @DefaultValue("id") String bookIdType) {
+                            @QueryParam(LOGGED_IN_USER_QPARAM) final String loggedInUser,
+                            @QueryParam(ID_TYPE_QPARAM) @DefaultValue("id") String bookIdType) {
         com.campusconnect.neo4j.types.neo4j.Book book;
         if (loggedInUser != null) {
             if (bookIdType.equals("id"))
-                book = bookDao.getBookRelatedUser(bookId, loggedInUser);
+                book = bookDao.getBooksRelatedUser(bookId, loggedInUser);
             else
                 book = bookDao.getBookByGoodreadsIdWithUser(Integer.parseInt(bookId), loggedInUser);
         } else {
@@ -82,14 +82,14 @@ public class BookResource {
     @Path("{bookId}/users/{userId}")
     public Response addBook(@PathParam("userId") final String userId,
                             @PathParam("bookId") final String bookId,
-                            @QueryParam("listingType") final String listingType,
-                            @QueryParam("status") final String status,
-                            @QueryParam("idType") String bookIdType) throws Exception {
+                            @QueryParam(LISTING_TYPE_QPARAM) final String listingType,
+                            @QueryParam(STATUS_QPARAM) final String status,
+                            @QueryParam(ID_TYPE_QPARAM) String bookIdType) throws Exception {
         User user = userDao.getUser(userId);
         com.campusconnect.neo4j.types.neo4j.Book book = null;
-        if (bookIdType == null || bookIdType.equals("id")) {
+        if (bookIdType == null || bookIdType.equals(ID)) {
             book = bookDao.getBook(bookId);
-        } else if (bookIdType.equals("grId")) {
+        } else if (bookIdType.equals(GR_ID)) {
             book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
         }
         Long now = System.currentTimeMillis();
@@ -116,7 +116,9 @@ public class BookResource {
 
     @POST
     @Path("{bookId}/borrow")
-    public Response borrowBook(@PathParam("bookId") String bookId, @QueryParam("idType") String bookIdType, BorrowRequest borrowRequest) {
+    public Response borrowBook(@PathParam("bookId") String bookId,
+                               @QueryParam(ID_TYPE_QPARAM) String bookIdType,
+                               BorrowRequest borrowRequest) {
         com.campusconnect.neo4j.types.neo4j.Book book = null;
         if (bookIdType == null || bookIdType.equals("id")) {
             book = bookDao.getBook(bookId);
@@ -133,9 +135,9 @@ public class BookResource {
     public Response updateStatus(@PathParam("bookId") String bookId,
                                  @PathParam("ownerUserId") String ownerUserId,
                                  @PathParam("borrowerId") String borrowerId,
-                                 @QueryParam("status") String status,
-                                 @QueryParam("sharePh") String phoneSharing,
-                                 @QueryParam("message") String message) {
+                                 @QueryParam(STATUS_QPARAM) String status,
+                                 @QueryParam(SHARE_PH_QPARAM) String phoneSharing,
+                                 @QueryParam(MESSAGE_QPARAM) String message) {
 
         com.campusconnect.neo4j.types.neo4j.Book book = bookDao.getBook(bookId);
         User owner = userDao.getUser(ownerUserId);
@@ -168,7 +170,7 @@ public class BookResource {
 
     @GET
     @Path("search")
-    public Response search(@QueryParam("q") final String queryString, @QueryParam("userId") final String userId) {
+    public Response search(@QueryParam("q") final String queryString, @QueryParam(LOGGED_IN_USER_QPARAM) final String userId) {
         List<com.campusconnect.neo4j.types.neo4j.Book> searchResult;
         if (userId == null) {
             searchResult = bookDao.search(queryString);

@@ -17,11 +17,12 @@ import com.campusconnect.neo4j.types.neo4j.Reminder;
 import com.campusconnect.neo4j.types.neo4j.*;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.*;
+import com.campusconnect.neo4j.util.Constants;
 import com.campusconnect.neo4j.util.StringUtils;
 import com.campusconnect.neo4j.util.Validator;
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import com.campusconnect.neo4j.util.*;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -45,6 +46,7 @@ import static com.campusconnect.neo4j.util.ErrorCodes.INVALId_ARGMENTS;
 @Consumes("application/json")
 @Produces("application/json")
 public class UserResource {
+
     private AddressDao addressDao;
     private BookDao bookDao;
     private FBDao fbDao;
@@ -71,7 +73,8 @@ public class UserResource {
     }
 
     @POST
-    public Response createUser(@QueryParam("accessToken") final String accessToken, final com.campusconnect.neo4j.types.web.User userPayload) throws URISyntaxException {
+    public Response createUser(@QueryParam(ACCESS_TOKEN_QPARAM) final String accessToken,
+                               final com.campusconnect.neo4j.types.web.User userPayload) throws URISyntaxException {
 
         StringBuffer validateUserDataMessage = Validator.validateUserObject(userPayload);
         if (null != validateUserDataMessage) {
@@ -118,7 +121,8 @@ public class UserResource {
 
     @PUT
     @Path("{userId}/fields")
-    public Response updateUserFields(@PathParam("userId") final String userId, Fields fields) throws Exception {
+    public Response updateUserFields(@PathParam("userId") final String userId,
+                                     Fields fields) throws Exception {
         //todo: validate passed fields are valid or not
         User user = userDao.getUser(userId);
         setUpdatedFields(user, fields);
@@ -153,7 +157,7 @@ public class UserResource {
     }
 
     private void updateUserGoodReadsSynchToInprogress(User user) {
-        user.setGoodReadsSynchStatus("inProgress");
+        user.setGoodReadsSynchStatus(IN_PROGRESS_GREADS_STATUS);
         userDao.updateUser(user.getId(), user);
     }
 
@@ -204,6 +208,7 @@ public class UserResource {
     @GET
     @Path("{userId}/addresses/{addressId}")
     public Response getAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId) {
+        //TODO: validate user and address existing
         Address address = addressDao.getAddress(addressId);
         com.campusconnect.neo4j.types.web.Address returnAddress = mapAddressNeo4jToWeb(address);
         return Response.ok().entity(returnAddress).build();
@@ -246,6 +251,7 @@ public class UserResource {
     @PUT
     @Path("{userId}/addresses/{addressId}")
     public Response updateAddress(@PathParam("userId") String userId, @PathParam("addressId") String addressId, com.campusconnect.neo4j.types.web.Address addressPayload) {
+        //TODO: validate the address before updating
         Address address = mapAddressWebToNeo4j(addressPayload);
         Address updatedAddress = addressDao.updateAddress(address, userId);
         com.campusconnect.neo4j.types.web.Address returnAddress = mapAddressNeo4jToWeb(updatedAddress);
@@ -262,11 +268,11 @@ public class UserResource {
 
     @GET
     @Path("{userId}/books")
-    public Response getBooks(@PathParam("userId") final String userId, @QueryParam("filter") String filter) throws Exception {
+    public Response getBooks(@PathParam("userId") final String userId, @QueryParam(FILTER_QPARAM) String filter) throws Exception {
         if (filter == null) {
             throw new Exception("filer is null");
         }
-        switch (filter.toLowerCase()) {
+        switch (filter.toUpperCase()) {
             case OWNS_RELATION: {
                 final List<OwnedBook> ownedBooks = bookDao.getOwnedBooks(userId);
                 OwnedBooksPage ownedBooksPage = new OwnedBooksPage(0, ownedBooks.size(), ownedBooks);
@@ -277,7 +283,6 @@ public class UserResource {
                 List<com.campusconnect.neo4j.types.web.Book> returnBooks = new ArrayList<>();
                 for (Book book : readBooks)
                     returnBooks.add(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
-
                 BooksPage booksPage = new BooksPage(0, returnBooks.size(), returnBooks);
                 return Response.ok().entity(booksPage).build();
             }
@@ -308,19 +313,22 @@ public class UserResource {
                 List<Book> allBooks = bookDao.getAllUserBooks(userId);
                 AllBooks resultBooks = new AllBooks();
                 for (Book book : allBooks) {
+                    com.campusconnect.neo4j.types.web.Book webBook = mapBookNeo4jToWeb(book);
                     switch (book.getBookType()) {
                         case OWNS_RELATION:
-                            resultBooks.getOwnedBooks().add(mapBookNeo4jToWeb(book));
+                            resultBooks.getOwnedBooks().add(webBook);
                             break;
                         case BORROWED_RELATION:
-                            resultBooks.getBorrowedBooks().add(mapBookNeo4jToWeb(book));
+                            resultBooks.getBorrowedBooks().add(webBook);
                             break;
                         case WISHLIST_RELATION:
-                            resultBooks.getWishlistBooks().add(mapBookNeo4jToWeb(book));
+                            resultBooks.getWishlistBooks().add(webBook);
                             break;
                         case READ_RELATION:
-                            resultBooks.getReadBooks().add(mapBookNeo4jToWeb(book));
+                            resultBooks.getReadBooks().add(webBook);
                             break;
+                        case CURRENTLY_READING_RELATION:
+                            resultBooks.getCurrentlyReadingBooks().add(webBook);
                     }
                 }
                 return Response.ok().entity(resultBooks).build();
@@ -381,21 +389,21 @@ public class UserResource {
 
     @PUT
     @Path("{userId}/friend/{friendUserId}")
-    public Response confirmFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId, @QueryParam("status") final String status) {
+    public Response confirmFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId, @QueryParam(STATUS_QPARAM) final String status) {
         if (status.toLowerCase().equals("agreed")) {
             userDao.confirmFriendRelation(userDao.getUser(userId), userDao.getUser(friendUserId));
             //TODO:notification to user about acceptance
 
         } else if (status.toLowerCase().equals("cancel")) {
-            userDao.deleteFriendRequest(userId, friendUserId,Constants.FRIEND_REQUEST_CANCEL_DELETE);
+            userDao.deleteFriendRequest(userId, friendUserId, Constants.FRIEND_REQUEST_CANCEL_DELETE);
         }
         return Response.ok().build();
     }
-    
+
     @DELETE
     @Path("{userId}/friend/{friendUserId}")
     public Response unFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId) {
-            userDao.deleteFriendRequest(userId, friendUserId,Constants.FRIEND_UNFRIEND_DELETE);
+        userDao.deleteFriendRequest(userId, friendUserId, Constants.FRIEND_UNFRIEND_DELETE);
         return Response.ok().build();
     }
 
@@ -449,7 +457,7 @@ public class UserResource {
 
     @POST
     @Path("{userId}/reminders")
-    public Response createReminder(Reminder reminder, @PathParam("userId") final String userId, @QueryParam("reminderAbout") final String reminderAbout, @QueryParam("createdBy") final String createdBy) {
+    public Response createReminder(Reminder reminder, @PathParam("userId") final String userId, @QueryParam(REMINDER_ABOUT_QPARM) final String reminderAbout, @QueryParam(CREATED_BY_QPARAM) final String createdBy) {
         setReminderCreateProperties(reminder);
         Reminder createdReminder = reminderDao.createReminder(reminder);
         User reminderForUser = userDao.getUser(userId);
@@ -521,7 +529,7 @@ public class UserResource {
 
     @GET
     @Path("{userId}/notifications")
-    public Response getNotifications(@PathParam("userId") final String userId, @QueryParam("filter") @DefaultValue("fresh") final String filter) {
+    public Response getNotifications(@PathParam("userId") final String userId, @QueryParam(FILTER_QPARAM) @DefaultValue(FRESH_NOTIFICATION_TYPE) final String filter) {
         //AuditEvent auditEvent = auditEventDao.getEvents(userId);
         List<Notification> notifications = notificationDao.getNotifications(userId, filter);
         NotificationPage notificationPage = new NotificationPage(0, notifications.size(), notifications);
@@ -551,7 +559,7 @@ public class UserResource {
 
     @GET
     @Path("{userId}/search")
-    public Response searchUsers(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
+    public Response searchUsers(@PathParam("userId") String userId, @QueryParam(SEARCH_QPARAM) String searchString) {
         List<User> users = userDao.search(searchString, userId);
         List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(users.size());
         for (User user : users) {
@@ -562,7 +570,7 @@ public class UserResource {
 
     @GET
     @Path("{userId}/search/friends")
-    public Response searchFriends(@PathParam("userId") String userId, @QueryParam("q") String searchString) {
+    public Response searchFriends(@PathParam("userId") String userId, @QueryParam(SEARCH_QPARAM) String searchString) {
         List<User> users = userDao.searchFriends(userId, searchString);
         List<com.campusconnect.neo4j.types.web.User> returnUsers = new ArrayList<>(users.size());
         for (User user : users) {
@@ -584,7 +592,7 @@ public class UserResource {
 
     @GET
     @Path("{userId}/friends/rec")
-    public Response getFriendsRec(@PathParam("userId") String userId, @QueryParam("size") @DefaultValue("10") final String size, @QueryParam("includeFriends") @DefaultValue("false") final String includeFriends) {
+    public Response getFriendsRec(@PathParam("userId") String userId, @QueryParam(SIZE_QPARAM) @DefaultValue("10") final String size, @QueryParam(INCLUDE_FRIENDS_QPARAM) @DefaultValue("false") final String includeFriends) {
         //validations
         boolean isIncludeFriends = StringUtils.getBoolean(includeFriends);
         Integer sizeValue = StringUtils.getIntegerValue(size, 10);
@@ -599,7 +607,7 @@ public class UserResource {
 
     @GET
     @Path("{userId}/friends")
-    public Response getFriends(@PathParam("userId") String userId, @QueryParam("currentUserId") String currentUser) {
+    public Response getFriends(@PathParam("userId") String userId, @QueryParam(LOGGED_IN_USER_QPARAM) String currentUser) {
         List<User> friends = userDao.getFriends(userId, currentUser);
         List<com.campusconnect.neo4j.types.web.User> returnFriends = new ArrayList<>();
         for (User friend : friends) {

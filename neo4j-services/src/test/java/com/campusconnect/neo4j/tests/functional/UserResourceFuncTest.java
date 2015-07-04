@@ -15,13 +15,12 @@ import static org.testng.Assert.*;
 
 public class UserResourceFuncTest extends TestBase {
 
-    private static User createdUser;
     Long addressId1;
     Long addressId2;
-    String userId1 = createUser();
-    String userId2 = createUser();
-    String userId3 = createUser();
-    String userId4 = createUser();
+    String userId1;
+    String userId2;
+    String userId3;
+    String userId4;
 
     public static Address addAddressToUser(String userId, Address address) {
         ClientResponse clientResponse = resource.path("users").path(userId)
@@ -29,7 +28,6 @@ public class UserResourceFuncTest extends TestBase {
                 .post(ClientResponse.class);
         assertEquals(clientResponse.getStatus(), 200);
         return clientResponse.getEntity(Address.class);
-
     }
 
     public static String createUser() {
@@ -38,7 +36,7 @@ public class UserResourceFuncTest extends TestBase {
                 .entity(DataBrewer.getFakeUserWithAddress())
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 201;
-        createdUser = clientResponse.getEntity(User.class);
+        User createdUser = clientResponse.getEntity(User.class);
         String userId = createdUser.getId();
         return userId;
     }

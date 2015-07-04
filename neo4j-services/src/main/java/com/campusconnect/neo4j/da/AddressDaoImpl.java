@@ -3,6 +3,7 @@ package com.campusconnect.neo4j.da;
 import com.campusconnect.neo4j.da.iface.AddressDao;
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
 import com.campusconnect.neo4j.da.iface.UserDao;
+import com.campusconnect.neo4j.da.utils.EventHelper;
 import com.campusconnect.neo4j.da.utils.TargetHelper;
 import com.campusconnect.neo4j.repositories.AddressRepository;
 import com.campusconnect.neo4j.types.common.AuditEventType;
@@ -62,10 +63,8 @@ public class AddressDaoImpl implements AddressDao {
         try {
             Long currentTime = System.currentTimeMillis();
 
-            String targetEvent = objectMapper.writeValueAsString(updatedAddress);
-
-            Target target = new Target(IdType.USER_ID.toString(), targetEvent, null);
-            Event updatedAddressUserEvent = new Event(AuditEventType.UPDATED_ADDRESS.toString(), target, currentTime, false);
+           Target target = TargetHelper.createTargetToUser(userDao.getUser(userId));
+            Event updatedAddressUserEvent = EventHelper.createPrivateEvent(AuditEventType.UPDATED_ADDRESS.toString(), target);
             auditEventDao.addEvent(userId, updatedAddressUserEvent);
 
         } catch (Exception e) {
@@ -80,9 +79,9 @@ public class AddressDaoImpl implements AddressDao {
     public void deleteAddress(String addressId, @PartialCacheKey String userId) {
     	
         addressRepository.delete(Long.parseLong(addressId));
-     //   Event event = new Event(Constants.ADDRESS_DELETED_EVENT,TargetHelper.  , System.currentTimeMillis(), true);
-        
-        //TODO: add internal Event
+        Target target = TargetHelper.createTargetToUser(userDao.getUser(userId));
+        Event event = EventHelper.createPrivateEvent(AuditEventType.DELETED_ADDRESS.toString(), target);
+        auditEventDao.addEvent(userId, event);
     }
 
     @Override

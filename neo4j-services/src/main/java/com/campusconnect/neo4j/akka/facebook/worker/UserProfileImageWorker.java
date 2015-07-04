@@ -24,7 +24,7 @@ public class UserProfileImageWorker extends UntypedActor {
             final User user = userProfileImageTask.getUser();
             String userProfileImageUrl = getUserProfileImage.getImageUrlForUser(user.getFbId(), userProfileImageTask.getAccessToken());
             user.setProfileImageUrl(userProfileImageUrl);
-            userDao.updateUser(user.getId(), user);
+            userDao.updateUser(user.getId(), user,false);
         }
     }
 }

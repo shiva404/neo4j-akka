@@ -109,12 +109,10 @@ public class UserResourceFuncTest extends TestBase {
 
     @BeforeClass
     public void setUp() {
-
         userId1 = createUser();
         userId2 = createUser();
         userId3 = createUser();
         userId4 = createUser();
-
     }
 
     @AfterClass

@@ -54,16 +54,22 @@ public class Constants {
     public static final String BORROW_SUCCESS = "success";
     public static final String BORROW_REJECT = "reject";
 
+    public static final String RETURN_INIT = "init";
+    public static final String RETURN_AGREED = "agreed";
+    public static final String RETURN_SUCCESS = "success";
+
     public static final String ADDRESS_DELETED_EVENT = "ADDRESS_DELETED";
 
     public static final String FRIEND_REQUEST_CANCEL_DELETE = "FRIEND_REQUEST_CANCEL_DELETE";
     public static final String FRIEND_UNFRIEND_DELETE = "FRIEND_REQUEST_CANCEL_DELETE";
 
+    public static final String STATUS = "status";
 
     public static final String ACCESS_TOKEN_QPARAM = "accessToken";
     public static final String IN_PROGRESS_GREADS_STATUS = "inProgress";
     public static final String FILTER_QPARAM = "filter";
-    public static final String STATUS_QPARAM = "status";
+    public static final String STATUS_QPARAM = STATUS;
+
     public static final String CREATED_BY_QPARAM = "createdBy";
     public static final String REMINDER_ABOUT_QPARM = "reminderAbout";
     public static final String FRESH_NOTIFICATION_TYPE = "fresh";
@@ -76,7 +82,9 @@ public class Constants {
     public static final String LOGGED_IN_USER_QPARAM = "loggedInUser";
     public static final String SHARE_PH_QPARAM = "sharePh";
     public static final String MESSAGE_QPARAM = "message";
-    
+    public static final String OWNER_USER_ID_QPARAM = "ownerUserId";
+    public static final String BORROWER_ID_QPARAM = "borrowerId";
+
     public static final String REMINDER_CREATED_NOTIFICATION_TYPE = "REMINDER_CREATED";
 
 

@@ -4,15 +4,9 @@ import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.GroupDao;
 import com.campusconnect.neo4j.da.iface.*;
-import com.campusconnect.neo4j.da.utils.AuditEventHelper;
-import com.campusconnect.neo4j.da.utils.EventHelper;
-import com.campusconnect.neo4j.da.utils.TargetHelper;
 import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
-import com.campusconnect.neo4j.types.common.AuditEventType;
 import com.campusconnect.neo4j.types.common.GoodreadsAuthStatus;
-import com.campusconnect.neo4j.types.common.IdType;
-import com.campusconnect.neo4j.types.common.Target;
 import com.campusconnect.neo4j.types.neo4j.Address;
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.Group;
@@ -23,13 +17,11 @@ import com.campusconnect.neo4j.types.web.*;
 import com.campusconnect.neo4j.util.Constants;
 import com.campusconnect.neo4j.util.StringUtils;
 import com.campusconnect.neo4j.util.Validator;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -61,8 +53,7 @@ public class UserResource {
     private AuditEventDao auditEventDao;
     private NotificationDao notificationDao;
     private GroupDao groupDao;
-    
-    
+
 
     public UserResource() {
     }
@@ -77,7 +68,7 @@ public class UserResource {
         this.auditEventDao = auditEventDao;
         this.notificationDao = notificationDao;
         this.groupDao = groupDao;
-        
+
     }
 
     @POST
@@ -96,11 +87,11 @@ public class UserResource {
             if (null != existingUser) {
                 if (existingUser.getFbId() == null && user.getFbId() != null) {
                     existingUser.setFbId(user.getFbId());
-                    existingUser = userDao.updateUser(existingUser.getId(), existingUser,true);
+                    existingUser = userDao.updateUser(existingUser.getId(), existingUser, true);
                 }
                 if (existingUser.getGoogleId() == null && user.getGoogleId() != null) {
                     existingUser.setGoogleId(user.getGoogleId());
-                    existingUser = userDao.updateUser(existingUser.getId(), existingUser,true);
+                    existingUser = userDao.updateUser(existingUser.getId(), existingUser, true);
                 }
                 com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(existingUser);
                 return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
@@ -125,7 +116,7 @@ public class UserResource {
         User createdUser = userDao.createUser(user, accessToken);
         com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(createdUser);
         return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
-        
+
     }
 
     @PUT
@@ -133,11 +124,11 @@ public class UserResource {
     public Response updateUserFields(@PathParam("userId") final String userId,
                                      Fields fields) throws Exception {
         //TODO: validate passed fields are valid or not
-    	
+
         User user = userDao.getUser(userId);
         setUpdatedFields(user, fields);
         user.setLastModifiedDate(System.currentTimeMillis());
-        User updatedUser = userDao.updateUser(userId, user,true);
+        User updatedUser = userDao.updateUser(userId, user, true);
         checkWhetherSynchIsNeeded(updatedUser, fields);
         com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(updatedUser);
         return Response.ok().entity(returnUser).build();
@@ -168,7 +159,7 @@ public class UserResource {
 
     private void updateUserGoodReadsSynchToInprogress(User user) {
         user.setGoodReadsSynchStatus(IN_PROGRESS_GREADS_STATUS);
-        userDao.updateUser(user.getId(), user,false);
+        userDao.updateUser(user.getId(), user, false);
     }
 
     private void setUpdatedFields(User user, Fields fields) throws Exception {
@@ -176,9 +167,8 @@ public class UserResource {
         for (Field field : fields.getFields()) {
             BeanUtils.setProperty(user, field.getName(), field.getValue());
         }
-       
-    
-    
+
+
     }
 
     @GET
@@ -205,7 +195,7 @@ public class UserResource {
     public Response updateUser(@PathParam("userId") final String userId, com.campusconnect.neo4j.types.web.User userPayload) {
         User user = mapUserWebToNeo4j(userPayload);
         user.setLastModifiedDate(System.currentTimeMillis());
-        User updatedUser = userDao.updateUser(userId, user,true);
+        User updatedUser = userDao.updateUser(userId, user, true);
         com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(updatedUser);
         return Response.ok().entity(returnUser).build();
     }
@@ -285,9 +275,7 @@ public class UserResource {
             }
             case READ_RELATION: {
                 final List<Book> readBooks = bookDao.getReadBooks(userId);
-                List<com.campusconnect.neo4j.types.web.Book> returnBooks = new ArrayList<>();
-                for (Book book : readBooks)
-                    returnBooks.add(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
+                List<com.campusconnect.neo4j.types.web.Book> returnBooks = getWebBooks(readBooks);
                 BooksPage booksPage = new BooksPage(0, returnBooks.size(), returnBooks);
                 return Response.ok().entity(booksPage).build();
             }
@@ -306,8 +294,8 @@ public class UserResource {
                 BorrowedBooksPage borrowedBooksPage = new BorrowedBooksPage(0, borrowedBooks.size(), borrowedBooks);
                 return Response.ok().entity(borrowedBooksPage).build();
             case WISHLIST_RELATION:
-                List<WishListBook> wishListBooks = bookDao.getWishListBooks(userId);
-                WishListBooksPage wishListBooksPage = new WishListBooksPage(0, wishListBooks.size(), wishListBooks);
+                List<com.campusconnect.neo4j.types.web.Book> wishListBooks = getWebBooks(bookDao.getWishlistBooksWithDetails(userId));
+                BooksPage wishListBooksPage = new BooksPage(0, wishListBooks.size(), wishListBooks);
                 return Response.ok().entity(wishListBooksPage).build();
             case CURRENTLY_READING_RELATION:
                 List<CurrentlyReadingBook> currentlyReadingBooks = bookDao.getCurrentlyReadingBook(userId);
@@ -339,6 +327,13 @@ public class UserResource {
                 return Response.ok().entity(resultBooks).build();
         }
         return Response.ok().build();
+    }
+
+    private List<com.campusconnect.neo4j.types.web.Book> getWebBooks(List<Book> neo4jBooks) {
+        List<com.campusconnect.neo4j.types.web.Book> returnBooks = new ArrayList<>();
+        for (Book book : neo4jBooks)
+            returnBooks.add(Neo4jToWebMapper.mapBookNeo4jToWeb(book));
+        return returnBooks;
     }
 
     @GET
@@ -441,7 +436,7 @@ public class UserResource {
         properties.put("createdDate", System.currentTimeMillis());
         properties.put("role", role);
         return properties;
-        
+
     }
 
     private Map<String, Object> getRequiredHeadersForAddressLink(String addressType) {
@@ -475,8 +470,8 @@ public class UserResource {
         userDao.setReminder(reminderRelationShip);
         return Response.created(null).entity(createdReminder).build();
         //TODO : change reminder flow
-        
-        
+
+
     }
 
     @PUT
@@ -640,7 +635,7 @@ public class UserResource {
         return Response.ok().entity(allFriends).build();
     }
 
-    
+
     @DELETE
     @Path("{userId}")
     public Response deleteUser(@PathParam("userId") String userId) {

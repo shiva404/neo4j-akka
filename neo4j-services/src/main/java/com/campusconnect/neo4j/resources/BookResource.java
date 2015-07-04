@@ -84,7 +84,7 @@ public class BookResource {
                             @PathParam("bookId") final String bookId,
                             @QueryParam(LISTING_TYPE_QPARAM) final String listingType,
                             @QueryParam(STATUS_QPARAM) final String status,
-                            @QueryParam(ID_TYPE_QPARAM) String bookIdType) throws Exception {
+                            @QueryParam(ID_TYPE_QPARAM) @DefaultValue("id") String bookIdType) throws Exception {
         User user = userDao.getUser(userId);
         com.campusconnect.neo4j.types.neo4j.Book book = null;
         if (bookIdType == null || bookIdType.equals(ID)) {
@@ -130,11 +130,36 @@ public class BookResource {
         return Response.ok().build();
     }
 
+    @POST
+    @Path("{bookId}/return")
+    public Response returnBook(@PathParam("bookId") String bookId,
+                               @QueryParam(STATUS) String status,
+                               ReturnRequest returnRequest) {
+        //TODO: Throw invalid exception
+        bookDao.initiateBookReturn(bookId, status, returnRequest);
+        return Response.ok().build();
+    }
+
     @PUT
-    @Path("{bookId}/users/{ownerUserId}/{borrowerId}/borrowedBook")
+    @Path("{bookId}/return")
+    public Response returnBookStatusUpdate(@PathParam("bookId") String bookId,
+                                           @QueryParam(STATUS) String status,
+                                           @QueryParam(OWNER_USER_ID_QPARAM) String ownerId,
+                                           @QueryParam(BORROWER_ID_QPARAM) String borrowerId,
+                                           @QueryParam(MESSAGE_QPARAM) String message) {
+        if (STATUS.equals(RETURN_AGREED)) {
+            bookDao.updateBookReturnToAgreed(bookId, status, ownerId, borrowerId, message);
+        } else if (STATUS.equals(RETURN_AGREED)) {
+            bookDao.updateBookReturnToSuccess(bookId, status, ownerId, borrowerId, message);
+        }
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("{bookId}/borrow")
     public Response updateStatus(@PathParam("bookId") String bookId,
-                                 @PathParam("ownerUserId") String ownerUserId,
-                                 @PathParam("borrowerId") String borrowerId,
+                                 @QueryParam(OWNER_USER_ID_QPARAM) String ownerUserId,
+                                 @QueryParam(BORROWER_ID_QPARAM) String borrowerId,
                                  @QueryParam(STATUS_QPARAM) String status,
                                  @QueryParam(SHARE_PH_QPARAM) String phoneSharing,
                                  @QueryParam(MESSAGE_QPARAM) String message) {

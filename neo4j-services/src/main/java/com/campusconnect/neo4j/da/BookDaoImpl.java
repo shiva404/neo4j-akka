@@ -65,7 +65,6 @@ public class BookDaoImpl implements BookDao {
         this.userDao = userDao;
     }
 
-
     @Override
     public Book createBook(Book book) {
         return neo4jTemplate.save(book);
@@ -86,16 +85,51 @@ public class BookDaoImpl implements BookDao {
         try {
             neo4jTemplate.save(readRelation);
         } catch (Exception e) {
-            LOGGER.error("Error while saving read relation bookId" + readRelation.getBook().getId() + " UserId:" + readRelation.getUser().getId());
+            LOGGER.error("Error while saving read relation bookId" + readRelation.getBook().getId() + " UserId:" +
+                    readRelation.getUser().getId());
             e.printStackTrace();
         }
     }
 
     @Override
-    public List<Book> getWishlistBooks(String userId) {
+    public List<Book> getWishlistBooksWithDetails(String userId) {
         List<Book> wishlistRecOnFriends = getWishlistRecOnFriends(userId);
         wishlistRecOnFriends.addAll(getWishlistRecOnGroups(userId));
         return wishlistRecOnFriends;
+    }
+
+    @Override
+    public void initiateBookReturn(String bookId, String status, ReturnRequest returnRequest) {
+        //todo: get a relation b/w users with borrowed, if not exists throw not found error
+        User borrower = userDao.getUser(returnRequest.getBorrowerUserId());
+        User owner = userDao.getUser(returnRequest.getOwnerUserId());
+        Book book = getBook(bookId);
+        updateBorrowedBookStatus(borrower, book, RETURN_INIT, returnRequest.getAdditionalMessage());
+        updateOwnedBookStatus(owner, book, RETURN_INIT, returnRequest.getAdditionalMessage());
+        //todo: Add notification to owner user
+
+    }
+
+    @Override
+    public void updateBookReturnToAgreed(String bookId, String status, String ownerId, String borrowerId, String comment) {
+        //todo: get a relation b/w users with borrowed, if not exists throw not found error
+        User borrower = userDao.getUser(borrowerId);
+        User owner = userDao.getUser(ownerId);
+        Book book = getBook(bookId);
+        updateBorrowedBookStatus(borrower, book, RETURN_AGREED, comment);
+        updateOwnedBookStatus(owner, book, RETURN_INIT, comment);
+        //todo: add notification to the user
+    }
+
+    @Override
+    public void updateBookReturnToSuccess(String bookId, String status, String ownerId, String borrowerId, String comment) {
+        //todo: get a relation b/w users with borrowed, if not exists throw not found error
+        User borrower = userDao.getUser(borrowerId);
+        User owner = userDao.getUser(ownerId);
+        Book book = getBook(bookId);
+        updateBorrowedBookStatus(borrower, book, RETURN_SUCCESS, comment);
+        updateOwnedBookStatus(owner, book, RETURN_SUCCESS, comment);
+        //todo: add notification to the user
     }
 
     private List<Book> getWishlistRecOnFriends(String userId) {
@@ -327,7 +361,7 @@ public class BookDaoImpl implements BookDao {
         params.put("bookId", bookId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book {id: {bookId}}) - [relation] - (user:User {id: {userId}}) return relation, book", params);
         //todo throw not found
-        List<Book> books = getBookDetails(mapResult, userId);
+        List<Book> books = getBookFromMapResult(mapResult, userId);
         if (books.size() > 0) {
             return books.get(0);
         } else
@@ -340,7 +374,10 @@ public class BookDaoImpl implements BookDao {
         params.put("userId", userId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query(GET_ALL_BOOKS_QUERY, params);
         //todo throw not found
-        return getBookDetails(mapResult, userId);
+        List<Book> books = getWishlistBooksWithDetails(userId);
+        List<Book> bookFromMapResult = getBookFromMapResult(mapResult, userId);
+        replaceBooksWithExistingBooks(bookFromMapResult, books);
+        return bookFromMapResult;
     }
 
     @Override
@@ -352,14 +389,14 @@ public class BookDaoImpl implements BookDao {
         params.put("goodreadsId", goodreadsId);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query(GET_BOOK_BY_GRID_USER_QUERY, params);
         //todo throw not found
-        List<Book> books = getBookDetails(mapResult, userId);
+        List<Book> books = getBookFromMapResult(mapResult, userId);
         if (books.size() > 0) {
             return books.get(0);
         } else
             return null;
     }
 
-    private List<Book> getBookDetails(Result<Map<String, Object>> mapResult, String userId) {
+    private List<Book> getBookFromMapResult(Result<Map<String, Object>> mapResult, String userId) {
         List<Book> books = new ArrayList<>();
         for (Map<String, Object> objectMap : mapResult) {
             RestNode bookNode = (RestNode) objectMap.get("book");

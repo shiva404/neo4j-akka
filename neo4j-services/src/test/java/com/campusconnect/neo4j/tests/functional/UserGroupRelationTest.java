@@ -13,9 +13,9 @@ public class UserGroupRelationTest extends TestBase {
 
     @Test
     public void TestGroupCreationAndUserAdditionToGroup() {
-        String userIdAdmin = UserResourceTest.createUser();
+        String userIdAdmin = UserResourceFuncTest.createUser();
         String groupId = GroupResourceTest.createGroup(userIdAdmin);
-        String userId = UserResourceTest.createUser();
+        String userId = UserResourceFuncTest.createUser();
 
         ClientResponse clientResponseForCreationOfGroupAndAddingUsers = resource
                 .path("groups").path(groupId).path("users").path(userId)
@@ -36,7 +36,7 @@ public class UserGroupRelationTest extends TestBase {
 
         List<String> bulkUserIds = new ArrayList<String>();
         for (int i = 0; i < 5; i++) {
-            String userIdbulk = UserResourceTest.createUser();
+            String userIdbulk = UserResourceFuncTest.createUser();
             bulkUserIds.add(userIdbulk);
         }
 

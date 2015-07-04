@@ -18,6 +18,8 @@ import javax.ws.rs.core.Response;
 
 import static org.testng.Assert.*;
 
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
@@ -52,14 +54,16 @@ public class UserResourceFuncTest extends TestBase {
 		String userId = createdUser.getId();
 		return userId;
 	}
-
-	Long addressId1;
-
-	Long addressId2;
-	String userId1 = createUser();
-	String userId2 = createUser();
-	String userId3 = createUser();
-	String userId4 = createUser();
+	
+	 public static String createBook() {
+	        ClientResponse createBookClientResponse = resource.path("books").type("application/json").entity(DataBrewer.getFakeBook()).post(ClientResponse.class);
+	        return createBookClientResponse.getEntity(Book.class).getId();
+	    }
+	 
+	 public static void deleteUser(String userId) {
+	        ClientResponse clientResponse = resource.path("users").path(userId).type("application/json").delete(ClientResponse.class);
+	        assert clientResponse.getStatus() == 200;
+	    }
 
 	private void assertAddress(Address address1, Address returnedAddress1) {
 		assertEquals(address1.getCity(), returnedAddress1.getCity());
@@ -103,6 +107,34 @@ public class UserResourceFuncTest extends TestBase {
 		assertTrue(foundExpected);
 	}
 
+	
+	Long addressId1;
+	Long addressId2;
+	String userId1;
+	String userId2;
+	String userId3;
+	String userId4;
+	
+	 @BeforeClass
+	    public void setUp() {
+		 	
+			 userId1 = createUser();
+			 userId2 = createUser();
+			 userId3 = createUser();
+			 userId4 = createUser();
+
+	    }
+
+	    @AfterClass
+	    public void removeData() {
+	        //deleteUsers
+	        UserResourceFuncTest.deleteUser(userId1);
+	        UserResourceFuncTest.deleteUser(userId2);
+	        UserResourceFuncTest.deleteUser(userId3);
+	        UserResourceFuncTest.deleteUser(userId4);
+	    }
+	
+	
 	@Test
 	public void testAddAndGetAddressToUser() {
 
@@ -255,4 +287,5 @@ public class UserResourceFuncTest extends TestBase {
 	
 	}
 
+		
 }

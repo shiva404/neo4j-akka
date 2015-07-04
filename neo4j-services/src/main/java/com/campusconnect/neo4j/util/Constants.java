@@ -76,6 +76,8 @@ public class Constants {
     public static final String LOGGED_IN_USER_QPARAM = "loggedInUser";
     public static final String SHARE_PH_QPARAM = "sharePh";
     public static final String MESSAGE_QPARAM = "message";
+    
+    public static final String REMINDER_CREATED_NOTIFICATION_TYPE = "REMINDER_CREATED";
 
 
 }

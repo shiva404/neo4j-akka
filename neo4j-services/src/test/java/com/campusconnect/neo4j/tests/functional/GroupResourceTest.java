@@ -22,7 +22,7 @@ public class GroupResourceTest extends TestBase {
     @Test
     public void testGroupResourceFlow() {
         Group group = DataBrewer.getFakeGroup();
-        String userId = UserResourceTest.createUser();
+        String userId = UserResourceFuncTest.createUser();
 
         ClientResponse clientResponse = resource.path("groups").queryParam("userId", userId).type("application/json").entity(group).post(ClientResponse.class);
         assert clientResponse.getStatus() == 201;

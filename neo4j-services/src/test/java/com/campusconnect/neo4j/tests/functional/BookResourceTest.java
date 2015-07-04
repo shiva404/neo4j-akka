@@ -31,15 +31,15 @@ public class BookResourceTest extends TestBase {
     @BeforeClass
     public void setUp() {
         //createUser for linking books
-        userId = UserResourceTest.createUser();
-        borrowerId = UserResourceTest.createUser();
+        userId = UserResourceFuncTest.createUser();
+        borrowerId = UserResourceFuncTest.createUser();
     }
 
     @AfterClass
     public void removeData() {
         //deleteUsers
-        UserResourceTest.deleteUser(userId);
-        UserResourceTest.deleteUser(borrowerId);
+    	UserResourceFuncTest.deleteUser(userId);
+    	UserResourceFuncTest.deleteUser(borrowerId);
     }
 
 

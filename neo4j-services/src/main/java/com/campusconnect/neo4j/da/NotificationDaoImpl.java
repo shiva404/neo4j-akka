@@ -1,10 +1,12 @@
 package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.da.iface.NotificationDao;
+import com.campusconnect.neo4j.da.utils.NotificationHelper;
 import com.campusconnect.neo4j.repositories.NotificationRepository;
 import com.campusconnect.neo4j.types.common.NotificationType;
 import com.campusconnect.neo4j.types.neo4j.NotificationEntity;
 import com.campusconnect.neo4j.types.web.Notification;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,26 +43,29 @@ public class NotificationDaoImpl implements NotificationDao {
                 notificationsSet.addAll(eachNotificationEntity.getNotifications());
             }
             for (String eachNotification : notificationsSet) {
-                try {
+             
                     System.out.println("each notification" + eachNotification);
-                    Notification notificationDeserialised = objectMapper.readValue(eachNotification, Notification.class);
+                    Notification notificationDeserialised = NotificationHelper.deserializeNotificationString(eachNotification);
+                    		
                     notifications.add(notificationDeserialised);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    
+                    //TODO : Add notification string according to notification type
+              
             }
-        } else {
+        } else if(filter.equalsIgnoreCase("fresh")){
             NotificationEntity notificationEntity = notificationRepository.getFreshNotificationForUser(userId, NotificationType.FRESH.toString());
             notificationsSet.addAll(notificationEntity.getNotifications());
 
             for (String eachNotification : notificationsSet) {
-                try {
+           
                     System.out.println("each notification" + eachNotification);
-                    Notification notificationDeserialised = objectMapper.readValue(eachNotification, Notification.class);
+                    Notification notificationDeserialised = NotificationHelper.deserializeNotificationString(eachNotification);
                     notifications.add(notificationDeserialised);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    
+                  //TODO : Add notification string according to notification type
+                    
+
+               
             }
         }
 
@@ -70,17 +75,16 @@ public class NotificationDaoImpl implements NotificationDao {
     @Override
     public NotificationEntity addNotification(String userId,
                                               Notification notification) {
-        try {
-            String notificationEventSerialized = objectMapper.writeValueAsString(notification);
-            String notificationString = notificationEventSerialized;
+      
+            String notificationEventSerialized = NotificationHelper.serializeNotification(notification);
+            
             NotificationEntity notificationEntity = getFreshNotification(userId);
+            
             Set<String> notifications = notificationEntity.getNotifications();
-            notifications.add(notificationString);
+            notifications.add(notificationEventSerialized);
+            
             return savenotification(notificationEntity);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        
     }
 
     @Override

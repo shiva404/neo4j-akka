@@ -26,23 +26,7 @@ public class UserResourceTest extends TestBase {
 
     private User updatedUser;
 
-    public static String createUser() {
-        ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithAddress()).post(ClientResponse.class);
-        assert clientResponse.getStatus() == 201;
-        createdUser = clientResponse.getEntity(User.class);
-        String userId = createdUser.getId();
-        return userId;
-    }
-
-    public static void deleteUser(String userId) {
-        ClientResponse clientResponse = resource.path("users").path(userId).type("application/json").delete(ClientResponse.class);
-        assert clientResponse.getStatus() == 200;
-    }
-
-    public static String createBook() {
-        ClientResponse createBookClientResponse = resource.path("books").type("application/json").entity(DataBrewer.getFakeBook()).post(ClientResponse.class);
-        return createBookClientResponse.getEntity(Book.class).getId();
-    }
+      
 
     public static String createKnowUserWithGoogleId(String userName, String email, String googleId) {
         ClientResponse clientResponse = resource.path("users").type("application/json").entity(DataBrewer.getFakeUserWithKnownEmailAddressAndGoogleId(userName, email, googleId)).post(ClientResponse.class);

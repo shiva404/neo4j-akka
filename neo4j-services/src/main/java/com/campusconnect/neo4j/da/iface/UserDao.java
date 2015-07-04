@@ -30,7 +30,7 @@ public interface UserDao {
 
     void synchWishListRec(String userId);
 
-    User updateUser(String userId, User user);
+    User updateUser(String userId, User user,boolean addEvent);
 
     void setReminder(ReminderRelationShip reminderRelationShip);
 

@@ -1,6 +1,7 @@
 package com.campusconnect.neo4j.da;
 
 import com.campusconnect.neo4j.da.iface.AuditEventDao;
+import com.campusconnect.neo4j.da.utils.EventHelper;
 import com.campusconnect.neo4j.repositories.AuditEventRepository;
 import com.campusconnect.neo4j.types.common.AuditEventType;
 import com.campusconnect.neo4j.types.common.IdType;
@@ -9,6 +10,7 @@ import com.campusconnect.neo4j.types.web.Event;
 import com.campusconnect.neo4j.types.web.Subject;
 import com.campusconnect.neo4j.util.EventDisplayStrings;
 import com.campusconnect.neo4j.util.comparator.TimeStampComparator;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,8 +21,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
 
     @Autowired
     AuditEventRepository auditEventRepository;
-    ObjectMapper objectMapper = new ObjectMapper();
-
+   
     public AuditEventDaoImpl() {
     }
 
@@ -40,7 +41,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
         for (String eachEvent : event) {
             try {
                 System.out.println("each event" + eachEvent);
-                Event eventDeserialised = objectMapper.readValue(eachEvent, Event.class);
+                Event eventDeserialised = EventHelper.deserializeEventString(eachEvent);
                 if (eventDeserialised.isPublic()) {
                     if (eventDeserialised.getAuditEventType().equals(AuditEventType.FRIEND.toString())) {
                         eventDeserialised.setEventString(EventDisplayStrings.FRIEND_EVENT_STRING);
@@ -50,7 +51,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
                         eventDeserialised.setEventString(EventDisplayStrings.ADDED_ADDRESS_EVENT_STRING);
                     } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.BORROWED.toString())) {
                         eventDeserialised.setEventString(EventDisplayStrings.BORROWED_EVENT_STRING);
-                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.CREATED.toString())) {
+                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.USER_CREATED.toString())) {
                         eventDeserialised.setEventString(EventDisplayStrings.CREATED_EVENT_STRING);
                     } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.FOLLOWED.toString())) {
                         eventDeserialised.setEventString(EventDisplayStrings.FOLLOWED_EVENT_STRING);
@@ -74,7 +75,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
     @Override
     public AuditEvent addEvent(String userId, Event event) {
         try {
-            String eventString = objectMapper.writeValueAsString(event);
+            String eventString = EventHelper.serializeEvent(event);
             AuditEvent auditEvent = auditEventRepository.getAuditEventForUser(userId);
             Set<String> events = auditEvent.getEvents();
             events.add(eventString);
@@ -104,7 +105,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
         for (Long key : mergedEvents.keySet()) {
             AuditEvent auditEvent = mergedEvents.get(key);
             for (String eventString : auditEvent.getEvents()) {
-                Event event = objectMapper.readValue(eventString, Event.class);
+                Event event = EventHelper.deserializeEventString(eventString);
                 if (event.isPublic()) {
                     if (event.getAuditEventType().equals(AuditEventType.FRIEND.toString())) {
                         event.setEventString(EventDisplayStrings.FRIEND_EVENT_STRING);
@@ -114,7 +115,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
                         event.setEventString(EventDisplayStrings.ADDED_ADDRESS_EVENT_STRING);
                     } else if (event.getAuditEventType().equals(AuditEventType.BORROWED.toString())) {
                         event.setEventString(EventDisplayStrings.BORROWED_EVENT_STRING);
-                    } else if (event.getAuditEventType().equals(AuditEventType.CREATED.toString())) {
+                    } else if (event.getAuditEventType().equals(AuditEventType.USER_CREATED.toString())) {
                         event.setEventString(EventDisplayStrings.CREATED_EVENT_STRING);
                     } else if (event.getAuditEventType().equals(AuditEventType.FOLLOWED.toString())) {
                         event.setEventString(EventDisplayStrings.FOLLOWED_EVENT_STRING);

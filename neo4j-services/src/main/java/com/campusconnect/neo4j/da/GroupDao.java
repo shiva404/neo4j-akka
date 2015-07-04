@@ -49,7 +49,8 @@ public class GroupDao {
         return groupRepository.save(group);
     }
 
-    public void deleteGroup(Group group) {
+    public void deleteGroup(String groupId) {
+        Group group = getGroup(groupId);
         groupRepository.delete(group);
     }
 
@@ -64,7 +65,7 @@ public class GroupDao {
 
     public List<GroupMember> getMembers(String groupId, String loggedInUser) {
         List<GroupMember> allGroupUsers = getAllGroupUsers(groupId);
-        if(allGroupUsers.size() > 0 && loggedInUser != null){
+        if (allGroupUsers.size() > 0 && loggedInUser != null) {
             List<User> friends = userDao.getRelatedUsers(loggedInUser);
             friends.add(userDao.getUser(loggedInUser));
             return FilterHelper.groupMembersMergeWithFriends(allGroupUsers, friends);

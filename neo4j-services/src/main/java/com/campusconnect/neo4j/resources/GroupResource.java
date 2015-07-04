@@ -8,13 +8,18 @@ import com.campusconnect.neo4j.types.common.AccessRoles;
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.Group;
 import com.campusconnect.neo4j.types.neo4j.User;
-import com.campusconnect.neo4j.types.web.*;
+import com.campusconnect.neo4j.types.web.BooksPage;
+import com.campusconnect.neo4j.types.web.GroupMember;
+import com.campusconnect.neo4j.types.web.GroupMembersPage;
+import com.campusconnect.neo4j.types.web.UserIdsPage;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.mapGroupNeo4jToWeb;
 
 @Path("/groups")
 @Consumes("application/json")
@@ -37,24 +42,22 @@ public class GroupResource {
         group.setId(UUID.randomUUID().toString());
         setGroupCreateProperties(group, userId);
         Group createdGroup = groupDao.createGroup(group);
-
         // Todo Add user as admin
         groupDao.addUser(createdGroup.getId(), userId, AccessRoles.ADMIN.toString(), userId);
-        return Response.created(null).entity(createdGroup).build();
+        return Response.created(null).entity(mapGroupNeo4jToWeb(createdGroup)).build();
     }
 
-    // @DELETE
-    // public Response deleteGroup(Group group)
-    // {
-    // groupDao.deleteGroup(group);
-    // return Response.ok().build();
-    // }
+    @DELETE
+    public Response deleteGroup(Group group) {
+        groupDao.deleteGroup(group);
+        return Response.ok().build();
+    }
 
     @GET
     @Path("{groupId}")
     public Response getGroup(@PathParam("groupId") final String groupId) {
         Group group = groupDao.getGroup(groupId);
-        return Response.ok().entity(group).build();
+        return Response.ok().entity(mapGroupNeo4jToWeb(group)).build();
     }
 
     @PUT
@@ -62,9 +65,9 @@ public class GroupResource {
     public Response updateGroup(@PathParam("groupId") final String groupId,
                                 Group group) {
         //Todo Add the user who updated Group (last updated by)
-        Group groupToBeUpdated = groupDao.updateGroup(groupId, group);
+        Group groupUpdated = groupDao.updateGroup(groupId, group);
         group.setLastModifiedTime(System.currentTimeMillis());
-        return Response.created(null).entity(groupToBeUpdated).build();
+        return Response.created(null).entity(mapGroupNeo4jToWeb(groupUpdated)).build();
     }
 
     private Group setGroupCreateProperties(Group group, String userId) {
@@ -81,6 +84,7 @@ public class GroupResource {
                             @PathParam("userId") final String userId, @QueryParam("role") final String role,
                             @QueryParam("createdBy") final String createdBy) {
         groupDao.addUser(groupId, userId, role, createdBy);
+        //TODO: Check userId exists or not
         return Response.created(null).build();
     }
 
@@ -105,7 +109,7 @@ public class GroupResource {
         // Todo validate user exist
         // Todo CreatedBy is of Admin or Write USER_ACCESS
         for (String userId : userIdsPage.getUserIds()) {
-            User user = userDao.getUser(userId);
+//            User user = userDao.getUser(userId);
             groupDao.addUser(groupId, userId, AccessRoles.READ.toString(), createdBy);
         }
         return Response.ok().build();

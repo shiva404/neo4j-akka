@@ -1,7 +1,6 @@
 package com.campusconnect.neo4j.types.neo4j;
 
 import com.campusconnect.neo4j.util.Constants;
-
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 
 import java.util.HashMap;
@@ -15,6 +14,16 @@ import java.util.TreeSet;
 @RelationshipEntity(type = Constants.OWNS_RELATION)
 public class OwnsRelationship extends BookRelationship {
 
+    private Long lentDate;
+
+    public Long getLentDate() {
+        return lentDate;
+    }
+
+    public void setLentDate(Long lentDate) {
+        this.lentDate = lentDate;
+    }
+
     private String borrowerId;
 
     private Integer contractPeriodInDays;
@@ -24,23 +33,22 @@ public class OwnsRelationship extends BookRelationship {
     private String goodreadsStatus;
 
     private String userComment;
-    
+
     private Set<String> historyEvents;
 
     public Set<String> getHistoryEvents() {
-    	
-    	if(null == historyEvents)
-    	{
-    		return new TreeSet<String>();
-    	}
-		return historyEvents;
-	}
-    
-    public void appendHistoryEvent(String historyEvent) {
-    	getHistoryEvents().add(historyEvent);
+
+        if (null == historyEvents) {
+            return new TreeSet<String>();
+        }
+        return historyEvents;
     }
 
-	public OwnsRelationship() {
+    public void appendHistoryEvent(String historyEvent) {
+        getHistoryEvents().add(historyEvent);
+    }
+
+    public OwnsRelationship() {
         super();
     }
 

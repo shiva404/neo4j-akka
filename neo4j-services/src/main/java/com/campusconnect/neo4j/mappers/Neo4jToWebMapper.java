@@ -46,8 +46,8 @@ public class Neo4jToWebMapper {
         webBook.setBookType(book.getBookType());
         if (book.getBookType() != null && book.getBookDetails() != null) {
             BookDetails bookDetails = book.getBookDetails();
-            if (bookDetails instanceof AvailableBookDetails) {
-                webBook.setAvailableBookDetails((AvailableBookDetails) bookDetails);
+            if (bookDetails instanceof OwnedBookDetails) {
+                webBook.setOwnedBookDetails((OwnedBookDetails) bookDetails);
             } else if (bookDetails instanceof WishlistBookDetails) {
                 webBook.setWishlistBookDetails((WishlistBookDetails) bookDetails);
             } else if (bookDetails instanceof LentBookDetails) {
@@ -68,7 +68,7 @@ public class Neo4jToWebMapper {
     public static Group mapGroupNeo4jToWeb(com.campusconnect.neo4j.types.neo4j.Group group) {
         if (group == null)
             return null;
-        return new Group(group.getId(), group.getName(), group.getCreatedDate(), group.getLastModifiedTime(), group.getLastModifiedBy());
+        return new Group(group.getId(), group.getName(), group.getCreatedDate(), group.getLastModifiedTime(), group.getLastModifiedBy(), group.getPublic());
     }
 
     public static Reminder mapReminderNeo4jToWeb(com.campusconnect.neo4j.types.neo4j.Reminder reminder) {

@@ -16,16 +16,17 @@ public class AuditEvent {
     private Long nodeId;
     private String userId;
     private String userName;
-    
-    
 
     public AuditEvent(String userName, String userId) {
-		super();
-		this.userId = userId;
-		this.userName = userName;
-	}
+        super();
+        this.userId = userId;
+        this.userName = userName;
+    }
 
-	public Set<String> getEvents() {
+    public AuditEvent() {
+    }
+
+    public Set<String> getEvents() {
 
         if (null == events) {
             events = new TreeSet<String>();

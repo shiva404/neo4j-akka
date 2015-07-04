@@ -2,6 +2,7 @@ package com.campusconnect.neo4j.tests;
 
 import com.campusconnect.neo4j.tests.base.DataBrewer;
 import com.campusconnect.neo4j.tests.functional.GroupResourceTest;
+import com.campusconnect.neo4j.tests.functional.UserResourceFuncTest;
 import com.campusconnect.neo4j.tests.functional.UserResourceTest;
 import com.campusconnect.neo4j.types.common.ReminderAbout;
 import com.campusconnect.neo4j.types.web.BorrowRequest;
@@ -9,6 +10,7 @@ import com.campusconnect.neo4j.types.web.GroupPage;
 import com.campusconnect.neo4j.types.web.Reminder;
 import com.campusconnect.neo4j.types.web.ReminderPage;
 import com.sun.jersey.api.client.ClientResponse;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -30,49 +32,49 @@ public class DataSetUpTest extends TestBase {
                 "Namitha Hugar", "namics08@gmail.comm", "118244923848234911918");
 
         // createUser2
-        String userId2 = UserResourceTest.createUser();
+        String userId2 = UserResourceFuncTest.createUser();
 
         // createUser3
-        String userId1 = UserResourceTest.createUser();
+        String userId1 = UserResourceFuncTest.createUser();
 
         // createUser4
-        String userId4 = UserResourceTest.createUser();
+        String userId4 = UserResourceFuncTest.createUser();
 
         // create user5
-        String userId5 = UserResourceTest.createUser();
+        String userId5 = UserResourceFuncTest.createUser();
 
         // create user6
-        String userId6 = UserResourceTest.createUser();
+        String userId6 = UserResourceFuncTest.createUser();
 
         // create user7
-        String userId7 = UserResourceTest.createUser();
+        String userId7 = UserResourceFuncTest.createUser();
 
         // create user8
-        String userId8 = UserResourceTest.createUser();
+        String userId8 = UserResourceFuncTest.createUser();
 
         // create user9
-        String userId9 = UserResourceTest.createUser();
+        String userId9 = UserResourceFuncTest.createUser();
 
         // create user10
-        String userId10 = UserResourceTest.createUser();
+        String userId10 = UserResourceFuncTest.createUser();
 
         // create book1
-        String book1 = UserResourceTest.createBook();
+        String book1 = UserResourceFuncTest.createBook();
 
         // create book2
-        String book2 = UserResourceTest.createBook();
+        String book2 = UserResourceFuncTest.createBook();
 
         // create book3
-        String book3 = UserResourceTest.createBook();
+        String book3 = UserResourceFuncTest.createBook();
 
         // create book4
-        String book4 = UserResourceTest.createBook();
+        String book4 = UserResourceFuncTest.createBook();
 
         // create book5
-        String book5 = UserResourceTest.createBook();
+        String book5 = UserResourceFuncTest.createBook();
 
         // create book6
-        String book6 = UserResourceTest.createBook();
+        String book6 = UserResourceFuncTest.createBook();
 
         // user1 friend with user2
         ClientResponse clientResponse = resource.path("users").path(userId1)

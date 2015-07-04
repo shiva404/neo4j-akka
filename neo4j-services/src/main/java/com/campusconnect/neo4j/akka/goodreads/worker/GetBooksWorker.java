@@ -113,6 +113,6 @@ public class GetBooksWorker extends UntypedActor {
     private void updateGoodreadsSynchStatusToDone(User user) {
         user.setGoodReadsSynchStatus("done");
         user.setLastGoodreadsSychDate(System.currentTimeMillis());
-        userDao.updateUser(user.getId(), user);
+        userDao.updateUser(user.getId(), user,false);
     }
 }

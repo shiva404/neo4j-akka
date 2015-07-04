@@ -4,6 +4,9 @@ import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.GroupDao;
 import com.campusconnect.neo4j.da.iface.*;
+import com.campusconnect.neo4j.da.utils.AuditEventHelper;
+import com.campusconnect.neo4j.da.utils.EventHelper;
+import com.campusconnect.neo4j.da.utils.TargetHelper;
 import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.types.common.AuditEventType;
@@ -20,11 +23,13 @@ import com.campusconnect.neo4j.types.web.*;
 import com.campusconnect.neo4j.util.Constants;
 import com.campusconnect.neo4j.util.StringUtils;
 import com.campusconnect.neo4j.util.Validator;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -56,6 +61,8 @@ public class UserResource {
     private AuditEventDao auditEventDao;
     private NotificationDao notificationDao;
     private GroupDao groupDao;
+    
+    
 
     public UserResource() {
     }
@@ -70,6 +77,7 @@ public class UserResource {
         this.auditEventDao = auditEventDao;
         this.notificationDao = notificationDao;
         this.groupDao = groupDao;
+        
     }
 
     @POST
@@ -88,11 +96,11 @@ public class UserResource {
             if (null != existingUser) {
                 if (existingUser.getFbId() == null && user.getFbId() != null) {
                     existingUser.setFbId(user.getFbId());
-                    existingUser = userDao.updateUser(existingUser.getId(), existingUser);
+                    existingUser = userDao.updateUser(existingUser.getId(), existingUser,true);
                 }
                 if (existingUser.getGoogleId() == null && user.getGoogleId() != null) {
                     existingUser.setGoogleId(user.getGoogleId());
-                    existingUser = userDao.updateUser(existingUser.getId(), existingUser);
+                    existingUser = userDao.updateUser(existingUser.getId(), existingUser,true);
                 }
                 com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(existingUser);
                 return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
@@ -117,17 +125,19 @@ public class UserResource {
         User createdUser = userDao.createUser(user, accessToken);
         com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(createdUser);
         return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
+        
     }
 
     @PUT
     @Path("{userId}/fields")
     public Response updateUserFields(@PathParam("userId") final String userId,
                                      Fields fields) throws Exception {
-        //todo: validate passed fields are valid or not
+        //TODO: validate passed fields are valid or not
+    	
         User user = userDao.getUser(userId);
         setUpdatedFields(user, fields);
         user.setLastModifiedDate(System.currentTimeMillis());
-        User updatedUser = userDao.updateUser(userId, user);
+        User updatedUser = userDao.updateUser(userId, user,true);
         checkWhetherSynchIsNeeded(updatedUser, fields);
         com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(updatedUser);
         return Response.ok().entity(returnUser).build();
@@ -158,7 +168,7 @@ public class UserResource {
 
     private void updateUserGoodReadsSynchToInprogress(User user) {
         user.setGoodReadsSynchStatus(IN_PROGRESS_GREADS_STATUS);
-        userDao.updateUser(user.getId(), user);
+        userDao.updateUser(user.getId(), user,false);
     }
 
     private void setUpdatedFields(User user, Fields fields) throws Exception {
@@ -166,14 +176,9 @@ public class UserResource {
         for (Field field : fields.getFields()) {
             BeanUtils.setProperty(user, field.getName(), field.getValue());
         }
-        Long currentTime = System.currentTimeMillis();
-        String targetUserId = user.getId();
-        String targetUserName = objectMapper.writeValueAsString(fields);
-        String targetUrl = null;
-        Target target = new Target(IdType.USER_ID.toString(), targetUserName, targetUrl);
-        Event followedUSerEvent = new Event(AuditEventType.USER_UPDATED.toString(), target, currentTime, false);
-        auditEventDao.addEvent(targetUserId, followedUSerEvent);
-
+       
+    
+    
     }
 
     @GET
@@ -200,7 +205,7 @@ public class UserResource {
     public Response updateUser(@PathParam("userId") final String userId, com.campusconnect.neo4j.types.web.User userPayload) {
         User user = mapUserWebToNeo4j(userPayload);
         user.setLastModifiedDate(System.currentTimeMillis());
-        User updatedUser = userDao.updateUser(userId, user);
+        User updatedUser = userDao.updateUser(userId, user,true);
         com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(updatedUser);
         return Response.ok().entity(returnUser).build();
     }
@@ -383,6 +388,7 @@ public class UserResource {
     @Path("{userId}/friend/{friendUserId}")
     public Response addFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId) {
         userDao.createFriendRelationWithPending(userDao.getUser(userId), userDao.getUser(friendUserId));
+        //TODO: Should event be added ??
         return Response.ok().build();
         //  return null;
     }
@@ -435,6 +441,7 @@ public class UserResource {
         properties.put("createdDate", System.currentTimeMillis());
         properties.put("role", role);
         return properties;
+        
     }
 
     private Map<String, Object> getRequiredHeadersForAddressLink(String addressType) {
@@ -467,6 +474,9 @@ public class UserResource {
                 reminderAbout, reminder);
         userDao.setReminder(reminderRelationShip);
         return Response.created(null).entity(createdReminder).build();
+        //TODO : change reminder flow
+        
+        
     }
 
     @PUT
@@ -630,6 +640,7 @@ public class UserResource {
         return Response.ok().entity(allFriends).build();
     }
 
+    
     @DELETE
     @Path("{userId}")
     public Response deleteUser(@PathParam("userId") String userId) {

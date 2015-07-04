@@ -20,7 +20,7 @@ public class AddEventTest extends TestBase {
 
     @Test
     public void TestCreateUserEvent() {
-        userId = UserResourceTest.createUser();
+        userId = UserResourceFuncTest.createUser();
         System.out.println(userId);
     }
 
@@ -28,7 +28,7 @@ public class AddEventTest extends TestBase {
     @Test(dependsOnMethods = "TestCreateUserEvent")
     public void TestFollowUserEvent() {
         System.out.println("first User id " + userId);
-        String userId2 = UserResourceTest.createUser();
+        String userId2 = UserResourceFuncTest.createUser();
         System.out.println("followed User id " + userId2);
         ClientResponse clientResponseForFollwingAnotherUser = resource
                 .path("users").path(userId).path("follow").path(userId2).type("application/json")

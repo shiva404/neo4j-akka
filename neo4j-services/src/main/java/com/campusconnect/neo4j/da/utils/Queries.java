@@ -29,7 +29,6 @@ public class Queries {
             "WHERE (user)-[:USER_ACCESS]-(group) " +
             "return book,friend,group";
 
-
     public static final String OWNED_BOOKS_BOOKS = "match (users:User {id: {userId}})-[relation:OWNS]->(books:Book) return books, relation";
     public static final String AVAILABLE_BOOKS_QUERY = "match (users:User {id: {userId}})-[relation:OWNS {status: \"" + AVAILABLE + "\"}]->(books:Book) return books, relation";
     public static final String LENT_BOOKS_QUERY = "match (users:User {id: {userId}})-[relation:OWNS {status: \"lent\"}]->(books:Book) return books, relation";

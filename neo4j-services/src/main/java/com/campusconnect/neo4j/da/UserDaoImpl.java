@@ -17,7 +17,6 @@ import com.campusconnect.neo4j.types.web.FriendRecommendation;
 import com.campusconnect.neo4j.types.web.Notification;
 import com.campusconnect.neo4j.util.Constants;
 import com.googlecode.ehcache.annotations.*;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
@@ -85,15 +84,15 @@ public class UserDaoImpl implements UserDao {
 
         User createdUser = neo4jTemplate.save(user);
         try {
-          
-           Event userCreatedEvent = EventHelper.createPublicEvent(AuditEventType.USER_CREATED.toString(), TargetHelper.createTargetToUser(createdUser));
-           
+
+            Event userCreatedEvent = EventHelper.createPublicEvent(AuditEventType.USER_CREATED.toString(), TargetHelper.createTargetToUser(createdUser));
+
             String serializedEvent = EventHelper.serializeEvent(userCreatedEvent);
-          AuditEvent auditEvent = AuditEventHelper.createAuditEvent(createdUser, serializedEvent);
-           
+            AuditEvent rawAuditEvent = AuditEventHelper.createAuditEvent(createdUser, serializedEvent);
+            AuditEvent auditEvent = neo4jTemplate.save(rawAuditEvent);
             NotificationEntity notificationEntityFresh = new NotificationEntity();
             NotificationEntity notificationEntityPast = new NotificationEntity();
-           
+
             notificationEntityFresh = notificationDao
                     .savenotification(notificationEntityFresh);
             notificationEntityPast = notificationDao
@@ -106,9 +105,10 @@ public class UserDaoImpl implements UserDao {
             UserNotificationRelationship userPastNotificationRelationship = new UserNotificationRelationship(
                     createdUser, notificationEntityPast,
                     NotificationType.PAST.toString());
+            neo4jTemplate.save(userEventRelationship);
             neo4jTemplate.save(userFreshNotificationRelationship);
             neo4jTemplate.save(userPastNotificationRelationship);
-            neo4jTemplate.save(userEventRelationship);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -325,20 +325,20 @@ public class UserDaoImpl implements UserDao {
                 try {
                     Long currentTime = System.currentTimeMillis();
 
-               
+
                     Target targetEventUser = TargetHelper.createTargetToUser(friend);
                     Event beFriendUserEvent1 = EventHelper.createPublicEvent(AuditEventType.FRIEND.toString(), targetEventUser);
                     auditEventDao.addEvent(user.getId(), beFriendUserEvent1);
-                    
-                    
+
+
                     Target targetEventFriend = TargetHelper.createTargetToUser(user);
                     Event beFriendUserEvent2 = EventHelper.createPublicEvent(AuditEventType.FRIEND.toString(), targetEventFriend);
                     auditEventDao.addEvent(friend.getId(), beFriendUserEvent2);
-                    
-                    Target targetNotification = TargetHelper.createNotificationTarget(IdType.USER_ID.toString(),friend);
+
+                    Target targetNotification = TargetHelper.createNotificationTarget(IdType.USER_ID.toString(), friend);
                     Notification beFriendNotification = new Notification(targetNotification, currentTime, Constants.FRIEND_REQUEST_ACCEPTED_NOTIFICATION);
                     notificationDao.addNotification(user.getId(), beFriendNotification);
-                    
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -367,12 +367,12 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     @TriggersRemove(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    public User updateUser(@PartialCacheKey String userId, User user,boolean addEvent) {
+    public User updateUser(@PartialCacheKey String userId, User user, boolean addEvent) {
         user.setUserRelation(null);
-        if(addEvent){
-        Target target = TargetHelper.createTargetToUser(user);
-        Event event = EventHelper.createPrivateEvent(AuditEventType.USER_UPDATED.toString(), target);
-        AuditEvent auditEvent= auditEventDao.addEvent(user.getId(), event);
+        if (addEvent) {
+            Target target = TargetHelper.createTargetToUser(user);
+            Event event = EventHelper.createPrivateEvent(AuditEventType.USER_UPDATED.toString(), target);
+            AuditEvent auditEvent = auditEventDao.addEvent(user.getId(), event);
         }
         return neo4jTemplate.save(user);
     }
@@ -400,7 +400,7 @@ public class UserDaoImpl implements UserDao {
         try {
             Long currentTime = System.currentTimeMillis();
 
-           Target target = TargetHelper.createTargetToUser(user);
+            Target target = TargetHelper.createTargetToUser(user);
             Event addAddressToUserEvent = EventHelper.createPrivateEvent(AuditEventType.ADDED_ADDRESS.toString(), target);
             auditEventDao.addEvent(user.getId(), addAddressToUserEvent);
 
@@ -425,16 +425,16 @@ public class UserDaoImpl implements UserDao {
         Target reminderTarget = TargetHelper.createReminderTarget(IdType.REMINDER_ID.toString(), reminderRelationShip.getReminder(), reminderRelationShip.getCreatedBy());
         Event event = EventHelper.createPrivateEvent(AuditEventType.REMINDER_SENT.toString(), reminderTarget);
         auditEventDao.addEvent(reminderRelationShip.getCreatedBy(), event);
-        
+
         Target reminderNotificationTarget = TargetHelper.createReminderTarget(IdType.REMINDER_ID.toString(), reminderRelationShip.getReminder(), reminderRelationShip.getReminderFor().getId());
-       
+
         Notification reminderNotification = new Notification(reminderNotificationTarget, System.currentTimeMillis(), Constants.REMINDER_CREATED_NOTIFICATION_TYPE);
         notificationDao.addNotification(reminderRelationShip.getReminderFor().getId(), reminderNotification);
-        
-     
+
+
     }
 
-    
+
     @Override
     public List<User> getFriends(String queryUserId, String currentUserId) {
         List<User> friends = userRelationRepository.getFriends(queryUserId);
@@ -503,7 +503,7 @@ public class UserDaoImpl implements UserDao {
             neo4jTemplate.save(userRelation);
             emailDao.sendFriendRequestEmail(user, friend);
             //send notification to friend
-           
+
             Target targetNotification = TargetHelper.createNotificationTarget(IdType.USER_ID.toString(), user);
 
             Notification sentFriendRequestNotification = new Notification(targetNotification, System.currentTimeMillis(), Constants.FRIEND_REQUEST_SENT_NOTIFICATION);

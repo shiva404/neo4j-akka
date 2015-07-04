@@ -80,5 +80,12 @@ public interface BookDao {
     void deleteBorrowRequest(String borrowerId, String bookId, String ownerId, String message);
 
 
-    List<Book> getWishlistBooks(String userId);
+    List<Book> getWishlistBooksWithDetails(String userId);
+
+    void initiateBookReturn(String bookId, String status, ReturnRequest returnRequest);
+
+
+    void updateBookReturnToAgreed(String bookId, String status, String ownerId, String borrowerId, String comment);
+
+    void updateBookReturnToSuccess(String bookId, String status, String ownerId, String borrowerId, String comment);
 }

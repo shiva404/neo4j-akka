@@ -10,7 +10,6 @@ import com.campusconnect.neo4j.types.web.GroupPage;
 import com.campusconnect.neo4j.types.web.Reminder;
 import com.campusconnect.neo4j.types.web.ReminderPage;
 import com.sun.jersey.api.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -22,14 +21,13 @@ import static com.campusconnect.neo4j.util.Constants.*;
 public class DataSetUpTest extends TestBase {
     @Test
     public void dataSetUp() {
+
         // create User1
+        String userId3 = UserResourceTest.createKnowUserWithGoogleId(
+                "Shiva Kumar", "shiva.n404@gmail.com", "105609898189858031660");
 
 //        String userId3 = UserResourceTest.createKnowUserWithGoogleId(
-//                "Shiva Kumar", "shiva.n404@gmail.com", "105609898189858031660");
-
-
-        String userId3 = UserResourceTest.createKnowUserWithGoogleId(
-                "Namitha Hugar", "namics08@gmail.comm", "118244923848234911918");
+//                "Namitha Hugar", "namics08@gmail.comm", "118244923848234911918");
 
         // createUser2
         String userId2 = UserResourceFuncTest.createUser();
@@ -99,10 +97,10 @@ public class DataSetUpTest extends TestBase {
         assert clientResponse.getStatus() == 200;
 
         // user1 follow user8
-        clientResponse = resource.path("users").path(userId1).path("follow")
-                .path(userId8).type("application/json")
-                .post(ClientResponse.class);
-        assert clientResponse.getStatus() == 200;
+//        clientResponse = resource.path("users").path(userId1).path("follow")
+//                .path(userId8).type("application/json")
+//                .post(ClientResponse.class);
+//        assert clientResponse.getStatus() == 200;
 
         // user2 friend with user9
         clientResponse = resource.path("users").path(userId2).path("friend")
@@ -148,17 +146,17 @@ public class DataSetUpTest extends TestBase {
                 .type("application/json").put(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        // user3 follow with user5
-        clientResponse = resource.path("users").path(userId3).path("follow")
-                .path(userId5).type("application/json")
-                .post(ClientResponse.class);
-        assert clientResponse.getStatus() == 200;
-
-        // user3 follow with user6
-        clientResponse = resource.path("users").path(userId3).path("follow")
-                .path(userId6).type("application/json")
-                .post(ClientResponse.class);
-        assert clientResponse.getStatus() == 200;
+//        // user3 follow with user5
+//        clientResponse = resource.path("users").path(userId3).path("follow")
+//                .path(userId5).type("application/json")
+//                .post(ClientResponse.class);
+//        assert clientResponse.getStatus() == 200;
+//
+//        // user3 follow with user6
+//        clientResponse = resource.path("users").path(userId3).path("follow")
+//                .path(userId6).type("application/json")
+//                .post(ClientResponse.class);
+//        assert clientResponse.getStatus() == 200;
 
         // user4 friend with user8
         clientResponse = resource.path("users").path(userId4).path("friend")
@@ -182,23 +180,23 @@ public class DataSetUpTest extends TestBase {
                 .type("application/json").put(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        // user6 follow with user3
-        clientResponse = resource.path("users").path(userId6).path("follow")
-                .path(userId3).type("application/json")
-                .post(ClientResponse.class);
-        assert clientResponse.getStatus() == 200;
-
-        // user7 follow with user2
-        clientResponse = resource.path("users").path(userId7).path("follow")
-                .path(userId2).type("application/json")
-                .post(ClientResponse.class);
-        assert clientResponse.getStatus() == 200;
-
-        // user7 follow with user9
-        clientResponse = resource.path("users").path(userId7).path("follow")
-                .path(userId9).type("application/json")
-                .post(ClientResponse.class);
-        assert clientResponse.getStatus() == 200;
+//        // user6 follow with user3
+//        clientResponse = resource.path("users").path(userId6).path("follow")
+//                .path(userId3).type("application/json")
+//                .post(ClientResponse.class);
+//        assert clientResponse.getStatus() == 200;
+//
+//        // user7 follow with user2
+//        clientResponse = resource.path("users").path(userId7).path("follow")
+//                .path(userId2).type("application/json")
+//                .post(ClientResponse.class);
+//        assert clientResponse.getStatus() == 200;
+//
+//        // user7 follow with user9
+//        clientResponse = resource.path("users").path(userId7).path("follow")
+//                .path(userId9).type("application/json")
+//                .post(ClientResponse.class);
+//        assert clientResponse.getStatus() == 200;
 
         String groupID1 = GroupResourceTest.createGroup(userId3);
         String groupID2 = GroupResourceTest.createGroup(userId5);
@@ -241,76 +239,134 @@ public class DataSetUpTest extends TestBase {
         // assert groupPage.getSize() == 2;
 
         //Add books to user
-        clientResponse = resource.path("books")
-                .path(book2).path("users").path(userId1).queryParam(LISTING_TYPE_QPARAM, WISHLIST).queryParam(ID_TYPE_QPARAM, ID).type("application/json")
+        clientResponse = resource
+                .path("books").path(book2)
+                .path("users").path(userId1)
+                .queryParam(LISTING_TYPE_QPARAM, WISHLIST)
+                .queryParam(ID_TYPE_QPARAM, ID)
+                .type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId1).path("books")
-                .path(book3).path("own").queryParam("status", "available").type("application/json")
+        clientResponse = resource
+                .path("books").path(book3)
+                .path("users").path(userId1)
+                .queryParam(LISTING_TYPE_QPARAM, OWNS)
+                .queryParam(ID_TYPE_QPARAM, ID)
+                .queryParam(STATUS_QPARAM, AVAILABLE)
+                .type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId1).path("books")
-                .path(book1).path("read").type("application/json")
+        clientResponse = resource
+                .path("books").path(book1)
+                .path("users").path(userId1)
+                .queryParam(LISTING_TYPE_QPARAM, READ)
+                .queryParam(ID_TYPE_QPARAM, ID)
+                .type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId2).path("books")
-                .path(book2).path("own").type("application/json")
+        clientResponse = resource
+                .path("books").path(book2)
+                .path("users").path(userId2)
+                .queryParam(LISTING_TYPE_QPARAM, OWNS)
+                .queryParam(STATUS_QPARAM, AVAILABLE)
+                .queryParam(ID_TYPE_QPARAM, ID)
+                .type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId2).path("books")
-                .path(book3).path("own").type("application/json")
+        clientResponse = resource
+                .path("books").path(book3)
+                .path("users").path(userId2)
+                .queryParam(LISTING_TYPE_QPARAM, OWNS)
+                .queryParam(STATUS_QPARAM, AVAILABLE)
+                .queryParam(ID_TYPE_QPARAM, ID)
+                .type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId3).path("books")
-                .path(book3).path("wish").type("application/json")
+        clientResponse = resource
+                .path("books").path(book3)
+                .path("users").path(userId3)
+                .queryParam(LISTING_TYPE_QPARAM, WISHLIST)
+                .queryParam(ID_TYPE_QPARAM, ID)
+                .type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId3).path("books")
-                .path(book1).path("own").type("application/json")
+        clientResponse = resource
+                .path("books").path(book1)
+                .path("users").path(userId3)
+                .queryParam(LISTING_TYPE_QPARAM, OWNS)
+                .queryParam(STATUS_QPARAM, AVAILABLE)
+                .queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId3).path("books")
-                .path(book4).path("own").type("application/json")
+        clientResponse = resource
+                .path("books").path(book4)
+                .path("users").path(userId3)
+                .queryParam(LISTING_TYPE_QPARAM, OWNS)
+                .queryParam(STATUS_QPARAM, AVAILABLE)
+                .queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId4).path("books")
-                .path(book3).path("read").type("application/json")
+        clientResponse = resource
+                .path("books").path(book3)
+                .path("users").path(userId4)
+                .queryParam(LISTING_TYPE_QPARAM, READ)
+                .queryParam(ID_TYPE_QPARAM, ID)
+                .type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId6).path("books")
-                .path(book5).path("own").type("application/json")
+        clientResponse = resource
+                .path("books").path(book5)
+                .path("users").path(userId6)
+                .queryParam(LISTING_TYPE_QPARAM, OWNS)
+                .queryParam(STATUS_QPARAM, AVAILABLE)
+                .queryParam(ID_TYPE_QPARAM, ID)
+                .type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId6).path("books")
-                .path(book4).path("wish").type("application/json")
+        clientResponse = resource
+                .path("books").path(book4)
+                .path("users").path(userId6)
+                .queryParam(LISTING_TYPE_QPARAM, WISHLIST)
+                .queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId7).path("books")
-                .path(book1).path("wish").type("application/json")
+        clientResponse = resource
+                .path("books").path(book1)
+                .path("users").path(userId7)
+                .queryParam(LISTING_TYPE_QPARAM, WISHLIST)
+                .queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId7).path("books")
-                .path(book4).path("wish").type("application/json")
+        clientResponse = resource
+                .path("books").path(book4)
+                .path("users").path(userId7)
+                .queryParam(LISTING_TYPE_QPARAM, WISHLIST)
+                .queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId7).path("books")
-                .path(book5).path("own").type("application/json")
+        clientResponse = resource
+                .path("books").path(book5)
+                .path("users").path(userId7)
+                .queryParam(LISTING_TYPE_QPARAM, OWNS)
+                .queryParam(STATUS_QPARAM, AVAILABLE)
+                .queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
+        //adding borrow borrow req
         clientResponse = resource
                 .path("books")
                 .path(book5)
@@ -320,35 +376,46 @@ public class DataSetUpTest extends TestBase {
                 .type("application/json").post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
+        //accept borrow
         clientResponse = resource
-                .path("books")
-                .path(book5)
-                .path("users")
-                .path(userId7)
-                .queryParam("borrowerId", userId3)
-                .queryParam("status", "success")
-                .entity(new BorrowRequest(userId7, userId3, 5, System
-                        .currentTimeMillis(), "Can i borrow this book"))
+                .path("books").path(book5)
+                .path("borrow")
+                .queryParam(OWNER_USER_ID_QPARAM, userId7)
+                .queryParam(BORROWER_ID_QPARAM, userId3)
+                .queryParam(STATUS_QPARAM, BORROW_SUCCESS)
+                .queryParam(MESSAGE_QPARAM, "Sample comment")
                 .type("application/json").put(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId8).path("books")
-                .path(book3).path("own").type("application/json")
+        clientResponse = resource
+                .path("books").path(book3)
+                .path("users").path(userId8)
+                .queryParam(LISTING_TYPE_QPARAM, OWNS)
+                .queryParam(STATUS_QPARAM, AVAILABLE)
+                .queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId9).path("books")
-                .path(book2).path("own").type("application/json")
+        clientResponse = resource.path("books").path(book2)
+                .path("users").path(userId9)
+                .queryParam(LISTING_TYPE_QPARAM, OWNS)
+                .queryParam(STATUS_QPARAM, AVAILABLE)
+                .queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId10).path("books")
-                .path(book5).path("own").type("application/json")
+        clientResponse = resource.path("books").path(book5)
+                .path("users").path(userId10)
+                .queryParam(LISTING_TYPE_QPARAM, OWNS)
+                .queryParam(STATUS_QPARAM, AVAILABLE)
+                .queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
-        clientResponse = resource.path("users").path(userId10).path("books")
-                .path(book6).path("wish").type("application/json")
+        clientResponse = resource.path("books").path(book6)
+                .path("users").path(userId10)
+                .queryParam(LISTING_TYPE_QPARAM, WISHLIST)
+                .queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
@@ -398,6 +465,5 @@ public class DataSetUpTest extends TestBase {
         ClientResponse clientResponseForMultipleReminderFetch = resource.path("users").path(userId3).path("reminders").type("application/json").get(ClientResponse.class);
         assert clientResponseForMultipleReminderFetch.getStatus() == 200;
         ReminderPage reminderPage = clientResponseForMultipleReminderFetch.getEntity(ReminderPage.class);
-
     }
 }

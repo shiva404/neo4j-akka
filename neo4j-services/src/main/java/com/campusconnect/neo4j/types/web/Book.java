@@ -22,12 +22,12 @@ public class Book implements Serializable {
     private String publisher;
     private Integer numberOfPages;
 
-    public AvailableBookDetails getAvailableBookDetails() {
-        return availableBookDetails;
+    public OwnedBookDetails getOwnedBookDetails() {
+        return ownedBookDetails;
     }
 
-    public void setAvailableBookDetails(AvailableBookDetails availableBookDetails) {
-        this.availableBookDetails = availableBookDetails;
+    public void setOwnedBookDetails(OwnedBookDetails ownedBookDetails) {
+        this.ownedBookDetails = ownedBookDetails;
     }
 
     public BorrowedBookDetails getBorrowedBookDetails() {
@@ -54,7 +54,7 @@ public class Book implements Serializable {
         this.wishlistBookDetails = wishlistBookDetails;
     }
 
-    private AvailableBookDetails availableBookDetails;
+    private OwnedBookDetails ownedBookDetails;
     private BorrowedBookDetails borrowedBookDetails;
     private LentBookDetails lentBookDetails;
     private WishlistBookDetails wishlistBookDetails;

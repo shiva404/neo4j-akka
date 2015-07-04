@@ -3,10 +3,9 @@ package com.campusconnect.neo4j.da.mapper;
 import com.campusconnect.neo4j.types.common.BookDetails;
 import com.campusconnect.neo4j.types.common.UserRelationType;
 import com.campusconnect.neo4j.types.neo4j.*;
-import com.campusconnect.neo4j.types.web.AvailableBookDetails;
 import com.campusconnect.neo4j.types.web.BorrowedBookDetails;
 import com.campusconnect.neo4j.types.web.GroupMember;
-import com.campusconnect.neo4j.types.web.LentBookDetails;
+import com.campusconnect.neo4j.types.web.OwnedBookDetails;
 import com.campusconnect.neo4j.util.Constants;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.rest.graphdb.entity.RestNode;
@@ -174,33 +173,38 @@ public class DBMapper {
     }
 
     private static BookDetails getOwnsBookDetails(RestRelationship ownsRelationship) {
-        //todo return based on the status
-        return new AvailableBookDetails();
-        /*
-        wnedBook.setCreatedDate(ownsRelationship.getCreatedDate());
-            ownedBook.setStatus(ownsRelationship.getStatus());
-            ownedBook.setLastModifiedDate(ownsRelationship.getLastModifiedDate());
-            ownedBook.setBorrowerId(ownsRelationship.getBorrowerId());
-            ownedBook.setDueDate(ownsRelationship.getDueDate());
-         */
+
+        OwnedBookDetails ownedBookDetails = new OwnedBookDetails();
+
+        String status = (String) ownsRelationship.getProperty(STATUS, "");
+        switch (status) {
+            case AVAILABLE:
+                ownedBookDetails.setStatus(AVAILABLE);
+                break;
+            case BORROW_LOCK:
+                ownedBookDetails.setStatus(BORROW_LOCK);
+                ownedBookDetails.setBorrowerId((String) ownsRelationship.getProperty("borrowerId", null));
+                ownedBookDetails.setContractPeriodInDays((Integer) ownsRelationship.getProperty("contractPeriodInDays", null));
+                break;
+            case LENT:
+                ownedBookDetails.setStatus(BORROW_LOCK);
+                ownedBookDetails.setBorrowerId((String) ownsRelationship.getProperty("borrowerId", null));
+                ownedBookDetails.setContractPeriodInDays((Integer) ownsRelationship.getProperty("contractPeriodInDays", null));
+                ownedBookDetails.setLentDate((Long) ownsRelationship.getProperty("lentDate", null));
+                break;
+        }
+        return ownedBookDetails;
     }
 
     private static BorrowedBookDetails getBorrowBookDetails(RestRelationship borrowRelation) {
-        return new BorrowedBookDetails();
-        /*
-                    borrowedBook.setStatus(borrowRelationship.getStatus());
-            borrowedBook.setDueDate(borrowRelationship.getDueDate());
-            borrowedBook.setCreatedDate(borrowRelationship.getCreatedDate());
-            borrowedBook.setOwnerUserId(borrowRelationship.getOwnerUserId());
-            borrowedBook.setAdditionalComments(borrowRelationship.getAdditionalComments());
-            borrowedBook.setBorrowDate(borrowRelationship.getBorrowDate());
-            borrowedBook.setContractPeriodInDays(borrowRelationship.getContractPeriodInDays());
-            borrowedBook.setLastModifiedDate(borrowRelationship.getLastModifiedDate());
-         */
-    }
+        BorrowedBookDetails borrowedBookDetails = new BorrowedBookDetails();
 
-    private static LentBookDetails getLentBookDetails(RestRelationship ownsRelationship) {
-        return new LentBookDetails();
-    }
+        String status = (String) borrowRelation.getProperty(STATUS, "");
+        borrowedBookDetails.setOwnerUserId((String) borrowRelation.getProperty("ownerUserId", null));
+        borrowedBookDetails.setContractPeriodInDays((Integer) borrowRelation.getProperty("contractPeriodInDays", null));
+        borrowedBookDetails.setAdditionalComments((String) borrowRelation.getProperty("additionalComments", null));
+        borrowedBookDetails.setStatus(status);
 
+        return borrowedBookDetails;
+    }
 }

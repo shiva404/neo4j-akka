@@ -5,12 +5,13 @@ public class Group {
     private String id;
     private String name;
 
-    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy) {
+    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy, boolean isPublic) {
         this.id = id;
         this.name = name;
         this.createdDate = createdDate;
         this.lastModifiedTime = lastModifiedTime;
         this.lastModifiedBy = lastModifiedBy;
+        this.isPublic = isPublic;
     }
 
     private Long createdDate;
@@ -18,6 +19,8 @@ public class Group {
     private Long lastModifiedTime;
 
     private String lastModifiedBy;
+
+    private boolean isPublic;
 
     public Group(String name) {
         this.name = name;
@@ -27,6 +30,18 @@ public class Group {
 
         this.name = name;
         this.createdDate = createdDate;
+    }
+
+    public Group(String name, boolean isPublic) {
+        this.name = name;
+        this.isPublic = isPublic;
+    }
+
+    public Group(String name, Long createdDate, boolean isPublic) {
+
+        this.name = name;
+        this.createdDate = createdDate;
+        this.isPublic = isPublic;
     }
 
     public Group() {
@@ -70,6 +85,14 @@ public class Group {
 
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
+    public boolean getPublic() {
+        return  isPublic;
     }
 
 }

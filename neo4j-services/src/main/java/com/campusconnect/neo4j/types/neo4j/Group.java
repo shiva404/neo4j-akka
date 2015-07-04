@@ -21,12 +21,15 @@ public class Group {
     private String id;
     private String name;
 
-    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy) {
+    private boolean isPublic;
+
+    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy, boolean isPublic) {
         this.id = id;
         this.name = name;
         this.createdDate = createdDate;
         this.lastModifiedTime = lastModifiedTime;
         this.lastModifiedBy = lastModifiedBy;
+        this.isPublic = isPublic;
     }
 
     @CreatedDate
@@ -47,6 +50,17 @@ public class Group {
 
         this.name = name;
         this.createdDate = createdDate;
+    }
+    public Group(String name, boolean isPublic) {
+        this.name = name;
+        this.isPublic = isPublic;
+    }
+
+    public Group(String name, Long createdDate, boolean isPublic) {
+
+        this.name = name;
+        this.createdDate = createdDate;
+        this.isPublic = isPublic;
     }
 
     public Group() {
@@ -101,11 +115,15 @@ public class Group {
         this.lastModifiedBy = lastModifiedBy;
     }
 
+    public void setPublic(boolean isPublic) { this.isPublic = isPublic; }
+
+    public boolean getPublic() { return  isPublic; }
+
     @Override
     public String toString() {
         return "Group [nodeId=" + nodeId + ", id=" + id + ", name=" + name
                 + ", createdDate=" + createdDate + ", lastModifiedTime="
-                + lastModifiedTime + ", lastModifiedBy=" + lastModifiedBy + "]";
+                + lastModifiedTime + ", lastModifiedBy=" + lastModifiedBy + ", isPublic=" + isPublic + "]";
     }
 
 }

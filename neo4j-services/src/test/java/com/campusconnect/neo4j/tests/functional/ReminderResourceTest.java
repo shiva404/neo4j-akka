@@ -1,9 +1,9 @@
 package com.campusconnect.neo4j.tests.functional;
 
 import com.campusconnect.neo4j.tests.TestBase;
-import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
+import com.campusconnect.neo4j.tests.base.DataBrewer;
 import com.campusconnect.neo4j.types.common.ReminderAbout;
-import com.campusconnect.neo4j.types.neo4j.Reminder;
+import com.campusconnect.neo4j.types.web.Reminder;
 import com.campusconnect.neo4j.types.web.ReminderPage;
 import com.sun.jersey.api.client.ClientResponse;
 import org.testng.annotations.Test;

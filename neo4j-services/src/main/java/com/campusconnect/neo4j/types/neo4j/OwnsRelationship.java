@@ -1,10 +1,13 @@
 package com.campusconnect.neo4j.types.neo4j;
 
 import com.campusconnect.neo4j.util.Constants;
+
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by sn1 on 2/25/15.
@@ -21,8 +24,23 @@ public class OwnsRelationship extends BookRelationship {
     private String goodreadsStatus;
 
     private String userComment;
+    
+    private Set<String> historyEvents;
 
-    public OwnsRelationship() {
+    public Set<String> getHistoryEvents() {
+    	
+    	if(null == historyEvents)
+    	{
+    		return new TreeSet<String>();
+    	}
+		return historyEvents;
+	}
+    
+    public void appendHistoryEvent(String historyEvent) {
+    	getHistoryEvents().add(historyEvent);
+    }
+
+	public OwnsRelationship() {
         super();
     }
 

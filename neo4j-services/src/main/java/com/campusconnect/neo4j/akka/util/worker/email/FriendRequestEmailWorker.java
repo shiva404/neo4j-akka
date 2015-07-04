@@ -35,7 +35,7 @@ public class FriendRequestEmailWorker extends UntypedActor {
             generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(emailTask.getFriend().getEmail()));
             String subjectLine = getSubjectLine(emailTask.getUser());
             generateMailMessage.setSubject(subjectLine);
-            String emailBody = "<h3>Click here to accept</h3><br /><a href=\"" + URL + "\"/>";
+            String emailBody = "<h3>Click <a href=\"" + URL + "\">here</a> to accept</h3><br />";
             generateMailMessage.setContent(emailBody, "text/html");
 
             Transport transport = getMailSession.getTransport("smtp");
@@ -44,18 +44,15 @@ public class FriendRequestEmailWorker extends UntypedActor {
             transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
             transport.close();
         }
-
 //	    public static void main(String[] args) throws Exception {
 //	        BorrowInitEmailWorker borrowInitEmailWorker = new BorrowInitEmailWorker();
 //	        borrowInitEmailWorker.onReceive(new Object());
 //	    }
-
     }
 
     private String getSubjectLine(User fromUser) {
         return String.format(SUBJECT_TITLE, fromUser.getName());
     }
-
 //	    private String getUrlForRedirection(User fromUser, Book book, User toUser) {
 //	        return String.format(URL, book.getId(), toUser.getId(), fromUser.getId());
 //	    }

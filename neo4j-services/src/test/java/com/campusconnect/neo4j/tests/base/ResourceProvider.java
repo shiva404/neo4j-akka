@@ -1,4 +1,4 @@
-package com.campusconnect.neo4j.tests.functional.base;
+package com.campusconnect.neo4j.tests.base;
 
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;

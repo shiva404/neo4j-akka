@@ -17,4 +17,5 @@ public interface AuditEventDao {
 
     List<Event> getFeedEvents(String userId) throws IOException;
 
+    void deleteAuditEventsOfUser(String userId);
 }

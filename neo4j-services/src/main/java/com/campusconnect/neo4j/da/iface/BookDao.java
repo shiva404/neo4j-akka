@@ -21,6 +21,8 @@ public interface BookDao {
 
     void listBookAsRead(ReadRelationship readRelation);
 
+    void listBookAsCurrentlyReading(CurrentlyReadingRelationShip currentlyReadingRelationship);
+
     @Transactional
     void updateOwnedBookStatus(User user, Book book, String status, String userComment);
 
@@ -36,9 +38,9 @@ public interface BookDao {
     List<Book> search(String queryString);
 
     // @Cacheable(cacheName = "bookByGRIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
-    Book getBookByGoodreadsId(Integer goodreadsId) throws IOException;
+    Book getBookByGoodreadsId(Integer goodreadsId);
 
-    public Book getBookByGoodreadsIdAndSaveIfNotExists(String goodreadsId, Book book);
+    public Book getBookByGoodreadsIdAndSaveIfNotExists(Integer goodreadsId, Book book);
 
     public void addWishBookToUser(WishListRelationship wishListRelationship);
 
@@ -46,7 +48,7 @@ public interface BookDao {
 
     Book getBookByIsbn(String isbn) throws IOException;
 
-    Book getBookRelatedUser(String bookId, String userId);
+    Book getBooksRelatedUser(String bookId, String userId);
 
     Book getBookByGoodreadsIdWithUser(Integer goodreadsId, String userId);
 
@@ -62,11 +64,21 @@ public interface BookDao {
 
     List<OwnedBook> getAvailableBooks(String userId);
 
-    List<UserRecommendation> getGoodreadsUserRecommendations(String userId);
+    List<GoodreadsUserRecommendation> getGoodreadsUserRecommendations(String userId);
 
     //    @Cacheable(cacheName = "userWishBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     List<WishListBook> getWishListBooks(String userId);
 
+    List<CurrentlyReadingBook> getCurrentlyReadingBook(String userId);
+
     //    @Cacheable(cacheName = "userBorrowedBooks", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     List<BorrowedBook> getBorrowedBooks(String userId);
+
+    // Return history of books
+    List<HistoryEvent> getBookHistory(String bookId, String UserId);
+
+    void deleteBorrowRequest(String borrowerId, String bookId, String ownerId, String message);
+
+
+    List<Book> getWishlistBooks(String userId);
 }

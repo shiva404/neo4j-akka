@@ -39,7 +39,7 @@ public class BorrowInitEmailWorker extends UntypedActor {
             generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(emailTask.getOwner().getEmail()));
             String subjectLine = getSubjectLine(emailTask.getBorrower(), emailTask.getBook());
             generateMailMessage.setSubject(subjectLine);
-            String emailBody = "<h3>Click below to update data</h3><br /><a href=\"" + getUrlForRedirection(emailTask.getBorrower(), emailTask.getBook(), emailTask.getOwner()) + "\"/>";
+            String emailBody = "<h3>Click <a href=\"" + getUrlForRedirection(emailTask.getBorrower(), emailTask.getBook(), emailTask.getOwner()) + "\">here</a> to update data</h3><br/>";
             generateMailMessage.setContent(emailBody, "text/html");
 
             Transport transport = getMailSession.getTransport("smtp");

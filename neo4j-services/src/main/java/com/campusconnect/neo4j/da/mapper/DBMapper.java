@@ -1,12 +1,8 @@
 package com.campusconnect.neo4j.da.mapper;
 
-import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.types.common.BookDetails;
 import com.campusconnect.neo4j.types.common.UserRelationType;
-import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.GoodreadsRecRelationship;
-import com.campusconnect.neo4j.types.neo4j.User;
-import com.campusconnect.neo4j.types.neo4j.UserRelation;
+import com.campusconnect.neo4j.types.neo4j.*;
 import com.campusconnect.neo4j.types.web.AvailableBookDetails;
 import com.campusconnect.neo4j.types.web.BorrowedBookDetails;
 import com.campusconnect.neo4j.types.web.GroupMember;
@@ -18,6 +14,7 @@ import org.neo4j.rest.graphdb.entity.RestRelationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.mapUserNeo4jToWebGroupMember;
 import static com.campusconnect.neo4j.util.Constants.*;
 
 /**
@@ -46,7 +43,7 @@ public class DBMapper {
     }
 
     public static UserRelation getUserRelation(RestRelationship userRawRelation) {
-        if(userRawRelation.getType().name().equals(CONNECTED_RELATION)){
+        if (userRawRelation.getType().name().equals(CONNECTED_RELATION)) {
             UserRelation userRelation = new UserRelation();
             userRelation.setCreatedDate((Long) userRawRelation.getProperty("createdDate", null));
             userRelation.setId((Long) userRawRelation.getProperty("id", null));
@@ -59,29 +56,46 @@ public class DBMapper {
     }
 
     public static void setUserRelationFieldsToUser(RestRelationship rawUserRelation, User user) {
-        if(user != null && rawUserRelation != null && rawUserRelation.getType().name().equals(CONNECTED_RELATION)) {
+        if (user != null && rawUserRelation != null && rawUserRelation.getType().name().equals(CONNECTED_RELATION)) {
             String relationType = (String) rawUserRelation.getProperty("type", null);
-            if(relationType.equals(UserRelationType.FRIEND_REQUEST_PENDING.toString()))
+            if (relationType.equals(UserRelationType.FRIEND_REQUEST_PENDING.toString()))
                 user.setUserRelation(Constants.FRIEND_REQ_SENT);
             else
                 user.setUserRelation(relationType);
         }
     }
 
+    public static Group getGroupFromRestNode(RestNode groupNode) {
+        try {
+            Group group = new Group();
+            group.setCreatedDate((Long) groupNode.getProperty("createdDate", null));
+            group.setId((String) groupNode.getProperty("id", null));
+            group.setLastModifiedBy((String) groupNode.getProperty("lastModifiedBy", null));
+            group.setLastModifiedTime((Long) groupNode.getProperty("lastModifiedTime", null));
+            group.setName((String) groupNode.getProperty("lastModifiedTime", null));
+            group.setNodeId((Long) groupNode.getProperty("nodeId", null));
+            return group;
+        } catch (Exception e) {
+            logger.error("Error while constructing user object:" + groupNode.getProperty("id"));
+        }
+        return null;
+    }
+
     public static GroupMember getGroupMember(User user, RestRelationship rawRelationship, String groupId) {
-        if(user != null && rawRelationship != null) {
+        if (user != null && rawRelationship != null) {
             String role = (String) rawRelationship.getProperty("role", null);
             Long createdDate = (Long) rawRelationship.getProperty("createdDate", null);
-            return Neo4jToWebMapper.mapUserNeo4jToWebGroupMember(user, groupId, createdDate, role);
-        }
-        else if(user != null)
-            return Neo4jToWebMapper.mapUserNeo4jToWebGroupMember(user, groupId, 0L, null);
+            //fixme groupName returned null
+            return mapUserNeo4jToWebGroupMember(user, groupId, null, createdDate, role);
+        } else if (user != null)
+            //fixme groupName returned null
+            return mapUserNeo4jToWebGroupMember(user, groupId, null, 0L, null);
         else
             return null;
     }
 
     public static User getUserFromRestNode(RestNode userNode) {
-        try{
+        try {
             User user = new User();
             user.setCreatedDate((Long) userNode.getProperty("createdDate", null));
             user.setEmail((String) userNode.getProperty("email", null));
@@ -106,8 +120,8 @@ public class DBMapper {
             user.setWorkDesignation((String) userNode.getProperty("workDesignation", null));
             user.setWorkLocation((String) userNode.getProperty("workLocation", null));
             return user;
-        }catch (Exception e) {
-            logger.error("Error while constructing user object:" + userNode.getProperty("id"));
+        } catch (Exception e) {
+            logger.error("Error while constructing user object:" + userNode.getProperty("id", null));
         }
         return null;
     }
@@ -151,6 +165,9 @@ public class DBMapper {
                 break;
             case WISHLIST_RELATION:
                 book.setBookType(WISHLIST_RELATION);
+                break;
+            case CURRENTLY_READING_RELATION:
+                book.setBookType(CURRENTLY_READING_RELATION);
                 break;
         }
         return book;

@@ -135,4 +135,10 @@ public class AuditEventDaoImpl implements AuditEventDao {
         Collections.sort(events, new TimeStampComparator());
         return events;
     }
+
+    @Override
+    public void deleteAuditEventsOfUser(String userId) {
+        AuditEvent auditEvent = auditEventRepository.getAuditEventForUser(userId);
+        auditEventRepository.delete(auditEvent);
+    }
 }

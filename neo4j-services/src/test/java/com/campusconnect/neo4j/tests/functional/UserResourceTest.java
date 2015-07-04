@@ -1,12 +1,12 @@
 package com.campusconnect.neo4j.tests.functional;
 
 import com.campusconnect.neo4j.tests.TestBase;
-import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
+import com.campusconnect.neo4j.tests.base.DataBrewer;
 import com.campusconnect.neo4j.types.common.AddressType;
-import com.campusconnect.neo4j.types.neo4j.Book;
-import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.Book;
 import com.campusconnect.neo4j.types.web.Field;
 import com.campusconnect.neo4j.types.web.Fields;
+import com.campusconnect.neo4j.types.web.User;
 import com.sun.jersey.api.client.ClientResponse;
 import org.testng.annotations.Test;
 
@@ -32,6 +32,11 @@ public class UserResourceTest extends TestBase {
         createdUser = clientResponse.getEntity(User.class);
         String userId = createdUser.getId();
         return userId;
+    }
+
+    public static void deleteUser(String userId) {
+        ClientResponse clientResponse = resource.path("users").path(userId).type("application/json").delete(ClientResponse.class);
+        assert clientResponse.getStatus() == 200;
     }
 
     public static String createBook() {
@@ -104,5 +109,6 @@ public class UserResourceTest extends TestBase {
 
         assert getBook != null;
     }
+
 
 }

@@ -1,15 +1,18 @@
 package com.campusconnect.neo4j.tests;
 
+import com.campusconnect.neo4j.tests.base.DataBrewer;
 import com.campusconnect.neo4j.tests.functional.GroupResourceTest;
 import com.campusconnect.neo4j.tests.functional.UserResourceTest;
-import com.campusconnect.neo4j.tests.functional.base.DataBrewer;
 import com.campusconnect.neo4j.types.common.ReminderAbout;
-import com.campusconnect.neo4j.types.neo4j.Reminder;
 import com.campusconnect.neo4j.types.web.BorrowRequest;
 import com.campusconnect.neo4j.types.web.GroupPage;
+import com.campusconnect.neo4j.types.web.Reminder;
 import com.campusconnect.neo4j.types.web.ReminderPage;
 import com.sun.jersey.api.client.ClientResponse;
+import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import static com.campusconnect.neo4j.util.Constants.*;
 
 /**
  * Created by sn1 on 5/7/15.
@@ -19,8 +22,12 @@ public class DataSetUpTest extends TestBase {
     public void dataSetUp() {
         // create User1
 
+//        String userId3 = UserResourceTest.createKnowUserWithGoogleId(
+//                "Shiva Kumar", "shiva.n404@gmail.com", "105609898189858031660");
+
+
         String userId3 = UserResourceTest.createKnowUserWithGoogleId(
-                "Shiva Kumar", "shiva.n404@gmail.com", "105609898189858031660");
+                "Namitha Hugar", "namics08@gmail.comm", "118244923848234911918");
 
         // createUser2
         String userId2 = UserResourceTest.createUser();
@@ -231,13 +238,14 @@ public class DataSetUpTest extends TestBase {
         GroupPage groupPage = clientResponse.getEntity(GroupPage.class);
         // assert groupPage.getSize() == 2;
 
-        clientResponse = resource.path("users").path(userId1).path("books")
-                .path(book2).path("wish").type("application/json")
+        //Add books to user
+        clientResponse = resource.path("books")
+                .path(book2).path("users").path(userId1).queryParam(LISTING_TYPE_QPARAM, WISHLIST).queryParam(ID_TYPE_QPARAM, ID).type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
         clientResponse = resource.path("users").path(userId1).path("books")
-                .path(book3).path("own").type("application/json")
+                .path(book3).path("own").queryParam("status", "available").type("application/json")
                 .post(ClientResponse.class);
         assert clientResponse.getStatus() == 200;
 
@@ -315,7 +323,6 @@ public class DataSetUpTest extends TestBase {
                 .path(book5)
                 .path("users")
                 .path(userId7)
-                .path("borrow")
                 .queryParam("borrowerId", userId3)
                 .queryParam("status", "success")
                 .entity(new BorrowRequest(userId7, userId3, 5, System
@@ -351,7 +358,8 @@ public class DataSetUpTest extends TestBase {
 
         ClientResponse clientResponseToGetReminderCreated = resource.path("users").path(userId3).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").get(ClientResponse.class);
         Reminder reminderReturned = clientResponseToGetReminderCreated.getEntity(Reminder.class);
-        assert reminderReturned.getReminderMessage().equalsIgnoreCase(reminderCreated.getReminderMessage()) && reminderReturned.getReminderTime() == reminderCreated.getReminderTime();
+        assert reminderReturned.getReminderMessage().equalsIgnoreCase(reminderCreated.getReminderMessage()) && reminderReturned.getReminderTime().equals(reminderCreated.getReminderTime());
+
 
         reminderReturned.setReminderMessage("Collect Book Time Update");
         Long updatedTime = System.currentTimeMillis();
@@ -361,7 +369,8 @@ public class DataSetUpTest extends TestBase {
 
         ClientResponse clientResponseToGetReminderUpdated = resource.path("users").path(userId3).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").get(ClientResponse.class);
         Reminder reminderUpdated = clientResponseToGetReminderUpdated.getEntity(Reminder.class);
-        assert reminderUpdated.getReminderMessage().equalsIgnoreCase(reminderReturned.getReminderMessage()) && reminderUpdated.getReminderTime() == reminderReturned.getReminderTime();
+        Assert.assertEquals(reminderUpdated.getReminderMessage(), reminderReturned.getReminderMessage());
+        Assert.assertEquals(reminderUpdated.getReminderTime(), reminderReturned.getReminderTime());
 
 
         ClientResponse clientResponseToDeleteReminder = resource.path("users").path(userId3).path("reminders").path(reminderCreated.getNodeId().toString()).type("application/json").delete(ClientResponse.class);

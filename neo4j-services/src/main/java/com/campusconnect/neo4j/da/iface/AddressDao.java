@@ -1,6 +1,7 @@
 package com.campusconnect.neo4j.da.iface;
 
 import com.campusconnect.neo4j.types.neo4j.Address;
+import com.campusconnect.neo4j.types.neo4j.User;
 
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface AddressDao {
     Address updateAddress(Address address, String userId);
 
     void deleteAddress(String addressId, String userId);
+
+    void deleteAddressOfUser(User user);
 }

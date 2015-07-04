@@ -4,7 +4,7 @@ public class EventDisplayStrings {
 
     public final static String FRIEND_EVENT_STRING = "became friend with";
     public final static String FOLLOWING_EVENT_STRING = "began following";
-
+    public final static String BORROW_REFUSED = "refused to lend you the book";
     public final static String BORROWED_EVENT_STRING = "borrowed the book ";
     public final static String WISHLIST_EVENT_STRING = "added to wish list the book ";
     public final static String CREATED_EVENT_STRING = "joined book4borow";

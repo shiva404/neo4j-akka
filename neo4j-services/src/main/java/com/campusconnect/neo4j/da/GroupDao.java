@@ -53,8 +53,6 @@ public class GroupDao {
         groupRepository.delete(group);
     }
 
-
-
     public Group getGroup(String groupId) {
 
         return groupRepository.findBySchemaPropertyValue("id", groupId);
@@ -125,6 +123,4 @@ public class GroupDao {
     public List<Book> getWishListBooks(String groupId) {
         return groupRepository.getWishListBooks(groupId);
     }
-
-
 }

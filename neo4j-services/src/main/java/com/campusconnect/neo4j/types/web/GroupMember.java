@@ -8,12 +8,14 @@ public class GroupMember extends User {
                        String goodReadsSynchStatus, Long lastGoodreadsSychDate, String goodreadsId, String googleId,
                        String id, Long lastModifiedDate, String name, String phone, String gender,
                        String profileImageUrl, String workDesignation, String workLocation,
-                       String userRelation, String groupId, String role, Long memberSince) {
+                       String userRelation, String groupId,String groupName,  String role, Long memberSince) {
         super(addresses, createdDate, email, favorites, fbId, goodreadsAccessToken, goodreadsAccessTokenSecret,
                 goodreadsAuthStatus, goodReadsSynchStatus, lastGoodreadsSychDate, goodreadsId, googleId, id,
                 lastModifiedDate, name, phone, gender, profileImageUrl, workDesignation, workLocation, userRelation);
         this.groupId = groupId;
+        this.groupName = groupName;
         this.role = role;
+
         this.memberSince = memberSince;
     }
 
@@ -38,6 +40,15 @@ public class GroupMember extends User {
 
     private String groupId;
     private String role;
+    private String groupName;
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
 
     public Long getMemberSince() {
         return memberSince;

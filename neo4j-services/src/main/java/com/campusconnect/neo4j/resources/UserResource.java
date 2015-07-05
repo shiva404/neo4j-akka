@@ -464,37 +464,39 @@ public class UserResource {
         Reminder createdReminder = reminderDao.createReminder(reminder);
         User reminderForUser = userDao.getUser(userId);
         Long currentTime = System.currentTimeMillis();
-        ReminderRelationShip reminderRelationShip = new ReminderRelationShip(
+        ReminderRelationShip reminderRelationShipFor = new ReminderRelationShip(
                 createdBy, currentTime, reminderForUser, currentTime,
-                reminderAbout, reminder);
-        userDao.setReminder(reminderRelationShip);
+                reminderAbout, reminder,Constants.RECEIVED_REMINDER_TYPE);
+        ReminderRelationShip reminderRelationShipBy = new ReminderRelationShip(reminderForUser.toString(), currentTime, userDao.getUser(createdBy), currentTime,
+                reminderAbout, reminder,Constants.SENT_REMINDER_TYPE);
+        userDao.setReminder(reminderRelationShipFor,true);
+        userDao.setReminder(reminderRelationShipBy,false);
         return Response.created(null).entity(createdReminder).build();
-        //TODO : change reminder flow
-
-
     }
 
-    @PUT
-    @Path("{userId}/reminders/{reminderId}")
-    public Response updateReminder(Reminder reminder, @PathParam("userId") final String userId, @PathParam("reminderId") final String reminderId) {
-        Reminder updatedReminder = reminderDao.updateReminder(reminderId, reminder);
-        return Response.ok().entity(updatedReminder).build();
-    }
+//    @PUT
+//    @Path("{userId}/reminders/{reminderId}")
+//    public Response updateReminder(Reminder reminder, @PathParam("userId") final String userId, @PathParam("reminderId") final String reminderId) {
+//        Reminder updatedReminder = reminderDao.updateReminder(reminderId, reminder,userId);
+//        return Response.ok().entity(updatedReminder).build();
+//    }
 
     @DELETE
     @Path("{userId}/reminders/{reminderId}")
     public Response deleteReminder(@PathParam("userId") final String userId, @PathParam("reminderId") final String reminderId) {
-        reminderDao.deleteReminder(reminderId);
+        reminderDao.deleteReminder(reminderId,userId);
+        //TODO : Should event/Notification be added ??
         return Response.ok().build();
     }
 
     @GET
     @Path("{userId}/reminders/{reminderId}")
-    public Response getReminder(@PathParam("userId") final String userId, @PathParam("reminderId") final String reminderId) {
+    public Response getSingleReminder(@PathParam("userId") final String userId, @PathParam("reminderId") final String reminderId) {
         Reminder reminder = reminderDao.getReminder(reminderId);
         return Response.ok().entity(reminder).build();
     }
-
+    
+   
     @GET
     @Path("{googleId}/googleId")
     public Response getUserByGoogleId(@PathParam("googleId") final String googleId) {
@@ -509,8 +511,8 @@ public class UserResource {
 
     @GET
     @Path("{userId}/reminders")
-    public Response getAllReminders(@PathParam("userId") final String userId) {
-        final List<Reminder> reminders = reminderDao.getAllReminders(userId);
+    public Response getReminders(@PathParam("userId") final String userId,@QueryParam("filter") final String filter) {
+        final List<Reminder> reminders = reminderDao.getReminders(userId,filter);
         ReminderPage reminderPage = new ReminderPage(0, reminders.size(), reminders);
         return Response.ok().entity(reminderPage).build();
     }

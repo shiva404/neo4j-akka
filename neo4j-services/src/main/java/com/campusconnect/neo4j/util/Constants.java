@@ -86,6 +86,8 @@ public class Constants {
     public static final String BORROWER_ID_QPARAM = "borrowerId";
 
     public static final String REMINDER_CREATED_NOTIFICATION_TYPE = "REMINDER_CREATED";
+	public static final String RECEIVED_REMINDER_TYPE = "Received";
+	public static final String SENT_REMINDER_TYPE = "Sent";
 
 
 }

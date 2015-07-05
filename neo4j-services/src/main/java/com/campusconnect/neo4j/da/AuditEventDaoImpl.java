@@ -54,16 +54,13 @@ public class AuditEventDaoImpl implements AuditEventDao {
 
     @Override
     public AuditEvent addEvent(String userId, Event event) {
-        try {
+   
             String eventString = EventHelper.serializeEvent(event);
             AuditEvent auditEvent = auditEventRepository.getAuditEventForUser(userId);
             Set<String> events = auditEvent.getEvents();
             events.add(eventString);
             return saveEvent(auditEvent);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+       
     }
 
     @Override

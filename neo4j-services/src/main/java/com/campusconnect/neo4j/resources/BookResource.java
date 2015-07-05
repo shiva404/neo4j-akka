@@ -93,7 +93,9 @@ public class BookResource {
             book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
         }
         Long now = System.currentTimeMillis();
-        //todo: listing type shouldn't be null:
+        //TODO : listing type shouldn't be null:
+        
+        //TODO: Should event/notification be added 
         switch (listingType.toUpperCase()) {
             case OWNS_RELATION:
                 bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status.toUpperCase(), now));

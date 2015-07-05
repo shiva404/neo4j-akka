@@ -71,11 +71,11 @@ public class DBMapper {
             group.setId((String) groupNode.getProperty("id", null));
             group.setLastModifiedBy((String) groupNode.getProperty("lastModifiedBy", null));
             group.setLastModifiedTime((Long) groupNode.getProperty("lastModifiedTime", null));
-            group.setName((String) groupNode.getProperty("lastModifiedTime", null));
-            group.setNodeId((Long) groupNode.getProperty("nodeId", null));
+            group.setName((String) groupNode.getProperty("name", null));
+            group.setNodeId(groupNode.getId());
             return group;
         } catch (Exception e) {
-            logger.error("Error while constructing user object:" + groupNode.getProperty("id"));
+            logger.error("Error while constructing group object:" + groupNode.getProperty("id"), e);
         }
         return null;
     }

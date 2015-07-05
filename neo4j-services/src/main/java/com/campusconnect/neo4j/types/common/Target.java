@@ -2,6 +2,16 @@ package com.campusconnect.neo4j.types.common;
 
 public class Target {
 
+    private String id;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     private String displayString;
     private String idType;
     private String url;
@@ -10,8 +20,9 @@ public class Target {
 
     }
 
-    public Target(String idType, String displayString, String url) {
+    public Target(String idType, String displayString, String url, String id) {
         super();
+        this.id = id;
         this.idType = idType;
         this.displayString = displayString;
         this.url = url;

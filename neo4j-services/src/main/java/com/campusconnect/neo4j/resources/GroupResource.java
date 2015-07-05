@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.mapGroupNeo4jToWeb;
+import static com.campusconnect.neo4j.mappers.WebToNeo4jMapper.mapGroupWebToNeo4j;
 
 @Path("/groups")
 @Consumes("application/json")
@@ -38,18 +39,18 @@ public class GroupResource {
     }
 
     @POST
-    public Response createGroup(Group group, @QueryParam("userId") final String userId) {
+    public Response createGroup(com.campusconnect.neo4j.types.web.Group group, @QueryParam("userId") final String userId) {
         group.setId(UUID.randomUUID().toString());
         setGroupCreateProperties(group, userId);
-        Group createdGroup = groupDao.createGroup(group);
+        Group createdGroup = groupDao.createGroup(mapGroupWebToNeo4j(group));
         // Todo Add user as admin
         groupDao.addUser(createdGroup.getId(), userId, AccessRoles.ADMIN.toString(), userId);
         return Response.created(null).entity(mapGroupNeo4jToWeb(createdGroup)).build();
     }
 
     @DELETE
-    public Response deleteGroup(Group group) {
-        groupDao.deleteGroup(group);
+    public Response deleteGroup(String groupId) {
+        groupDao.deleteGroup(groupId);
         return Response.ok().build();
     }
 
@@ -63,14 +64,14 @@ public class GroupResource {
     @PUT
     @Path("{groupId}")
     public Response updateGroup(@PathParam("groupId") final String groupId,
-                                Group group) {
+                                com.campusconnect.neo4j.types.web.Group group) {
         //Todo Add the user who updated Group (last updated by)
-        Group groupUpdated = groupDao.updateGroup(groupId, group);
+        Group groupUpdated = groupDao.updateGroup(groupId, mapGroupWebToNeo4j(group));
         group.setLastModifiedTime(System.currentTimeMillis());
         return Response.created(null).entity(mapGroupNeo4jToWeb(groupUpdated)).build();
     }
 
-    private Group setGroupCreateProperties(Group group, String userId) {
+    private com.campusconnect.neo4j.types.web.Group setGroupCreateProperties(com.campusconnect.neo4j.types.web.Group group, String userId) {
         Long createdDate = System.currentTimeMillis();
         group.setCreatedDate(createdDate);
         group.setLastModifiedTime(createdDate);

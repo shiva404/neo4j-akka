@@ -422,18 +422,20 @@ public class UserDaoImpl implements UserDao {
 
 
     @Override
-    public void setReminder(ReminderRelationShip reminderRelationShip) {
+    public void setReminder(ReminderRelationShip reminderRelationShip,boolean sendNotificationAddEvent) {
 
         neo4jTemplate.save(reminderRelationShip);
-        User createdByUser = getUser(reminderRelationShip.getCreatedBy());
-        Target reminderTarget = TargetHelper.createReminderTarget(reminderRelationShip.getReminder(), createdByUser, reminderRelationShip.getReminderFor());
-        Event event = EventHelper.createPrivateEvent(AuditEventType.REMINDER_SENT.toString(), reminderTarget);
-        auditEventDao.addEvent(reminderRelationShip.getCreatedBy(), event);
+        if(sendNotificationAddEvent) {
+            User createdByUser = getUser(reminderRelationShip.getCreatedBy());
+            Target reminderTarget = TargetHelper.createReminderTarget(reminderRelationShip.getReminder(), createdByUser, reminderRelationShip.getReminderFor());
+            Event event = EventHelper.createPrivateEvent(AuditEventType.REMINDER_SENT.toString(), reminderTarget);
+            auditEventDao.addEvent(reminderRelationShip.getCreatedBy(), event);
 
-        Target reminderNotificationTarget = TargetHelper.createReminderTarget(reminderRelationShip.getReminder(), createdByUser, reminderRelationShip.getReminderFor());
+            Target reminderNotificationTarget = TargetHelper.createReminderTarget(reminderRelationShip.getReminder(), createdByUser, reminderRelationShip.getReminderFor());
 
-        Notification reminderNotification = new Notification(reminderNotificationTarget, System.currentTimeMillis(), Constants.REMINDER_CREATED_NOTIFICATION_TYPE);
-        notificationDao.addNotification(reminderRelationShip.getReminderFor().getId(), reminderNotification);
+            Notification reminderNotification = new Notification(reminderNotificationTarget, System.currentTimeMillis(), Constants.REMINDER_CREATED_NOTIFICATION_TYPE);
+            notificationDao.addNotification(reminderRelationShip.getReminderFor().getId(), reminderNotification);
+        }
     }
 
     @Override
@@ -541,4 +543,6 @@ public class UserDaoImpl implements UserDao {
         }
         return -1;
     }
+    
+   
 }

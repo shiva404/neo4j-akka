@@ -224,7 +224,8 @@ public class BookDaoImpl implements BookDao {
         borrowRelation.setOwnerUserId(borrowRequest.getOwnerUserId());
         neo4jTemplate.save(borrowRelation);
         User ownerUser = userDao.getUser(borrowRelation.getOwnerUserId());
-        //todo: create notification to owner
+
+        //TODO : create notification to owner
         HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_INITIATED.toString(), TargetHelper.createUserTarget(borrower));
         setBookHistory(book.getId(), ownerUser.getId(), historyEvent);
         emailDao.sendBorrowBookInitEmail(borrower, ownerUser, book);
@@ -234,10 +235,9 @@ public class BookDaoImpl implements BookDao {
     public void updateBookStatusOnAgreement(User user, Book book, User borrower, String userComment) {
         updateOwnedBookStatus(user, book, BORROW_LOCK, userComment);
         updateBorrowedBookStatus(borrower, book, BORROW_LOCK, userComment);
-        //todo: put notification
+        //TODO: put notification
         HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_AGREED.toString(), TargetHelper.createUserTarget(borrower));
         setBookHistory(book.getId(), user.getId(), historyEvent);
-
         emailDao.sendAcceptedToLendBookEmail(user, borrower, book);
     }
 
@@ -255,12 +255,13 @@ public class BookDaoImpl implements BookDao {
     @Transactional
     public void updateBorrowedBookStatus(User user, Book book, String status, String userComment) {
         BorrowRelationship relationship = neo4jTemplate.getRelationshipBetween(user, book, BorrowRelationship.class, RelationTypes.BORROWED.toString());
-        if (relationship == null) //todo: throw an exception
+        if (relationship == null) //TODO: throw an exception
             return;
         relationship.setStatus(status);
         relationship.setLastModifiedDate(System.currentTimeMillis());
         relationship.setAdditionalComments(userComment);
         neo4jTemplate.save(relationship);
+        //TODO : is notification/Event required 
     }
 
     @Override
@@ -586,10 +587,9 @@ public class BookDaoImpl implements BookDao {
         if (null != borrowRelationship) {
             neo4jTemplate.delete(borrowRelationship);
             emailDao.sendRejectedToLendBookEmail(userDao.getUser(ownerId), userDao.getUser(borrowerId), getBook(bookId), message);
-            //todo: put notification to borrower
+            //TODO: put notification to borrower
             HistoryEvent historyEventRejectBorrow = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_REJECTED.toString(), TargetHelper.createUserTarget(userDao.getUser(borrowerId)));
             setBookHistory(bookId, ownerId, historyEventRejectBorrow);
-
         }
     }
 
@@ -607,6 +607,7 @@ public class BookDaoImpl implements BookDao {
 
         try {
             neo4jTemplate.save(currentlyReadingRelationship);
+            //TODO : should event be added 
         } catch (Exception e) {
             LOGGER.error("Error while saving read relation bookId" + currentlyReadingRelationship.getBook().getId() + " UserId:" + currentlyReadingRelationship.getUser().getId());
             e.printStackTrace();

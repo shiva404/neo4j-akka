@@ -44,13 +44,15 @@ public class GroupResource {
         setGroupCreateProperties(group, userId);
         Group createdGroup = groupDao.createGroup(mapGroupWebToNeo4j(group));
         // Todo Add user as admin
+ 		//TODO:should event/notification be added 
         groupDao.addUser(createdGroup.getId(), userId, AccessRoles.ADMIN.toString(), userId);
         return Response.created(null).entity(mapGroupNeo4jToWeb(createdGroup)).build();
     }
 
     @DELETE
-    public Response deleteGroup(String groupId) {
-        groupDao.deleteGroup(groupId);
+    public Response deleteGroup(Group group) {
+        groupDao.deleteGroup(group);
+        //TODO : should event or notification be added
         return Response.ok().build();
     }
 
@@ -70,6 +72,8 @@ public class GroupResource {
         group.setLastModifiedTime(System.currentTimeMillis());
         return Response.created(null).entity(mapGroupNeo4jToWeb(groupUpdated)).build();
     }
+    
+    //TODO: should there be exit from group API for group members ??
 
     private com.campusconnect.neo4j.types.web.Group setGroupCreateProperties(com.campusconnect.neo4j.types.web.Group group, String userId) {
         Long createdDate = System.currentTimeMillis();
@@ -86,6 +90,7 @@ public class GroupResource {
                             @QueryParam("createdBy") final String createdBy) {
         groupDao.addUser(groupId, userId, role, createdBy);
         //TODO: Check userId exists or not
+        //TODO :Should event or notification be added 
         return Response.created(null).build();
     }
 

@@ -534,7 +534,8 @@ public class UserResource {
 
     @GET
     @Path("{userId}/notifications")
-    public Response getNotifications(@PathParam("userId") final String userId, @QueryParam(FILTER_QPARAM) @DefaultValue(FRESH_NOTIFICATION_TYPE) final String filter) {
+    public Response getNotifications(@PathParam("userId") final String userId,
+                                     @QueryParam(FILTER_QPARAM) @DefaultValue(FRESH_NOTIFICATION_TYPE) final String filter) {
         //AuditEvent auditEvent = auditEventDao.getEvents(userId);
         List<Notification> notifications = notificationDao.getNotifications(userId, filter);
         NotificationPage notificationPage = new NotificationPage(0, notifications.size(), notifications);

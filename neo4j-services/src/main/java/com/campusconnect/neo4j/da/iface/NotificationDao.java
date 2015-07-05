@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface NotificationDao {
 
-    NotificationEntity savenotification(NotificationEntity notificationEntity);
+    NotificationEntity saveNotification(NotificationEntity notificationEntity);
 
     NotificationEntity addNotification(String userId, Notification notification);
 

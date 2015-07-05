@@ -27,8 +27,8 @@ public class Constants {
     public static final String ADDRESS_TYPE_HOME = "HOME";
     public static final String ADDRESS_TYPE_WORK = "WORK";
     public static final String ADDRESS_TYPE_OTHER = "OTHER";
-    public static final String FRIEND_REQUEST_SENT_NOTIFICATION = "FRIEND_REQUEST_SENT";
-    public static final String FRIEND_REQUEST_ACCEPTED_NOTIFICATION = "FRIEND_REQUEST_ACCEPTED";
+    public static final String FRIEND_REQUEST_SENT_NOTIFICATION_TYPE = "FRIEND_REQUEST_SENT";
+    public static final String FRIEND_REQUEST_ACCEPTED_NOTIFICATION_TYPE = "FRIEND_REQUEST_ACCEPTED";
 
     public static final String AVAILABLE = "AVAILABLE";
     public static final String PRIVATE = "PRIVATE";

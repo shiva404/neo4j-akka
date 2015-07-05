@@ -10,8 +10,6 @@ import com.campusconnect.neo4j.types.web.Event;
 import com.campusconnect.neo4j.types.web.Subject;
 import com.campusconnect.neo4j.util.EventDisplayStrings;
 import com.campusconnect.neo4j.util.comparator.TimeStampComparator;
-
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -21,7 +19,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
 
     @Autowired
     AuditEventRepository auditEventRepository;
-   
+
     public AuditEventDaoImpl() {
     }
 
@@ -43,25 +41,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
                 System.out.println("each event" + eachEvent);
                 Event eventDeserialised = EventHelper.deserializeEventString(eachEvent);
                 if (eventDeserialised.isPublic()) {
-                    if (eventDeserialised.getAuditEventType().equals(AuditEventType.FRIEND.toString())) {
-                        eventDeserialised.setEventString(EventDisplayStrings.FRIEND_EVENT_STRING);
-                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.FOLLOWING.toString())) {
-                        eventDeserialised.setEventString(EventDisplayStrings.FOLLOWING_EVENT_STRING);
-                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.ADDED_ADDRESS.toString())) {
-                        eventDeserialised.setEventString(EventDisplayStrings.ADDED_ADDRESS_EVENT_STRING);
-                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.BORROWED.toString())) {
-                        eventDeserialised.setEventString(EventDisplayStrings.BORROWED_EVENT_STRING);
-                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.USER_CREATED.toString())) {
-                        eventDeserialised.setEventString(EventDisplayStrings.CREATED_EVENT_STRING);
-                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.FOLLOWED.toString())) {
-                        eventDeserialised.setEventString(EventDisplayStrings.FOLLOWED_EVENT_STRING);
-                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.UPDATED_ADDRESS.toString())) {
-                        eventDeserialised.setEventString(EventDisplayStrings.UPDATED_ADDRESS_EVENT_STRING);
-                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.USER_UPDATED.toString())) {
-                        eventDeserialised.setEventString(EventDisplayStrings.USER_UPDATED_EVENT_STRING);
-                    } else if (eventDeserialised.getAuditEventType().equals(AuditEventType.WISHLIST.toString())) {
-                        eventDeserialised.setEventString(EventDisplayStrings.WISHLIST_EVENT_STRING);
-                    }
+                    setEventStrings(eventDeserialised);
                     eventDeserialised.setSubject(new Subject(IdType.USER_ID.toString(), auditEvent.getUserName(), "/users/" + auditEvent.getUserId(), auditEvent.getImageUrl()));
                     events.add(eventDeserialised);
                 }
@@ -107,25 +87,7 @@ public class AuditEventDaoImpl implements AuditEventDao {
             for (String eventString : auditEvent.getEvents()) {
                 Event event = EventHelper.deserializeEventString(eventString);
                 if (event.isPublic()) {
-                    if (event.getAuditEventType().equals(AuditEventType.FRIEND.toString())) {
-                        event.setEventString(EventDisplayStrings.FRIEND_EVENT_STRING);
-                    } else if (event.getAuditEventType().equals(AuditEventType.FOLLOWING.toString())) {
-                        event.setEventString(EventDisplayStrings.FOLLOWING_EVENT_STRING);
-                    } else if (event.getAuditEventType().equals(AuditEventType.ADDED_ADDRESS.toString())) {
-                        event.setEventString(EventDisplayStrings.ADDED_ADDRESS_EVENT_STRING);
-                    } else if (event.getAuditEventType().equals(AuditEventType.BORROWED.toString())) {
-                        event.setEventString(EventDisplayStrings.BORROWED_EVENT_STRING);
-                    } else if (event.getAuditEventType().equals(AuditEventType.USER_CREATED.toString())) {
-                        event.setEventString(EventDisplayStrings.CREATED_EVENT_STRING);
-                    } else if (event.getAuditEventType().equals(AuditEventType.FOLLOWED.toString())) {
-                        event.setEventString(EventDisplayStrings.FOLLOWED_EVENT_STRING);
-                    } else if (event.getAuditEventType().equals(AuditEventType.UPDATED_ADDRESS.toString())) {
-                        event.setEventString(EventDisplayStrings.UPDATED_ADDRESS_EVENT_STRING);
-                    } else if (event.getAuditEventType().equals(AuditEventType.USER_UPDATED.toString())) {
-                        event.setEventString(EventDisplayStrings.USER_UPDATED_EVENT_STRING);
-                    } else if (event.getAuditEventType().equals(AuditEventType.WISHLIST.toString())) {
-                        event.setEventString(EventDisplayStrings.WISHLIST_EVENT_STRING);
-                    }
+                    setEventStrings(event);
 
                     event.setSubject(new Subject(IdType.USER_ID.toString(), auditEvent.getUserName(), "/users/" + auditEvent.getUserId(), auditEvent.getImageUrl()));
                     events.add(event);
@@ -135,6 +97,28 @@ public class AuditEventDaoImpl implements AuditEventDao {
 
         Collections.sort(events, new TimeStampComparator());
         return events;
+    }
+
+    private void setEventStrings(Event event) {
+        if (event.getAuditEventType().equals(AuditEventType.FRIEND.toString())) {
+            event.setEventActionString(EventDisplayStrings.FRIEND_EVENT_STRING);
+        } else if (event.getAuditEventType().equals(AuditEventType.FOLLOWING.toString())) {
+            event.setEventActionString(EventDisplayStrings.FOLLOWING_EVENT_STRING);
+        } else if (event.getAuditEventType().equals(AuditEventType.ADDED_ADDRESS.toString())) {
+            event.setEventActionString(EventDisplayStrings.ADDED_ADDRESS_EVENT_STRING);
+        } else if (event.getAuditEventType().equals(AuditEventType.BORROWED.toString())) {
+            event.setEventActionString(EventDisplayStrings.BORROWED_EVENT_STRING);
+        } else if (event.getAuditEventType().equals(AuditEventType.USER_CREATED.toString())) {
+            event.setEventActionString(EventDisplayStrings.CREATED_EVENT_STRING);
+        } else if (event.getAuditEventType().equals(AuditEventType.FOLLOWED.toString())) {
+            event.setEventActionString(EventDisplayStrings.FOLLOWED_EVENT_STRING);
+        } else if (event.getAuditEventType().equals(AuditEventType.UPDATED_ADDRESS.toString())) {
+            event.setEventActionString(EventDisplayStrings.UPDATED_ADDRESS_EVENT_STRING);
+        } else if (event.getAuditEventType().equals(AuditEventType.USER_UPDATED.toString())) {
+            event.setEventActionString(EventDisplayStrings.USER_UPDATED_EVENT_STRING);
+        } else if (event.getAuditEventType().equals(AuditEventType.WISHLIST.toString())) {
+            event.setEventActionString(EventDisplayStrings.WISHLIST_EVENT_STRING);
+        }
     }
 
     @Override

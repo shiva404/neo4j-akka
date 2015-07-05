@@ -5,11 +5,11 @@ import com.campusconnect.neo4j.types.common.Target;
 public class Event {
 
     private String auditEventType;
-    private String eventString;
-
     private boolean isPublic;
-    
+
     private Subject subject;
+
+    private String eventActionString;
     private Target target;
     private Long timeStamp;
 
@@ -28,8 +28,8 @@ public class Event {
         return auditEventType;
     }
 
-    public String getEventString() {
-        return eventString;
+    public String getEventActionString() {
+        return eventActionString;
     }
 
     //Use only when returning
@@ -54,8 +54,8 @@ public class Event {
         this.auditEventType = auditEventType;
     }
 
-    public void setEventString(String eventString) {
-        this.eventString = eventString;
+    public void setEventActionString(String eventActionString) {
+        this.eventActionString = eventActionString;
     }
 
     public void setPublic(boolean isPublic) {

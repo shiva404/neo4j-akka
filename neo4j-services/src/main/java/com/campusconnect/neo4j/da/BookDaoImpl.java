@@ -225,7 +225,7 @@ public class BookDaoImpl implements BookDao {
         neo4jTemplate.save(borrowRelation);
         User ownerUser = userDao.getUser(borrowRelation.getOwnerUserId());
         //todo: create notification to owner
-        HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_INITIATED.toString(), TargetHelper.createTargetToUser(borrower));
+        HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_INITIATED.toString(), TargetHelper.createUserTarget(borrower));
         setBookHistory(book.getId(), ownerUser.getId(), historyEvent);
         emailDao.sendBorrowBookInitEmail(borrower, ownerUser, book);
     }
@@ -235,7 +235,7 @@ public class BookDaoImpl implements BookDao {
         updateOwnedBookStatus(user, book, BORROW_LOCK, userComment);
         updateBorrowedBookStatus(borrower, book, BORROW_LOCK, userComment);
         //todo: put notification
-        HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_AGREED.toString(), TargetHelper.createTargetToUser(borrower));
+        HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_AGREED.toString(), TargetHelper.createUserTarget(borrower));
         setBookHistory(book.getId(), user.getId(), historyEvent);
 
         emailDao.sendAcceptedToLendBookEmail(user, borrower, book);
@@ -245,7 +245,7 @@ public class BookDaoImpl implements BookDao {
     public void updateBookStatusOnSuccess(User user, Book book, User borrower, String userComment) {
         updateOwnedBookStatus(user, book, LENT, userComment);
         updateBorrowedBookStatus(borrower, book, BORROWED, userComment);
-        HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROWED.toString(), TargetHelper.createTargetToUser(borrower));
+        HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROWED.toString(), TargetHelper.createUserTarget(borrower));
         setBookHistory(book.getId(), user.getId(), historyEvent);
         //TODO:Put notification
         emailDao.sendSuccessfulBookTransactionEmail(user, borrower, book);
@@ -587,7 +587,7 @@ public class BookDaoImpl implements BookDao {
             neo4jTemplate.delete(borrowRelationship);
             emailDao.sendRejectedToLendBookEmail(userDao.getUser(ownerId), userDao.getUser(borrowerId), getBook(bookId), message);
             //todo: put notification to borrower
-            HistoryEvent historyEventRejectBorrow = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_REJECTED.toString(), TargetHelper.createTargetToUser(userDao.getUser(borrowerId)));
+            HistoryEvent historyEventRejectBorrow = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_REJECTED.toString(), TargetHelper.createUserTarget(userDao.getUser(borrowerId)));
             setBookHistory(bookId, ownerId, historyEventRejectBorrow);
 
         }

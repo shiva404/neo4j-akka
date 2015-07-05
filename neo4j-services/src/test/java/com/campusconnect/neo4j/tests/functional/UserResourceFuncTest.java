@@ -172,7 +172,7 @@ public class UserResourceFuncTest extends TestBase {
         assertEquals(users.get(0).getId(), userId1);
 
         assertNotifications(userId1, userId2,
-                Constants.FRIEND_REQUEST_SENT_NOTIFICATION);
+                Constants.FRIEND_REQUEST_SENT_NOTIFICATION_TYPE);
         // TODO: Search user's asserts
     }
 
@@ -205,7 +205,7 @@ public class UserResourceFuncTest extends TestBase {
 
 
         assertNotifications(userId1, userId2,
-                Constants.FRIEND_REQUEST_ACCEPTED_NOTIFICATION);
+                Constants.FRIEND_REQUEST_ACCEPTED_NOTIFICATION_TYPE);
     }
 
     @Test

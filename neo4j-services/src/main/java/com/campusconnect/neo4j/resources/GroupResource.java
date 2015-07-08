@@ -50,10 +50,17 @@ public class GroupResource {
 
     @DELETE
     @Path("{groupId}")
-    public Response deleteGroup(@PathParam("groupId") String groupId) {
-        groupDao.deleteGroup(groupId);
-        //TODO : should event or notification be added
+    public Response deleteGroup(@PathParam("groupId") String groupId,@QueryParam("userId") String userId) {
+        groupDao.deleteGroupByAdmin(groupId,userId);
         return Response.ok().build();
+    }
+    
+    @DELETE
+    @Path("{groupId}/users/userId")
+    public Response exitFromGroup(@PathParam("groupId") String groupId ,@PathParam("userId") String userId)
+    {
+    	groupDao.exitFromGroup(groupId,userId);
+    	return Response.ok().build();
     }
 
     @GET
@@ -66,14 +73,14 @@ public class GroupResource {
     @PUT
     @Path("{groupId}")
     public Response updateGroup(@PathParam("groupId") final String groupId,
-                                com.campusconnect.neo4j.types.web.Group group) {
-        //Todo Add the user who updated Group (last updated by)
-        Group groupUpdated = groupDao.updateGroup(groupId, mapGroupWebToNeo4j(group));
-        group.setLastModifiedTime(System.currentTimeMillis());
+                                com.campusconnect.neo4j.types.web.Group group,@QueryParam("userId") String userId) {
+        
+        Group groupUpdated = groupDao.updateGroup(groupId, mapGroupWebToNeo4j(group),userId);
+       
         return Response.created(null).entity(mapGroupNeo4jToWeb(groupUpdated)).build();
     }
 
-    //TODO: should there be exit from group API for group members ??
+  
 
     private com.campusconnect.neo4j.types.web.Group setGroupCreateProperties(com.campusconnect.neo4j.types.web.Group group, String userId) {
         Long createdDate = System.currentTimeMillis();

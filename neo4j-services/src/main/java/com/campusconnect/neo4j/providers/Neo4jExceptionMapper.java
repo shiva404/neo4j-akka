@@ -1,6 +1,6 @@
 package com.campusconnect.neo4j.providers;
 
-import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
+import com.campusconnect.neo4j.exceptions.InvalidDataException;
 import com.campusconnect.neo4j.exceptions.Neo4jException;
 import com.campusconnect.neo4j.types.web.Neo4jErrorResponse;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ public class Neo4jExceptionMapper implements ExceptionMapper<Throwable> {
     @Override
     public Response toResponse(Throwable exceptionOccured) {
         // TODO Auto-generated method stub
-        if (exceptionOccured instanceof InvalidInputDataException) {
+        if (exceptionOccured instanceof InvalidDataException) {
             return Response.status(403).entity(getNeo4jErrorResponse((Neo4jException) exceptionOccured)).build();
         } else {
             logger.error(exceptionOccured.getMessage(), exceptionOccured);

@@ -27,6 +27,10 @@ public class ReadRelationship extends BookRelationship {
     public ReadRelationship() {
     }
 
+    public ReadRelationship(User user, Book book, String status, Long createdDate, Long lastModifiedDate) {
+        super(user, book, status, createdDate, lastModifiedDate);
+    }
+
     @Override
     public String toString() {
         return "ReadRelationship{" +

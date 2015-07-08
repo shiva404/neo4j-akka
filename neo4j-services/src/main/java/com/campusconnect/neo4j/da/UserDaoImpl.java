@@ -7,6 +7,7 @@ import com.campusconnect.neo4j.da.utils.AuditEventHelper;
 import com.campusconnect.neo4j.da.utils.EventHelper;
 import com.campusconnect.neo4j.da.utils.Queries;
 import com.campusconnect.neo4j.da.utils.TargetHelper;
+import com.campusconnect.neo4j.exceptions.NotFoundException;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.repositories.UserRelationRepository;
 import com.campusconnect.neo4j.repositories.UserRepository;
@@ -19,6 +20,7 @@ import com.campusconnect.neo4j.types.web.Event;
 import com.campusconnect.neo4j.types.web.FriendRecommendation;
 import com.campusconnect.neo4j.types.web.Notification;
 import com.campusconnect.neo4j.util.Constants;
+import com.campusconnect.neo4j.util.ErrorCodes;
 import com.googlecode.ehcache.annotations.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.rest.graphdb.entity.RestNode;
@@ -124,6 +126,9 @@ public class UserDaoImpl implements UserDao {
     @Cacheable(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public User getUser(String userId) {
         User user = userRepository.findBySchemaPropertyValue("id", userId);
+        if (user == null) {
+            throw new NotFoundException(ErrorCodes.USER_NOT_FOUND, "User with id:" + userId + " not found");
+        }
         user.setUserRelation(Constants.SELF);
         return user;
     }
@@ -422,10 +427,10 @@ public class UserDaoImpl implements UserDao {
 
 
     @Override
-    public void setReminder(ReminderRelationShip reminderRelationShip,boolean sendNotificationAddEvent) {
+    public void setReminder(ReminderRelationShip reminderRelationShip, boolean sendNotificationAddEvent) {
 
         neo4jTemplate.save(reminderRelationShip);
-        if(sendNotificationAddEvent) {
+        if (sendNotificationAddEvent) {
             User createdByUser = getUser(reminderRelationShip.getCreatedBy());
             Target reminderTarget = TargetHelper.createReminderTarget(reminderRelationShip.getReminder(), createdByUser, reminderRelationShip.getReminderFor());
             Event event = EventHelper.createPrivateEvent(AuditEventType.REMINDER_SENT.toString(), reminderTarget);
@@ -543,6 +548,6 @@ public class UserDaoImpl implements UserDao {
         }
         return -1;
     }
-    
-   
+
+
 }

@@ -8,6 +8,7 @@ import com.campusconnect.neo4j.da.mapper.DBMapper;
 import com.campusconnect.neo4j.da.utils.HistoryEventHelper;
 import com.campusconnect.neo4j.da.utils.Queries;
 import com.campusconnect.neo4j.da.utils.TargetHelper;
+import com.campusconnect.neo4j.exceptions.NotFoundException;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.UserRecRepository;
@@ -19,6 +20,8 @@ import com.campusconnect.neo4j.types.neo4j.Group;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.*;
 import com.campusconnect.neo4j.util.Constants;
+import com.campusconnect.neo4j.util.ErrorCodes;
+import com.campusconnect.neo4j.util.TimeUtils;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
@@ -40,7 +43,7 @@ import static com.campusconnect.neo4j.util.Constants.*;
  * Created by sn1 on 2/16/15.
  */
 public class BookDaoImpl implements BookDao {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BookDaoImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(BookDaoImpl.class);
 
     public BookDaoImpl() {
     }
@@ -72,7 +75,11 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public Book getBook(String bookId) {
-        return bookRepository.findBySchemaPropertyValue("id", bookId);
+        Book book = bookRepository.findBySchemaPropertyValue("id", bookId);
+        if (book == null) {
+            throw new NotFoundException(ErrorCodes.BOOK_NOT_FOUND, "Book with id:" + bookId + " not found.");
+        }
+        return book;
     }
 
     @Override
@@ -85,7 +92,7 @@ public class BookDaoImpl implements BookDao {
         try {
             neo4jTemplate.save(readRelation);
         } catch (Exception e) {
-            LOGGER.error("Error while saving read relation bookId" + readRelation.getBook().getId() + " UserId:" +
+            logger.error("Error while saving read relation bookId" + readRelation.getBook().getId() + " UserId:" +
                     readRelation.getUser().getId());
             e.printStackTrace();
         }
@@ -216,22 +223,26 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public void addBookToBorrower(User borrower, Book book, BorrowRequest borrowRequest) {
+    public void addBookToBorrower(Book book, BorrowRequest borrowRequest) {
+        //check both owner and borrower exists
+        User borrower = userDao.getUser(borrowRequest.getBorrowerUserId());
+        User ownerUser = userDao.getUser(borrowRequest.getOwnerUserId());
+
         BorrowRelationship borrowRelation = new BorrowRelationship(borrower, book, Constants.BORROW_IN_PROGRESS);
-        borrowRelation.setBorrowDate(borrowRequest.getBorrowDate());
+        long now = TimeUtils.getCurrentTime();
+        borrowRelation.setCreatedDate(now);
+        borrowRelation.setLastModifiedDate(now);
         borrowRelation.setContractPeriodInDays(borrowRequest.getContractPeriodInDays());
         borrowRelation.setAdditionalComments(borrowRequest.getAdditionalMessage());
         borrowRelation.setOwnerUserId(borrowRequest.getOwnerUserId());
         neo4jTemplate.save(borrowRelation);
-        User ownerUser = userDao.getUser(borrowRelation.getOwnerUserId());
-
         //TODO : create notification to owner
+
         HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_INITIATED.toString(), TargetHelper.createUserTarget(borrower));
         setBookHistory(book.getId(), ownerUser.getId(), historyEvent);
         emailDao.sendBorrowBookInitEmail(borrower, ownerUser, book);
-        
-     
-        
+
+
     }
 
     @Override
@@ -270,7 +281,7 @@ public class BookDaoImpl implements BookDao {
     @Override
     public List<Book> search(String queryString) {
         List<Book> search = goodreadsDao.search(queryString);
-        LOGGER.debug("got results back");
+        logger.debug("got results back");
         return search;
     }
 
@@ -296,7 +307,7 @@ public class BookDaoImpl implements BookDao {
                 }
             }
         }
-        LOGGER.debug("Identified books count:" + identifiedBooks.size());
+        logger.debug("Identified books count:" + identifiedBooks.size());
         List<Book> resultBooks = new ArrayList<>();
         resultBooks.addAll(identifiedBooks);
         resultBooks.addAll(books);
@@ -306,22 +317,21 @@ public class BookDaoImpl implements BookDao {
     @Override
 //    @Cacheable(cacheName = "bookByGRIdCache", keyGenerator = @KeyGenerator(name="HashCodeCacheKeyGenerator", properties = @Property( name="includeMethod", value="false")))
     public Book getBookByGoodreadsId(Integer goodreadsId) {
-        try {
-            Book book = bookRepository.findBySchemaPropertyValue("goodreadsId", goodreadsId);
-            if (book == null) {
-                LOGGER.info("Goodreads book is not in there datsbase fetching from goodreads. Id: " + goodreadsId);
-                final Book bookByGoodreadId = goodreadsDao.getBookById(goodreadsId.toString());
-                bookByGoodreadId.setId(UUID.randomUUID().toString());
-                createBook(bookByGoodreadId);
-                return bookByGoodreadId;
-            } else {
-                return book;
-            }
-        } catch (Exception e) {
-            //Todo : if exception is not found searchMemebers in goodreads
-            //return goodreadsDao.getBookById(goodreadsId);
+
+        Book book = bookRepository.findBySchemaPropertyValue("goodreadsId", goodreadsId);
+        if (book == null) {
+            logger.info("Goodreads book is not in there datsbase fetching from goodreads. Id: " + goodreadsId);
+            return getBookFromGRIdAndSave(goodreadsId);
+        } else {
+            return book;
         }
-        return null;
+    }
+
+    private Book getBookFromGRIdAndSave(Integer goodreadsId) {
+        final Book bookByGoodreadId = goodreadsDao.getBookById(goodreadsId.toString());
+        bookByGoodreadId.setId(UUID.randomUUID().toString());
+        createBook(bookByGoodreadId);
+        return bookByGoodreadId;
     }
 
     @Override
@@ -359,7 +369,7 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public Book getBooksRelatedUser(String bookId, String userId) {
+    public Book getBookRelatedUser(String bookId, String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("bookId", bookId);
@@ -612,7 +622,7 @@ public class BookDaoImpl implements BookDao {
             neo4jTemplate.save(currentlyReadingRelationship);
             //TODO : should event be added 
         } catch (Exception e) {
-            LOGGER.error("Error while saving read relation bookId" + currentlyReadingRelationship.getBook().getId() + " UserId:" + currentlyReadingRelationship.getUser().getId());
+            logger.error("Error while saving read relation bookId" + currentlyReadingRelationship.getBook().getId() + " UserId:" + currentlyReadingRelationship.getUser().getId());
             e.printStackTrace();
         }
     }

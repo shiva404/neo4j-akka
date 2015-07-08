@@ -59,7 +59,8 @@ public class UserResource {
     }
 
     public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao, AddressDao addressDao, ReminderDao reminderDao, AuditEventDao auditEventDao, NotificationDao notificationDao, GroupDao groupDao) {
-        this.userDao = userDao;
+       
+    	this.userDao = userDao;
         this.bookDao = bookDao;
         this.fbDao = fbDao;
         this.goodreadsDao = goodreadsDao;
@@ -76,6 +77,7 @@ public class UserResource {
                                final com.campusconnect.neo4j.types.web.User userPayload) throws URISyntaxException {
 
         StringBuffer validateUserDataMessage = Validator.validateUserObject(userPayload);
+        
         if (null != validateUserDataMessage) {
             throw new InvalidInputDataException(INVALId_ARGMENTS, validateUserDataMessage.toString());
         }
@@ -97,6 +99,7 @@ public class UserResource {
                 return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
             }
         }
+        
         if (user.getFbId() != null) {
             User existingUser = userDao.getUserByFbId(user.getFbId());
             if (null != existingUser) {
@@ -112,6 +115,7 @@ public class UserResource {
                 return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
             }
         }
+        
         addPropertiesForCreate(user);
         User createdUser = userDao.createUser(user, accessToken);
         com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(createdUser);
@@ -383,9 +387,7 @@ public class UserResource {
     @Path("{userId}/friend/{friendUserId}")
     public Response addFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId) {
         userDao.createFriendRelationWithPending(userDao.getUser(userId), userDao.getUser(friendUserId));
-        //TODO: Should event be added ??
         return Response.ok().build();
-        //  return null;
     }
 
     @PUT
@@ -393,9 +395,7 @@ public class UserResource {
     public Response confirmFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId, @QueryParam(STATUS_QPARAM) final String status) {
         if (status.toLowerCase().equals("agreed")) {
             userDao.confirmFriendRelation(userDao.getUser(userId), userDao.getUser(friendUserId));
-            //TODO:notification to user about acceptance
-
-        } else if (status.toLowerCase().equals("cancel")) {
+           } else if (status.toLowerCase().equals("cancel")) {
             userDao.deleteFriendRequest(userId, friendUserId, Constants.FRIEND_REQUEST_CANCEL_DELETE);
         }
         return Response.ok().build();

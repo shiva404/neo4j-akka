@@ -127,6 +127,8 @@ public class BookResource {
         } else if (bookIdType.equals("grId")) {
             book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
         }
+        
+        //TODO : How to create borrower and book target for notification to owner ??
         User borrower = userDao.getUser(borrowRequest.getBorrowerUserId());
         bookDao.addBookToBorrower(borrower, book, borrowRequest);
         return Response.ok().build();

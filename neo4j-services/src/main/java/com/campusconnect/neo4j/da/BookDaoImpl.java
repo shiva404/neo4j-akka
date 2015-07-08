@@ -229,6 +229,9 @@ public class BookDaoImpl implements BookDao {
         HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_INITIATED.toString(), TargetHelper.createUserTarget(borrower));
         setBookHistory(book.getId(), ownerUser.getId(), historyEvent);
         emailDao.sendBorrowBookInitEmail(borrower, ownerUser, book);
+        
+     
+        
     }
 
     @Override

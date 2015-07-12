@@ -14,12 +14,12 @@ public class AddFriendsFromGoodReadsWorker extends UntypedActor {
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof AddFriendsFromGoodReadsTask) {
-            AddFriendsFromGoodReadsTask addFriendsFromGoodReadsTask = (AddFriendsFromGoodReadsTask) message;
+            AddFriendsFromGoodReadsTask task = (AddFriendsFromGoodReadsTask) message;
 
-            for (com.campusconnect.neo4j.akka.goodreads.types.User goodReadsUser : addFriendsFromGoodReadsTask.getFriends().getUser()) {
+            for (com.campusconnect.neo4j.akka.goodreads.types.User goodReadsUser : task.getFriends().getUser()) {
                 User grUser = userDao.getUserByGoodreadsId(goodReadsUser.getId());
-                if (null != grUser && null != userDao.getUsersRelationShip(addFriendsFromGoodReadsTask.getUser(), grUser)) {
-                    userDao.confirmFriendRelation(addFriendsFromGoodReadsTask.getUser(), grUser);
+                if (null != grUser && null != userDao.getUsersRelationShip(task.getUser(), grUser)) {
+                    userDao.confirmFriendRelation(task.getUser(), grUser);
                 }
             }
         }

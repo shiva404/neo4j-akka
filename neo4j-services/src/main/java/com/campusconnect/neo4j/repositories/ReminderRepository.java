@@ -17,7 +17,7 @@ public interface ReminderRepository extends GraphRepository<Reminder> {
     @Query(value = "match (user:User {id:{0}})-[reminderRelationship:REMINDER_ABOUT]-(reminders:Reminder{id:{1}}) delete reminderRelationship")
     public ReminderRelationShip deleteReminderRelationShip(String userId, String reminderId);
 
-    @Query(value = "match (user:User {id:{0}})-[r:REMINDER_ABOUT}]->(reminders:Reminder) return reminders")
+    @Query(value = "match (user:User {id:{0}})-[r:REMINDER_ABOUT]->(reminders:Reminder) return reminders")
 	public List<Reminder> getAllReminders(String userId);
 
 }

@@ -88,4 +88,7 @@ public interface BookDao {
     void updateBookReturnToAgreed(String bookId, String status, String ownerId, String borrowerId, String comment);
 
     void updateBookReturnToSuccess(String bookId, String status, String ownerId, String borrowerId, String comment);
+
+    List<Book> getWishListBooksWithRec(String userId);
+
 }

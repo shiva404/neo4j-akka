@@ -12,6 +12,7 @@ import com.campusconnect.neo4j.da.utils.HistoryEventHelper;
 import com.campusconnect.neo4j.da.utils.NotificationHelper;
 import com.campusconnect.neo4j.da.utils.Queries;
 import com.campusconnect.neo4j.da.utils.TargetHelper;
+import com.campusconnect.neo4j.exceptions.Neo4jException;
 import com.campusconnect.neo4j.exceptions.DuplicateDataException;
 import com.campusconnect.neo4j.exceptions.NotFoundException;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
@@ -45,6 +46,7 @@ import java.util.*;
 
 import static com.campusconnect.neo4j.da.mapper.DBMapper.*;
 import static com.campusconnect.neo4j.da.utils.Queries.*;
+import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.mapGroupNeo4jToWeb;
 import static com.campusconnect.neo4j.util.Constants.*;
 
 /**
@@ -61,10 +63,10 @@ public class BookDaoImpl implements BookDao {
 
     @Autowired
     UserRecRepository userRecRepository;
-    
+
     @Autowired
     AuditEventDao auditEventDao;
-    
+
     @Autowired
     NotificationDao notificationDao;
 
@@ -98,28 +100,28 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public void listBookAsOwns(OwnsRelationship ownsRelationship) {
-    	
+
     	OwnsRelationship existingOwnsRelationship = bookRepository.getOwnsRelationship(ownsRelationship.getUser().getId(), ownsRelationship.getBook().getId());
-    	
+
     	if(null==existingOwnsRelationship)
     	{
     		neo4jTemplate.save(ownsRelationship);
     		Target target = TargetHelper.createBookTarget(ownsRelationship.getBook());
     		Event event = EventHelper.createPublicEvent(AuditEventType.BOOK_ADDED_OWNS.toString(), target);
     		auditEventDao.addEvent(ownsRelationship.getUser().getId(), event);
-    	
+
     	}else
     	{
     		existingOwnsRelationship.setStatus(ownsRelationship.getStatus());
     		existingOwnsRelationship.setLastModifiedDate(ownsRelationship.getLastModifiedDate());
     		neo4jTemplate.save(existingOwnsRelationship);
     	}
-    	
+
     }
 
     @Override
     public void listBookAsRead(ReadRelationship readRelation) {
-       
+
     	ReadRelationship existingReadRelationship = bookRepository.getReadRelationShip(readRelation.getUser().getId(),readRelation.getBook().getId());
     	if(null==existingReadRelationship)
     	{
@@ -128,36 +130,54 @@ public class BookDaoImpl implements BookDao {
     		Event event = EventHelper.createPublicEvent(AuditEventType.BOOK_ADDED_READ.toString(), target);
     		auditEventDao.addEvent(readRelation.getUser().getId(), event);
     	}
-       
+
     }
 
     @Override
     public List<Book> getWishlistBooksWithDetails(String userId) {
         List<Book> wishlistRecOnFriends = getWishlistRecOnFriends(userId);
-        wishlistRecOnFriends.addAll(getWishlistRecOnGroups(userId));
-        return wishlistRecOnFriends;
+        List<Book> wishlistRecOnGroups = getWishlistRecOnGroups(userId);
+
+        //todo: merge the result to single id
+//        wishlistRecOnFriends.addAll(wishlistRecOnGroups);
+        List<Book> mergeWishList = new ArrayList<>();
+        for (Book wishListFriend : wishlistRecOnFriends){
+            for (Iterator<Book> iterator = wishlistRecOnGroups.iterator(); iterator.hasNext(); ) {
+                Book wishListGroup = iterator.next();
+                if(wishListFriend.getId().equals(wishListGroup.getId())){
+                    WishlistBookDetails wishlistBookDetailsFriendRec = (WishlistBookDetails) wishListFriend.getBookDetails();
+                    WishlistBookDetails wishlistBookDetailsGroupRec = (WishlistBookDetails) wishListGroup.getBookDetails();
+                    wishlistBookDetailsFriendRec.getGroupsWithMembers().addAll(wishlistBookDetailsGroupRec.getGroupsWithMembers());
+                    iterator.remove();
+                }
+                mergeWishList.add(wishListFriend);
+            }
+        }
+        //add all remaining books
+        mergeWishList.addAll(wishlistRecOnGroups);
+        return mergeWishList;
     }
 
     @Override
     public void initiateBookReturn(String bookId, String status, ReturnRequest returnRequest) {
         //TODO: get a relation b/w users with borrowed, if not exists throw not found error
-    	
+
     	BorrowRelationship borrowRelationship = bookRepository.getBorrowRelationship(returnRequest.getBorrowerUserId(), bookId, returnRequest.getOwnerUserId());
     	OwnsRelationship ownsRelationship = bookRepository.getOwnsRelationship(returnRequest.getOwnerUserId(), bookId);
-    	
-    	
-    	
+
+
+
     	if(borrowRelationship.getStatus().toUpperCase().equals(Constants.BORROW_SUCCESS))
     	Validator.checkBookReturnPreConditions(borrowRelationship,ownsRelationship);
-    	
+
     		//TODO : OPtimize updateBorrowedBookStatus and updateOwnedBookStatus
-    	
+
 	        User borrower = userDao.getUser(returnRequest.getBorrowerUserId());
 	        User owner = userDao.getUser(returnRequest.getOwnerUserId());
 	        Book book = getBook(bookId);
 	        updateBorrowedBookStatus(borrower, book, RETURN_INIT, returnRequest.getAdditionalMessage());
 	        updateOwnedBookStatus(owner, book, RETURN_INIT, returnRequest.getAdditionalMessage());
-    	        
+
     }
 
     @Override
@@ -180,6 +200,20 @@ public class BookDaoImpl implements BookDao {
         updateBorrowedBookStatus(borrower, book, RETURN_SUCCESS, comment);
         updateOwnedBookStatus(owner, book, RETURN_SUCCESS, comment);
         //todo: add notification to the user
+    }
+
+    @Override
+    public List<Book> getWishListBooksWithRec(String userId) {
+        List<Book> books = getWishlistBooksWithDetails(userId);
+        List<Book> resultBooks = new ArrayList<>();
+        if(books != null && !books.isEmpty()) {
+            for(Book book: books) {
+                if(book.getBookDetails() != null){
+                    resultBooks.add(book);
+                }
+            }
+        }
+        return resultBooks;
     }
 
     private List<Book> getWishlistRecOnFriends(String userId) {
@@ -206,22 +240,41 @@ public class BookDaoImpl implements BookDao {
             User user = getUserFromRestNode(userNode);
             Book book = getBookFromRestNode(bookNode);
             Group group = getGroupFromRestNode(groupNode);
+            if(group == null || user == null || book == null)
+                throw new Neo4jException(ErrorCodes.INTERNAL_SERVER_ERROR, "Data is corrupted. Needs action");
             GroupMember groupMember = Neo4jToWebMapper.mapUserNeo4jToWebGroupMember(user, group.getId(), group.getName(), group.getCreatedDate(), null);
             boolean appended = false;
             for (Book listedBook : books) {
                 if (listedBook.getId().equals(book.getId())) {
                     WishlistBookDetails wishlistBookDetails = (WishlistBookDetails) listedBook.getBookDetails();
-                    wishlistBookDetails.getGroupMembers().add(groupMember);
+                    boolean groupAppended = false;
+                    for (GroupWithMembers groupWithMembers : wishlistBookDetails.getGroupsWithMembers()){
+                        if(groupWithMembers.getGroup().getId().equals(group.getId())){
+                            groupWithMembers.getGroupMembers().add(groupMember);
+                            groupAppended = true;
+                            break;
+                        }
+                    }
+                    if(!groupAppended){
+                        GroupWithMembers groupWithMembers = new GroupWithMembers();
+                        groupWithMembers.setGroup(mapGroupNeo4jToWeb(group));
+                        groupWithMembers.getGroupMembers().add(groupMember);
+                        wishlistBookDetails.getGroupsWithMembers().add(groupWithMembers);
+                    }
                     appended = true;
                     break;
                 }
             }
             if (!appended) {
                 WishlistBookDetails wishlistBookDetails = new WishlistBookDetails();
-                wishlistBookDetails.getGroupMembers().add(groupMember);
+                GroupWithMembers groupWithMembers = new GroupWithMembers();
+                groupWithMembers.setGroup(mapGroupNeo4jToWeb(group));
+                groupWithMembers.getGroupMembers().add(groupMember);
+                wishlistBookDetails.getGroupsWithMembers().add(groupWithMembers);
                 book.setBookDetails(wishlistBookDetails);
+                book.setBookType(WISHLIST);
+                books.add(book);
             }
-            books.add(book);
         }
         return books;
     }
@@ -246,8 +299,10 @@ public class BookDaoImpl implements BookDao {
                 WishlistBookDetails wishlistBookDetails = new WishlistBookDetails();
                 wishlistBookDetails.getUsers().add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
                 book.setBookDetails(wishlistBookDetails);
+                book.setBookType(WISHLIST);
+                books.add(book);
             }
-            books.add(book);
+
         }
         return books;
     }
@@ -263,13 +318,13 @@ public class BookDaoImpl implements BookDao {
         relationship.setLastModifiedDate(System.currentTimeMillis());
         relationship.setUserComment(userComment);
         neo4jTemplate.save(relationship);
-        
+
         Target target = TargetHelper.createBookTarget(book);
         Notification notification = new Notification(target, System.currentTimeMillis(), Constants.RETURN_INIT_NOTIFICATION_TYPE);
         notificationDao.addNotification(user.getId(), notification);
-        
-       //TODO : Book History Event 
-        
+
+       //TODO : Book History Event
+
     }
 
     @Override
@@ -291,7 +346,7 @@ public class BookDaoImpl implements BookDao {
         HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_INITIATED.toString(), TargetHelper.createUserTarget(borrower));
         setBookHistory(book.getId(), ownerUser.getId(), historyEvent);
         emailDao.sendBorrowBookInitEmail(borrower, ownerUser, book);
-        
+
         Target target = TargetHelper.createBookTarget(book);
         Notification notification = new Notification(target, System.currentTimeMillis(), Constants.BORROW_IN_PROGRESS);
         notificationDao.addNotification(ownerUser.getId(), notification);
@@ -303,38 +358,38 @@ public class BookDaoImpl implements BookDao {
     public void updateBookStatusOnAgreement(User user, Book book, User borrower, String userComment) {
         updateOwnedBookStatus(user, book, BORROW_LOCK, userComment);
         updateBorrowedBookStatus(borrower, book, BORROW_LOCK, userComment);
- 
+
         HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_AGREED.toString(), TargetHelper.createUserTarget(borrower));
         setBookHistory(book.getId(), user.getId(), historyEvent);
         emailDao.sendAcceptedToLendBookEmail(user, borrower, book);
-        
+
         Target target = TargetHelper.createBookTarget(book);
 		Event event = EventHelper.createPrivateEvent(AuditEventType.BORROW_AGREED.toString(), target);
 		auditEventDao.addEvent(user.getId(), event);
 		//auditEventDao.addEvent(borrower.getId(), event);
 		//TODO : Revisit
-		
-        
+
+
         Notification notification = new Notification(target, System.currentTimeMillis(), Constants.BORROW_AGREED);
         notificationDao.addNotification(borrower.getId(), notification);
     }
 
     @Override
     public void updateBookStatusOnSuccess(User user, Book book, User borrower, String userComment) {
-    	
-    	//TODO : Change update methods to have borrower and owner variables 
+
+    	//TODO : Change update methods to have borrower and owner variables
         updateOwnedBookStatus(user, book, LENT, userComment);
         updateBorrowedBookStatus(borrower, book, BORROWED, userComment);
         HistoryEvent historyEvent = HistoryEventHelper.createPublicEvent(AuditEventType.BORROWED.toString(), TargetHelper.createUserTarget(borrower));
         setBookHistory(book.getId(), user.getId(), historyEvent);
         emailDao.sendSuccessfulBookTransactionEmail(user, borrower, book);
-        
+
         Target target = TargetHelper.createBookTarget(book);
 		Event eventBorrower = EventHelper.createPublicEvent(AuditEventType.BORROWED.toString(), target);
 		Event eventOwner = EventHelper.createPublicEvent(AuditEventType.LENT.toString(), target);
 		auditEventDao.addEvent(user.getId(), eventOwner);
 		auditEventDao.addEvent(borrower.getId(), eventBorrower);
-		 
+
         Notification notification = new Notification(target, System.currentTimeMillis(), Constants.BORROW_SUCCESS);
         notificationDao.addNotification(borrower.getId(), notification);
     }
@@ -349,7 +404,7 @@ public class BookDaoImpl implements BookDao {
         relationship.setLastModifiedDate(System.currentTimeMillis());
         relationship.setAdditionalComments(userComment);
         neo4jTemplate.save(relationship);
-        //TODO : is notification/Event required 
+        //TODO : is notification/Event required
     }
 
     @Override
@@ -375,7 +430,11 @@ public class BookDaoImpl implements BookDao {
         for (Iterator<Book> iterator = books.iterator(); iterator.hasNext(); ) {
             Book book = iterator.next();
             for (Book existingBook : existingBooks) {
-                if (existingBook.getGoodreadsId() != null && book.getGoodreadsId().equals(existingBook.getGoodreadsId())) {
+                if(existingBook.getId() != null && book.getId() != null && book.getId().equals(existingBook.getId())){
+                    iterator.remove();
+                    identifiedBooks.add(existingBook);
+                }
+                else if (existingBook.getGoodreadsId() != null && book.getGoodreadsId() != null && book.getGoodreadsId().equals(existingBook.getGoodreadsId())) {
                     iterator.remove();
                     identifiedBooks.add(existingBook);
                 }
@@ -420,7 +479,7 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public void addWishBookToUser(WishListRelationship wishListRelationship) {
-    	
+
     	WishListRelationship existingWishListRelationship = bookRepository.getWishListRelationship(wishListRelationship.getUser().getId(), wishListRelationship.getBook().getId());
     	if(null!=existingWishListRelationship)
     	{
@@ -428,7 +487,7 @@ public class BookDaoImpl implements BookDao {
     		Target target = TargetHelper.createBookTarget(wishListRelationship.getBook());
     		Event event = EventHelper.createPublicEvent(AuditEventType.BOOK_ADDED_WISHLIST.toString(), target);
     		auditEventDao.addEvent(wishListRelationship.getUser().getId(), event);
-    		
+
     	}
     }
 
@@ -473,8 +532,7 @@ public class BookDaoImpl implements BookDao {
         //todo throw not found
         List<Book> books = getWishlistBooksWithDetails(userId);
         List<Book> bookFromMapResult = getBookFromMapResult(mapResult, userId);
-        replaceBooksWithExistingBooks(bookFromMapResult, books);
-        return bookFromMapResult;
+        return replaceBooksWithExistingBooks(bookFromMapResult, books);
     }
 
     @Override
@@ -686,14 +744,14 @@ public class BookDaoImpl implements BookDao {
             //TODO: put notification to borrower
             HistoryEvent historyEventRejectBorrow = HistoryEventHelper.createPublicEvent(AuditEventType.BORROW_REJECTED.toString(), TargetHelper.createUserTarget(userDao.getUser(borrowerId)));
             setBookHistory(bookId, ownerId, historyEventRejectBorrow);
-            
+
             Target target = TargetHelper.createBookTarget(getBook(bookId));
     		Event event = EventHelper.createPrivateEvent(AuditEventType.BORROW_REJECTED.toString(), target);
     		auditEventDao.addEvent(ownerId, event);
-    		
+
             Notification notification = new Notification(target, System.currentTimeMillis(), Constants.BORROW_REJECT);
             notificationDao.addNotification(borrowerId, notification);
-            
+
         }
     }
 
@@ -708,7 +766,7 @@ public class BookDaoImpl implements BookDao {
     @Override
     public void listBookAsCurrentlyReading(
             CurrentlyReadingRelationShip currentlyReadingRelationship) {
-        	
+
     		CurrentlyReadingRelationShip existingCurrentlyReadingRelationShip = bookRepository.getCurrentlyReadingRelationShip(currentlyReadingRelationship.getUser().getId(),currentlyReadingRelationship.getBook().getId());
     		if(null!= existingCurrentlyReadingRelationShip)
     		{

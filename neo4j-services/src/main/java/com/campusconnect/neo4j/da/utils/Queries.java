@@ -21,7 +21,7 @@ public class Queries {
             "ORDER BY friend_of_friend";
 
     public static final String GET_WISHLIST_REC_FRIENDS = "match(user:User {id:{userId}}) - [:WISH]-(book:Book)-[:OWNS {status: \"AVAILABLE\"}]-(friend:User)\n" +
-            "WHERE (user)-[:CONNECTED]-(friend)" +
+            "WHERE (user)-[:CONNECTED {type:\"FRIEND\"}]-(friend)" +
             "return book, friend";
 
     public static final String GET_WISHLIST_GROUP = "match(user:User {id:{userId}})-[:WISH]-(book:Book)-[:OWNS]-(friend:User)-[:USER_ACCESS]-(group:Group) " +

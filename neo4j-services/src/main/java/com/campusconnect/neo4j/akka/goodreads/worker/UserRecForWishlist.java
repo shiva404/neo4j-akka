@@ -40,10 +40,11 @@ public class UserRecForWishlist extends UntypedActor {
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof UserRecForWishListTask) {
-            UserRecForWishListTask userRecForWishListTask = (UserRecForWishListTask) message;
+            UserRecForWishListTask task = (UserRecForWishListTask) message;
+            
 
             //Get books for user friend
-            GetBooksResponse getBooksResponse = getBooks.getBooksForUser(userRecForWishListTask.getFriend().getId(), userRecForWishListTask.getPage());
+            GetBooksResponse getBooksResponse = getBooks.getBooksForUser(task.getFriend().getId(), task.getPage());
             if (getBooksResponse != null) {
                 final Reviews reviews = getBooksResponse.getReviews();
                 List<Book> books = new ArrayList<>();
@@ -51,9 +52,9 @@ public class UserRecForWishlist extends UntypedActor {
 
                     //If more books present the message to fetch the books back
                     if (Integer.parseInt(reviews.getEnd()) != Integer.parseInt(reviews.getTotal())) {
-                        getSelf().tell(new UserRecForWishListTask(userRecForWishListTask.getAccessToken(), userRecForWishListTask.getAccessSecret(),
-                                userRecForWishListTask.getUserId(), userRecForWishListTask.getGoodreadsId(), userRecForWishListTask.getFriend(), userRecForWishListTask.getWishListBooks(),
-                                userRecForWishListTask.getPage() + 1, userRecForWishListTask.getGoodreadsUserRecommendations()), getSender());
+                        getSelf().tell(new UserRecForWishListTask(task.getAccessToken(), task.getAccessSecret(),
+                                task.getUserId(), task.getGoodreadsId(), task.getFriend(), task.getWishListBooks(),
+                                task.getPage() + 1, task.getGoodreadsUserRecommendations()), getSender());
                     }
 
                     //prepare books list
@@ -66,18 +67,18 @@ public class UserRecForWishlist extends UntypedActor {
                 }
 
                 //See what all books need to rec with user
-                List<WishListBook> wishListBooks = userRecForWishListTask.getWishListBooks();
+                List<WishListBook> wishListBooks = task.getWishListBooks();
                 if (wishListBooks != null)
                     for (com.campusconnect.neo4j.types.web.Book wishListBook : wishListBooks) {
                         for (Book friendBook : books) {
                             if (wishListBook.getGoodreadsId() != null && wishListBook.getGoodreadsId().equals(friendBook.getGoodreadsId())) {
-                                if (recExists(wishListBook.getGoodreadsId(), userRecForWishListTask.getFriend().getId(), userRecForWishListTask.getGoodreadsUserRecommendations())) {
+                                if (recExists(wishListBook.getGoodreadsId(), task.getFriend().getId(), task.getGoodreadsUserRecommendations())) {
                                     logger.info("User Recommendation already exists:");
                                 } else {
-                                    User user = userDao.getUser(userRecForWishListTask.getUserId());
-                                    final String goodreadsId = userRecForWishListTask.getFriend().getId();
+                                    User user = userDao.getUser(task.getUserId());
+                                    final String goodreadsId = task.getFriend().getId();
                                     User friend = userDao.getUserByGoodreadsId(goodreadsId);
-                                    bookDao.createGoodreadsFriendBookRec(new GoodreadsRecRelationship(user, WebToNeo4jMapper.mapBookWebToNeo4j(wishListBook), "rec", friend != null ? friend.getId() : null, goodreadsId, userRecForWishListTask.getFriend().getImageUrl(), userRecForWishListTask.getFriend().getName()));
+                                    bookDao.createGoodreadsFriendBookRec(new GoodreadsRecRelationship(user, WebToNeo4jMapper.mapBookWebToNeo4j(wishListBook), "rec", friend != null ? friend.getId() : null, goodreadsId, task.getFriend().getImageUrl(), task.getFriend().getName()));
                                 }
                             }
                         }

@@ -59,12 +59,14 @@ public class FriendsBookSearchForWishListWorker extends UntypedActor {
             goodreadsOauthClient.getsService().signRequest(sAccessToken, getBooksRequest);
             Response response = getBooksRequest.send();
             GetFriendsResponse getFriendsResponse = ResponseUtils.getEntity(response.getBody(), GetFriendsResponse.class);
+            assert getFriendsResponse != null;
             final Friends friends = getFriendsResponse.getFriends();
 
 
             if (friends != null && Integer.parseInt(friends.getTotal()) != 0) {
                 List<GoodreadsUserRecommendation> existingRecommendations = bookDao.getGoodreadsUserRecommendations(getFriendsTask.getUserId());
 
+                //if page is not the end and put the message back incrementing one page
                 if (Integer.parseInt(friends.getEnd()) != Integer.parseInt(friends.getTotal())) {
                     logger.info("fired friends request again for page:" + (getFriendsTask.getPage() + 1));
                     getSelf().tell(new FriendsBookSearchForWishListTask(getFriendsTask.getAccessToken(), getFriendsTask.getAccessSecret(), getFriendsTask.getUserId(),
@@ -72,8 +74,9 @@ public class FriendsBookSearchForWishListWorker extends UntypedActor {
                 }
                 logger.info("acquiring data from friends of number: " + friends.getUser().size() + " for user :" + getFriendsTask.getUserId() + " page : " + getFriendsTask.getPage());
 
-                com.campusconnect.neo4j.types.neo4j.User referUser = userDao.getUser(getFriendsTask.getUserId());
-                goodreadsAsynchHandler.getAddGoodReadsFriendsRouter().tell(new AddFriendsFromGoodReadsTask(referUser, friends), getSender());
+
+                com.campusconnect.neo4j.types.neo4j.User currentUser = userDao.getUser(getFriendsTask.getUserId());
+                goodreadsAsynchHandler.getAddGoodReadsFriendsRouter().tell(new AddFriendsFromGoodReadsTask(currentUser, friends), getSender());
 
                 for (User user : friends.getUser()) {
                     goodreadsAsynchHandler.getUserRecForWishListRouter().tell(new UserRecForWishListTask(getFriendsTask.getAccessToken(), getFriendsTask.getAccessSecret(), getFriendsTask.getUserId(),

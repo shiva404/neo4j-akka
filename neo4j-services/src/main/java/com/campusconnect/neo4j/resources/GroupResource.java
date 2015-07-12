@@ -44,7 +44,7 @@ public class GroupResource {
         setGroupCreateProperties(group, userId);
         Group createdGroup = groupDao.createGroup(mapGroupWebToNeo4j(group));
         // Todo Add user as admin
-        groupDao.addUser(createdGroup.getId(), userId, AccessRoles.ADMIN.toString(), userId);
+        groupDao.addUser(createdGroup.getId(), userId, AccessRoles.ADMIN.toString(), userId, true);
         return Response.created(null).entity(mapGroupNeo4jToWeb(createdGroup)).build();
     }
 
@@ -95,7 +95,7 @@ public class GroupResource {
     public Response addUser(@PathParam("groupId") final String groupId,
                             @PathParam("userId") final String userId, @QueryParam("role") final String role,
                             @QueryParam("createdBy") final String createdBy) {
-        groupDao.addUser(groupId, userId, role, createdBy);
+        groupDao.addUser(groupId, userId, role, createdBy, false);
         return Response.created(null).build();
     }
 
@@ -121,7 +121,7 @@ public class GroupResource {
         // Todo CreatedBy is of Admin or Write USER_ACCESS
         for (String userId : userIdsPage.getUserIds()) {
 //            User user = userDao.getUser(userId);
-            groupDao.addUser(groupId, userId, AccessRoles.READ.toString(), createdBy);
+            groupDao.addUser(groupId, userId, AccessRoles.READ.toString(), createdBy, false);
         }
         return Response.ok().build();
     }

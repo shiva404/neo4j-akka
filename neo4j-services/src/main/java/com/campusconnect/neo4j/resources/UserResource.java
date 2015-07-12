@@ -266,7 +266,9 @@ public class UserResource {
 
     @GET
     @Path("{userId}/books")
-    public Response getBooks(@PathParam("userId") final String userId, @QueryParam(FILTER_QPARAM) String filter) throws Exception {
+    public Response getBooks(@PathParam("userId") final String userId,
+                             @QueryParam(FILTER_QPARAM) String filter,
+                             @QueryParam(LOGGED_IN_USER_QPARAM) String loggedInUser) throws Exception {
         if (filter == null) {
             throw new Exception("filer is null");
         }
@@ -298,13 +300,16 @@ public class UserResource {
                 return Response.ok().entity(borrowedBooksPage).build();
             case WISHLIST_RELATION:
                 List<com.campusconnect.neo4j.types.web.Book> wishListBooks = getWebBooks(bookDao.getWishlistBooksWithDetails(userId));
-                BooksPage wishListBooksPage = new BooksPage(0, wishListBooks.size(), wishListBooks);
+                BooksPage wishListBooksPage = new BooksPage(wishListBooks.size(), 0, wishListBooks);
                 return Response.ok().entity(wishListBooksPage).build();
             case CURRENTLY_READING_RELATION:
                 List<CurrentlyReadingBook> currentlyReadingBooks = bookDao.getCurrentlyReadingBook(userId);
                 CurrentlyReadingBooksPage currentlyReadingBooksPage = new CurrentlyReadingBooksPage(0, currentlyReadingBooks.size(), currentlyReadingBooks);
                 return Response.ok().entity(currentlyReadingBooksPage).build();
-
+            case WISHLIST_WITH_REC:
+                List<com.campusconnect.neo4j.types.web.Book> wishListBooksWithRec = getWebBooks(bookDao.getWishListBooksWithRec(userId));
+                BooksPage wishListBooksRecPage = new BooksPage(wishListBooksWithRec.size(), 0, wishListBooksWithRec);
+                return Response.ok().entity(wishListBooksRecPage).build();
             case ALL:
                 List<Book> allBooks = bookDao.getAllUserBooks(userId);
                 AllBooks resultBooks = new AllBooks();
@@ -510,7 +515,7 @@ public class UserResource {
 
     @GET
     @Path("{userId}/reminders")
-    public Response getReminders(@PathParam("userId") final String userId, @QueryParam("filter") final String filter) {
+    public Response getReminders(@PathParam("userId") final String userId, @QueryParam("filter") @DefaultValue("all") final String filter) {
         final List<Reminder> reminders = reminderDao.getReminders(userId, filter);
         ReminderPage reminderPage = new ReminderPage(0, reminders.size(), reminders);
         return Response.ok().entity(reminderPage).build();

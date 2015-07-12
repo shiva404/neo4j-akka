@@ -21,7 +21,7 @@ public class Constants {
     public static final String NOTIFICATION_RELATION = "NOTIFICATION";
     public static final String CONNECTED_RELATION = "CONNECTED";
     public static final String WISHLIST_RELATION = "WISH";
-    
+    public static final String WISHLIST_WITH_REC = "WISH_REC";
 
     public static final String FRIEND_REQ_SENT = "FRIEND_REQ_SENT";
     public static final String FRIEND_REQ_APPROVAL_PENDING = "FRIEND_REQ_APPROVAL_PENDING";
@@ -90,7 +90,7 @@ public class Constants {
     public static final String REMINDER_CREATED_NOTIFICATION_TYPE = "REMINDER_CREATED";
 	public static final String RECEIVED_REMINDER_TYPE = "Received";
 	public static final String SENT_REMINDER_TYPE = "Sent";
-	
+
 	public static final String GROUP_ADMIN_ROLE = "admin";
 	public static final String GROUP_MEMBER_ROLE = "member";
 	public static final String GROUP_MEMBER_ADDED = "group memner added";

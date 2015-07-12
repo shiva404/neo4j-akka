@@ -21,6 +21,7 @@ public class Constants {
     public static final String NOTIFICATION_RELATION = "NOTIFICATION";
     public static final String CONNECTED_RELATION = "CONNECTED";
     public static final String WISHLIST_RELATION = "WISH";
+    
 
     public static final String FRIEND_REQ_SENT = "FRIEND_REQ_SENT";
     public static final String FRIEND_REQ_APPROVAL_PENDING = "FRIEND_REQ_APPROVAL_PENDING";
@@ -93,6 +94,8 @@ public class Constants {
 	public static final String GROUP_ADMIN_ROLE = "admin";
 	public static final String GROUP_MEMBER_ROLE = "member";
 	public static final String GROUP_MEMBER_ADDED = "group memner added";
+	public static final String GROUP_ADMIN_NOTIFICATION = "Group admin added";
+	public static final String RETURN_INIT_NOTIFICATION_TYPE = "Book retun initiated";
 
 
 }

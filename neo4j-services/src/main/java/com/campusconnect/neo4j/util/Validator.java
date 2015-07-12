@@ -1,6 +1,11 @@
 package com.campusconnect.neo4j.util;
 
+import com.campusconnect.neo4j.exceptions.AuthorizationException;
 import com.campusconnect.neo4j.exceptions.InvalidDataException;
+import com.campusconnect.neo4j.exceptions.Neo4jException;
+import com.campusconnect.neo4j.types.neo4j.BorrowRelationship;
+import com.campusconnect.neo4j.types.neo4j.OwnsRelationship;
+import com.campusconnect.neo4j.types.neo4j.UserGroupRelationship;
 import com.campusconnect.neo4j.types.web.User;
 
 import static com.campusconnect.neo4j.util.ErrorCodes.INVALID_ARGUMENTS;
@@ -46,4 +51,26 @@ public class Validator {
             throw new InvalidDataException(INVALID_ARGUMENTS, "idType is invalid");
         }
     }
+    
+    
+ public static void checkUserisAdmin(UserGroupRelationship createdByRelationShip) {
+		
+    	if(null==createdByRelationShip)
+    	{
+    		throw new AuthorizationException(ErrorCodes.UNAUTHORIZED, "invalid credentials");
+    	}
+    	else if(!createdByRelationShip.getRole().equalsIgnoreCase(Constants.GROUP_ADMIN_ROLE))
+    	{
+    		throw new AuthorizationException(ErrorCodes.UNAUTHORIZED, "you do not have admin permissions");
+    	}
+	}
+
+public static void checkBookReturnPreConditions(
+		BorrowRelationship borrowRelationship, OwnsRelationship ownsRelationship) {
+			
+	if (null==borrowRelationship || null == ownsRelationship || !(borrowRelationship.getStatus().toUpperCase().equals(Constants.BORROW_SUCCESS) && ownsRelationship.getStatus().equals(Constants.LENT)))
+	{
+		throw new Neo4jException(ErrorCodes.INCONSISTANT_DATA, "Data is not consistant please contact admin");
+	}
+}
 }

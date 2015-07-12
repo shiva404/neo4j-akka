@@ -96,8 +96,6 @@ public class GroupResource {
                             @PathParam("userId") final String userId, @QueryParam("role") final String role,
                             @QueryParam("createdBy") final String createdBy) {
         groupDao.addUser(groupId, userId, role, createdBy);
-        //TODO: Check userId exists or not
-        //TODO :Should event or notification be added 
         return Response.created(null).build();
     }
 

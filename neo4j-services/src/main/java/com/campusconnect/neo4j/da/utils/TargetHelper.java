@@ -3,8 +3,7 @@ package com.campusconnect.neo4j.da.utils;
 import com.campusconnect.neo4j.types.common.IdType;
 import com.campusconnect.neo4j.types.common.Target;
 import com.campusconnect.neo4j.types.neo4j.*;
-import com.campusconnect.neo4j.types.neo4j.Reminder;
-import com.campusconnect.neo4j.types.neo4j.User;
+import com.campusconnect.neo4j.types.web.BorrowRequest;
 
 public class TargetHelper {
 
@@ -34,4 +33,13 @@ public class TargetHelper {
     	Target target = new Target(IdType.GROUP_ID.toString(),group.getName(),targetUrl,group.getId());
     	return target;
     }
+
+
+
+	public static Target createBookTarget(Book book) {
+		
+		String targetUrl = "/books/"+book.getId();
+	
+		return new Target(IdType.BOOK_ID.toString(), book.getName(), targetUrl, book.getId());
+	}
 }

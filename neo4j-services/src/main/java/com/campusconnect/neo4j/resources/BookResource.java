@@ -36,6 +36,7 @@ public class BookResource {
 
     private BookDao bookDao;
     private UserDao userDao;
+    
 
     public BookResource(BookDao bookDao, UserDao userDao) {
         this.bookDao = bookDao;
@@ -104,26 +105,33 @@ public class BookResource {
         Long now = System.currentTimeMillis();
 
         //TODO: Should event/notification be added 
+      
         switch (listingType.toUpperCase()) {
-            case OWNS_RELATION:
-                if (status == null) {
-                    logger.info("status is null setting status to available");
-                    status = AVAILABLE;
-                }
-                bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status.toUpperCase(), now));
-                break;
-            case WISHLIST_RELATION:
-                bookDao.addWishBookToUser(new WishListRelationship(user, book, status, now, now));
-                break;
-            case CURRENTLY_READING_RELATION:
-                bookDao.listBookAsCurrentlyReading(new CurrentlyReadingRelationShip(user, book, status, now, now));
-                break;
-            case READ_RELATION:
-                bookDao.listBookAsRead(new ReadRelationship(user, book, status, now, now));
-                break;
-            default:
-                logger.warn("BookType is not matched: " + listingType);
+	            case OWNS_RELATION:
+	                if (status == null) {
+	                    logger.info("status is null setting status to available");
+	                    status = AVAILABLE;
+	                }
+	              
+	                bookDao.listBookAsOwns(new OwnsRelationship(user, book, now, status.toUpperCase(), now));
+	                break;
+	                
+	            case WISHLIST_RELATION:
+	                bookDao.addWishBookToUser(new WishListRelationship(user, book, status, now, now));
+	                break;
+	              
+	            case CURRENTLY_READING_RELATION:
+	                bookDao.listBookAsCurrentlyReading(new CurrentlyReadingRelationShip(user, book, status, now, now));
+	                break;
+	               
+	            case READ_RELATION:
+	                bookDao.listBookAsRead(new ReadRelationship(user, book, status, now, now));
+	                break;
+	                
+	            default:
+	                logger.warn("BookType is not matched: " + listingType);
         }
+        
         return Response.ok().build();
     }
 
@@ -142,6 +150,9 @@ public class BookResource {
         } else if (bookIdType.equals(GR_ID)) {
             book = bookDao.getBookByGoodreadsId(Integer.parseInt(bookId));
         }
+        
+        //TODO : Add unavailable exception if book is not available 
+        
         bookDao.addBookToBorrower(book, borrowRequest);
         return Response.ok().build();
     }
@@ -155,6 +166,8 @@ public class BookResource {
         bookDao.initiateBookReturn(bookId, status, returnRequest);
         return Response.ok().build();
     }
+    
+    //TODO: Add cancel book borrow from borrower
 
     @PUT
     @Path("{bookId}/return")
@@ -165,7 +178,7 @@ public class BookResource {
                                            @QueryParam(MESSAGE_QPARAM) String message) {
         if (STATUS.equals(RETURN_AGREED)) {
             bookDao.updateBookReturnToAgreed(bookId, status, ownerId, borrowerId, message);
-        } else if (STATUS.equals(RETURN_AGREED)) {
+        } else if (STATUS.equals(RETURN_SUCCESS)) {
             bookDao.updateBookReturnToSuccess(bookId, status, ownerId, borrowerId, message);
         }
         return Response.ok().build();

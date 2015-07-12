@@ -5,6 +5,8 @@ import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.da.mapper.DBMapper;
 import com.campusconnect.neo4j.da.utils.FilterHelper;
 import com.campusconnect.neo4j.da.utils.TargetHelper;
+import com.campusconnect.neo4j.exceptions.AuthorizationException;
+import com.campusconnect.neo4j.exceptions.InvalidDataException;
 import com.campusconnect.neo4j.repositories.GroupRepository;
 import com.campusconnect.neo4j.repositories.UserGroupRepository;
 import com.campusconnect.neo4j.types.common.Target;
@@ -15,6 +17,8 @@ import com.campusconnect.neo4j.types.neo4j.UserGroupRelationship;
 import com.campusconnect.neo4j.types.web.GroupMember;
 import com.campusconnect.neo4j.types.web.Notification;
 import com.campusconnect.neo4j.util.Constants;
+import com.campusconnect.neo4j.util.ErrorCodes;
+import com.campusconnect.neo4j.util.Validator;
 
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.entity.RestRelationship;
@@ -125,35 +129,48 @@ public class GroupDao {
 
     public void addUser(String groupId, String userId, String role, String createdBy) {
 
-        Group group = getGroup(groupId);
-        User user = userDao.getUser(userId);
-        UserGroupRelationship existingUserGroupRelationship = userGroupRepository.getUserGroupRelationShip(userId, groupId);
-        //TODO: null check for role of addUser
-        if (null != existingUserGroupRelationship) {
-            existingUserGroupRelationship.setRole(role);
-            neo4jTemplate.save(existingUserGroupRelationship);
-            //TODO : Add check if role is admin if yes then check created by is admin
-            //TODO : else why is this request coming ??
-            
-        } else {
-            Long currentTime = System.currentTimeMillis();
-            UserGroupRelationship userGroupRelationship = new UserGroupRelationship(
-                    createdBy, currentTime, group, currentTime,
-                    role, user);
-            
-            Target target = TargetHelper.createGroupTarget(group);
-            Notification notification = new Notification(target, System.currentTimeMillis(), Constants.GROUP_MEMBER_ADDED);
-            //TODO :Add in notification type of user role like admin or member 
-            
-            notificationDao.addNotification(userId, notification);
-            
-            neo4jTemplate.save(userGroupRelationship);
-        }
-        
+    	if(null==role)
+    	{
+    		throw new InvalidDataException(ErrorCodes.INVALID_ARGUMENTS, "role passed to add user is null");
+    	}
+    	else 
+    	{
+		        Group group = getGroup(groupId);
+		        User user = userDao.getUser(userId);
+		    
+		        UserGroupRelationship createdByRelationShip = userGroupRepository.getUserGroupRelationShip(createdBy, groupId);
+		            
+		        Validator.checkUserisAdmin(createdByRelationShip);
+		        	
+		        	        		
+		        	    UserGroupRelationship existingUserGroupRelationship = userGroupRepository.getUserGroupRelationShip(userId, groupId);
+		        	    if (null != existingUserGroupRelationship)
+		        	    {
+		        	    	existingUserGroupRelationship.setRole(role);
+		        	    	neo4jTemplate.save(existingUserGroupRelationship);
+		        	    	Target target = TargetHelper.createGroupTarget(group);
+				            Notification notification = new Notification(target, System.currentTimeMillis(), Constants.GROUP_ADMIN_NOTIFICATION);
+				            notificationDao.addNotification(userId, notification);
+		        	    }
+				         else 
+				         {
+				            Long currentTime = System.currentTimeMillis();
+				            UserGroupRelationship userGroupRelationship = new UserGroupRelationship(
+				                    createdBy, currentTime, group, currentTime,
+				                    role, user);
+				            
+				            Target target = TargetHelper.createGroupTarget(group);
+				            Notification notification = new Notification(target, System.currentTimeMillis(), Constants.GROUP_MEMBER_ADDED);
+				            notificationDao.addNotification(userId, notification);
+				            neo4jTemplate.save(userGroupRelationship);
+				         }
+    		}
         
     }
 
-    public Group updateGroup(String groupId, Group group, String userId) {
+   
+
+	public Group updateGroup(String groupId, Group group, String userId) {
         Group groupToBeUpdated = getGroup(groupId);
         groupToBeUpdated.setName(group.getName());
         groupToBeUpdated.setLastModifiedBy(userId);

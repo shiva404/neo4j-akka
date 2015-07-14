@@ -551,8 +551,12 @@ public class UserResource {
     @GET
     @Path("{userId}/groups")
     public Response getGroups(@PathParam("userId") final String userId) {
-        List<Group> groups = groupDao.getGroups(userId);
-        GroupPage groupPage = new GroupPage(groups, 0, groups.size());
+        List<com.campusconnect.neo4j.types.neo4j.Group> groups = groupDao.getGroups(userId);
+        List<com.campusconnect.neo4j.types.web.Group> returnGroups = new ArrayList<>(groups.size());
+        for (Group grp : groups) {
+            returnGroups.add(Neo4jToWebMapper.mapGroupNeo4jToWeb(grp));
+        }
+        GroupPage groupPage = new GroupPage(returnGroups, 0, returnGroups.size());
         return Response.ok().entity(groupPage).build();
     }
 

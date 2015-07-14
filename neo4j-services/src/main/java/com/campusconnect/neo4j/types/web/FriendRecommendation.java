@@ -3,13 +3,6 @@ package com.campusconnect.neo4j.types.web;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created with IntelliJ IDEA.
- * User: sn1
- * Date: 6/21/15
- * Time: 8:55 PM
- * To change this template use File | Settings | File Templates.
- */
 public class FriendRecommendation {
     private User user;
     private List<User> mutualFriends;
@@ -24,7 +17,7 @@ public class FriendRecommendation {
     }
 
     public List<User> getMutualFriends() {
-        if(mutualFriends == null) {
+        if (mutualFriends == null) {
             mutualFriends = new ArrayList<>();
         }
         return mutualFriends;

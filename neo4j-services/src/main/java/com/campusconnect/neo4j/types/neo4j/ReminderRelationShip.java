@@ -28,6 +28,10 @@ public class ReminderRelationShip {
     @StartNode
     private User reminderFor;
 
+    //BookCollection/BookBorrow/BookReturn 
+    private String reminderAbout;
+    
+    //Sent or received Reminders
     private String type;
 
     public ReminderRelationShip() {
@@ -35,17 +39,26 @@ public class ReminderRelationShip {
     }
 
     public ReminderRelationShip(String createdBy, Long createdDate, User reminderFor,
-                                Long lastModified, String type, Reminder reminder) {
+                                Long lastModified, String reminderAbout, Reminder reminder,String type) {
         super();
         this.createdBy = createdBy;
         this.createdDate = createdDate;
         this.reminderFor = reminderFor;
         this.lastModified = lastModified;
-        this.type = type;
+        this.reminderAbout = reminderAbout;
         this.reminder = reminder;
+        this.type = type;
     }
 
-    public String getCreatedBy() {
+    public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getCreatedBy() {
         return createdBy;
     }
 
@@ -93,12 +106,12 @@ public class ReminderRelationShip {
         this.reminderFor = reminderFor;
     }
 
-    public String getType() {
-        return type;
+    public String getReminderAbout() {
+        return reminderAbout;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setReminderAbout(String reminderAbout) {
+        this.reminderAbout = reminderAbout;
     }
 
 

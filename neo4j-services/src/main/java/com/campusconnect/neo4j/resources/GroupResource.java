@@ -44,14 +44,23 @@ public class GroupResource {
         setGroupCreateProperties(group, userId);
         Group createdGroup = groupDao.createGroup(mapGroupWebToNeo4j(group));
         // Todo Add user as admin
-        groupDao.addUser(createdGroup.getId(), userId, AccessRoles.ADMIN.toString(), userId);
+        groupDao.addUser(createdGroup.getId(), userId, AccessRoles.ADMIN.toString(), userId, true);
         return Response.created(null).entity(mapGroupNeo4jToWeb(createdGroup)).build();
     }
 
     @DELETE
-    public Response deleteGroup(String groupId) {
-        groupDao.deleteGroup(groupId);
+    @Path("{groupId}")
+    public Response deleteGroup(@PathParam("groupId") String groupId,@QueryParam("userId") String userId) {
+        groupDao.deleteGroupByAdmin(groupId,userId);
         return Response.ok().build();
+    }
+    
+    @DELETE
+    @Path("{groupId}/users/userId")
+    public Response exitFromGroup(@PathParam("groupId") String groupId ,@PathParam("userId") String userId)
+    {
+    	groupDao.exitFromGroup(groupId,userId);
+    	return Response.ok().build();
     }
 
     @GET
@@ -64,12 +73,14 @@ public class GroupResource {
     @PUT
     @Path("{groupId}")
     public Response updateGroup(@PathParam("groupId") final String groupId,
-                                com.campusconnect.neo4j.types.web.Group group) {
-        //Todo Add the user who updated Group (last updated by)
-        Group groupUpdated = groupDao.updateGroup(groupId, mapGroupWebToNeo4j(group));
-        group.setLastModifiedTime(System.currentTimeMillis());
+                                com.campusconnect.neo4j.types.web.Group group,@QueryParam("userId") String userId) {
+        
+        Group groupUpdated = groupDao.updateGroup(groupId, mapGroupWebToNeo4j(group),userId);
+       
         return Response.created(null).entity(mapGroupNeo4jToWeb(groupUpdated)).build();
     }
+
+  
 
     private com.campusconnect.neo4j.types.web.Group setGroupCreateProperties(com.campusconnect.neo4j.types.web.Group group, String userId) {
         Long createdDate = System.currentTimeMillis();
@@ -84,8 +95,7 @@ public class GroupResource {
     public Response addUser(@PathParam("groupId") final String groupId,
                             @PathParam("userId") final String userId, @QueryParam("role") final String role,
                             @QueryParam("createdBy") final String createdBy) {
-        groupDao.addUser(groupId, userId, role, createdBy);
-        //TODO: Check userId exists or not
+        groupDao.addUser(groupId, userId, role, createdBy, false);
         return Response.created(null).build();
     }
 
@@ -111,7 +121,7 @@ public class GroupResource {
         // Todo CreatedBy is of Admin or Write USER_ACCESS
         for (String userId : userIdsPage.getUserIds()) {
 //            User user = userDao.getUser(userId);
-            groupDao.addUser(groupId, userId, AccessRoles.READ.toString(), createdBy);
+            groupDao.addUser(groupId, userId, AccessRoles.READ.toString(), createdBy, false);
         }
         return Response.ok().build();
     }

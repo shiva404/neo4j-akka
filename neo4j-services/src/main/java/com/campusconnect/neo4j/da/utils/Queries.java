@@ -10,7 +10,6 @@ import static com.campusconnect.neo4j.util.Constants.AVAILABLE;
  * To change this template use File | Settings | File Templates.
  */
 public class Queries {
-
     public static final String GET_FRIEND_REC_ONLY_COUNT = "MATCH (currentUser:User { id: {userId}})-[:CONNECTED*2..2]-(friend_of_friend:User) " +
             "WHERE NOT (currentUser)-[:CONNECTED]-(friend_of_friend) " +
             "RETURN friend_of_friend, COUNT(*) as count " +
@@ -22,7 +21,7 @@ public class Queries {
             "ORDER BY friend_of_friend";
 
     public static final String GET_WISHLIST_REC_FRIENDS = "match(user:User {id:{userId}}) - [:WISH]-(book:Book)-[:OWNS {status: \"AVAILABLE\"}]-(friend:User)\n" +
-            "WHERE (user)-[:CONNECTED]-(friend)" +
+            "WHERE (user)-[:CONNECTED {type:\"FRIEND\"}]-(friend)" +
             "return book, friend";
 
     public static final String GET_WISHLIST_GROUP = "match(user:User {id:{userId}})-[:WISH]-(book:Book)-[:OWNS]-(friend:User)-[:USER_ACCESS]-(group:Group) " +

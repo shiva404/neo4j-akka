@@ -6,8 +6,10 @@ import com.campusconnect.neo4j.akka.goodreads.api.Search;
 import com.campusconnect.neo4j.akka.goodreads.mappers.BookMapper;
 import com.campusconnect.neo4j.akka.goodreads.types.*;
 import com.campusconnect.neo4j.types.neo4j.Book;
+import com.campusconnect.neo4j.util.ErrorCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.social.InternalServerErrorException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,8 +77,13 @@ public class GoodreadsDao {
         return searchBooks;
     }
 
-    public Book getBookById(String goodreadsId) throws IOException {
-        GetBookResponse getBookResponse = getBook.getBookById(goodreadsId);
+    public Book getBookById(String goodreadsId) {
+        GetBookResponse getBookResponse;
+        try {
+            getBookResponse = getBook.getBookById(goodreadsId);
+        } catch (IOException e) {
+            throw new InternalServerErrorException(ErrorCodes.INTERNAL_SERVER_ERROR, "Error while getting book from goodreads for Id:" + goodreadsId);
+        }
         return BookMapper.getBookFromGoodreadsBook(getBookResponse.getBook());
     }
 

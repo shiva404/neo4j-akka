@@ -7,7 +7,6 @@ import com.campusconnect.neo4j.da.utils.EventHelper;
 import com.campusconnect.neo4j.da.utils.TargetHelper;
 import com.campusconnect.neo4j.repositories.AddressRepository;
 import com.campusconnect.neo4j.types.common.AuditEventType;
-import com.campusconnect.neo4j.types.common.IdType;
 import com.campusconnect.neo4j.types.common.Target;
 import com.campusconnect.neo4j.types.neo4j.Address;
 import com.campusconnect.neo4j.types.neo4j.User;
@@ -16,8 +15,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.PartialCacheKey;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
-import com.campusconnect.neo4j.util.*;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -63,7 +60,7 @@ public class AddressDaoImpl implements AddressDao {
         try {
             Long currentTime = System.currentTimeMillis();
 
-           Target target = TargetHelper.createTargetToUser(userDao.getUser(userId));
+            Target target = TargetHelper.createUserTarget(userDao.getUser(userId));
             Event updatedAddressUserEvent = EventHelper.createPrivateEvent(AuditEventType.UPDATED_ADDRESS.toString(), target);
             auditEventDao.addEvent(userId, updatedAddressUserEvent);
 
@@ -77,9 +74,9 @@ public class AddressDaoImpl implements AddressDao {
     @Override
     @TriggersRemove(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public void deleteAddress(String addressId, @PartialCacheKey String userId) {
-    	
+
         addressRepository.delete(Long.parseLong(addressId));
-        Target target = TargetHelper.createTargetToUser(userDao.getUser(userId));
+        Target target = TargetHelper.createUserTarget(userDao.getUser(userId));
         Event event = EventHelper.createPrivateEvent(AuditEventType.DELETED_ADDRESS.toString(), target);
         auditEventDao.addEvent(userId, event);
     }

@@ -32,8 +32,6 @@ public interface UserDao {
 
     User updateUser(String userId, User user,boolean addEvent);
 
-    void setReminder(ReminderRelationShip reminderRelationShip);
-
     User getUserByGoodreadsId(String goodreadsId);
 
     User getUserByGoogleId(String googleId);
@@ -65,4 +63,7 @@ public interface UserDao {
     List<FriendRecommendation> getFriendsRecWithFriends(String userId, String size);
 
     void deleteUser(String userId);
+
+	void setReminder(ReminderRelationShip reminderRelationShip,
+			boolean sendNotificationAddEvent);
 }

@@ -26,7 +26,7 @@ public interface BookDao {
     @Transactional
     void updateOwnedBookStatus(User user, Book book, String status, String userComment);
 
-    void addBookToBorrower(User borrower, Book book, BorrowRequest borrowRequest);
+    void addBookToBorrower(Book book, BorrowRequest borrowRequest);
 
     void updateBookStatusOnAgreement(User user, Book book, User borrower, String userComment);
 
@@ -48,7 +48,7 @@ public interface BookDao {
 
     Book getBookByIsbn(String isbn) throws IOException;
 
-    Book getBooksRelatedUser(String bookId, String userId);
+    Book getBookRelatedUser(String bookId, String userId);
 
     Book getBookByGoodreadsIdWithUser(Integer goodreadsId, String userId);
 
@@ -88,4 +88,7 @@ public interface BookDao {
     void updateBookReturnToAgreed(String bookId, String status, String ownerId, String borrowerId, String comment);
 
     void updateBookReturnToSuccess(String bookId, String status, String ownerId, String borrowerId, String comment);
+
+    List<Book> getWishListBooksWithRec(String userId);
+
 }

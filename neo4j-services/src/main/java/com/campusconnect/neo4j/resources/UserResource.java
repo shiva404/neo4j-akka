@@ -4,7 +4,7 @@ import com.campusconnect.neo4j.da.FBDao;
 import com.campusconnect.neo4j.da.GoodreadsDao;
 import com.campusconnect.neo4j.da.GroupDao;
 import com.campusconnect.neo4j.da.iface.*;
-import com.campusconnect.neo4j.exceptions.InvalidInputDataException;
+import com.campusconnect.neo4j.exceptions.InvalidDataException;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.types.common.GoodreadsAuthStatus;
 import com.campusconnect.neo4j.types.neo4j.Address;
@@ -34,7 +34,7 @@ import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.*;
 import static com.campusconnect.neo4j.mappers.WebToNeo4jMapper.mapAddressWebToNeo4j;
 import static com.campusconnect.neo4j.mappers.WebToNeo4jMapper.mapUserWebToNeo4j;
 import static com.campusconnect.neo4j.util.Constants.*;
-import static com.campusconnect.neo4j.util.ErrorCodes.INVALId_ARGMENTS;
+import static com.campusconnect.neo4j.util.ErrorCodes.INVALID_ARGUMENTS;
 
 /**
  * Created by sn1 on 1/22/15.
@@ -54,11 +54,11 @@ public class UserResource {
     private NotificationDao notificationDao;
     private GroupDao groupDao;
 
-
     public UserResource() {
     }
 
     public UserResource(UserDao userDao, BookDao bookDao, FBDao fbDao, GoodreadsDao goodreadsDao, AddressDao addressDao, ReminderDao reminderDao, AuditEventDao auditEventDao, NotificationDao notificationDao, GroupDao groupDao) {
+
         this.userDao = userDao;
         this.bookDao = bookDao;
         this.fbDao = fbDao;
@@ -76,8 +76,9 @@ public class UserResource {
                                final com.campusconnect.neo4j.types.web.User userPayload) throws URISyntaxException {
 
         StringBuffer validateUserDataMessage = Validator.validateUserObject(userPayload);
+
         if (null != validateUserDataMessage) {
-            throw new InvalidInputDataException(INVALId_ARGMENTS, validateUserDataMessage.toString());
+            throw new InvalidDataException(INVALID_ARGUMENTS, validateUserDataMessage.toString());
         }
 
         User user = mapUserWebToNeo4j(userPayload);
@@ -97,6 +98,7 @@ public class UserResource {
                 return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
             }
         }
+
         if (user.getFbId() != null) {
             User existingUser = userDao.getUserByFbId(user.getFbId());
             if (null != existingUser) {
@@ -112,6 +114,7 @@ public class UserResource {
                 return Response.created(new URI("/users/" + returnUser.getId())).entity(returnUser).build();
             }
         }
+
         addPropertiesForCreate(user);
         User createdUser = userDao.createUser(user, accessToken);
         com.campusconnect.neo4j.types.web.User returnUser = mapUserNeo4jToWeb(createdUser);
@@ -263,7 +266,9 @@ public class UserResource {
 
     @GET
     @Path("{userId}/books")
-    public Response getBooks(@PathParam("userId") final String userId, @QueryParam(FILTER_QPARAM) String filter) throws Exception {
+    public Response getBooks(@PathParam("userId") final String userId,
+                             @QueryParam(FILTER_QPARAM) String filter,
+                             @QueryParam(LOGGED_IN_USER_QPARAM) String loggedInUser) throws Exception {
         if (filter == null) {
             throw new Exception("filer is null");
         }
@@ -295,13 +300,16 @@ public class UserResource {
                 return Response.ok().entity(borrowedBooksPage).build();
             case WISHLIST_RELATION:
                 List<com.campusconnect.neo4j.types.web.Book> wishListBooks = getWebBooks(bookDao.getWishlistBooksWithDetails(userId));
-                BooksPage wishListBooksPage = new BooksPage(0, wishListBooks.size(), wishListBooks);
+                BooksPage wishListBooksPage = new BooksPage(wishListBooks.size(), 0, wishListBooks);
                 return Response.ok().entity(wishListBooksPage).build();
             case CURRENTLY_READING_RELATION:
                 List<CurrentlyReadingBook> currentlyReadingBooks = bookDao.getCurrentlyReadingBook(userId);
                 CurrentlyReadingBooksPage currentlyReadingBooksPage = new CurrentlyReadingBooksPage(0, currentlyReadingBooks.size(), currentlyReadingBooks);
                 return Response.ok().entity(currentlyReadingBooksPage).build();
-
+            case WISHLIST_WITH_REC:
+                List<com.campusconnect.neo4j.types.web.Book> wishListBooksWithRec = getWebBooks(bookDao.getWishListBooksWithRec(userId));
+                BooksPage wishListBooksRecPage = new BooksPage(wishListBooksWithRec.size(), 0, wishListBooksWithRec);
+                return Response.ok().entity(wishListBooksRecPage).build();
             case ALL:
                 List<Book> allBooks = bookDao.getAllUserBooks(userId);
                 AllBooks resultBooks = new AllBooks();
@@ -383,9 +391,7 @@ public class UserResource {
     @Path("{userId}/friend/{friendUserId}")
     public Response addFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId) {
         userDao.createFriendRelationWithPending(userDao.getUser(userId), userDao.getUser(friendUserId));
-        //TODO: Should event be added ??
         return Response.ok().build();
-        //  return null;
     }
 
     @PUT
@@ -393,8 +399,6 @@ public class UserResource {
     public Response confirmFriend(@PathParam("userId") final String userId, @PathParam("friendUserId") final String friendUserId, @QueryParam(STATUS_QPARAM) final String status) {
         if (status.toLowerCase().equals("agreed")) {
             userDao.confirmFriendRelation(userDao.getUser(userId), userDao.getUser(friendUserId));
-            //TODO:notification to user about acceptance
-
         } else if (status.toLowerCase().equals("cancel")) {
             userDao.deleteFriendRequest(userId, friendUserId, Constants.FRIEND_REQUEST_CANCEL_DELETE);
         }
@@ -464,36 +468,38 @@ public class UserResource {
         Reminder createdReminder = reminderDao.createReminder(reminder);
         User reminderForUser = userDao.getUser(userId);
         Long currentTime = System.currentTimeMillis();
-        ReminderRelationShip reminderRelationShip = new ReminderRelationShip(
+        ReminderRelationShip reminderRelationShipFor = new ReminderRelationShip(
                 createdBy, currentTime, reminderForUser, currentTime,
-                reminderAbout, reminder);
-        userDao.setReminder(reminderRelationShip);
+                reminderAbout, reminder, Constants.RECEIVED_REMINDER_TYPE);
+        ReminderRelationShip reminderRelationShipBy = new ReminderRelationShip(reminderForUser.toString(), currentTime, userDao.getUser(createdBy), currentTime,
+                reminderAbout, reminder, Constants.SENT_REMINDER_TYPE);
+        userDao.setReminder(reminderRelationShipFor, true);
+        userDao.setReminder(reminderRelationShipBy, false);
         return Response.created(null).entity(createdReminder).build();
-        //TODO : change reminder flow
-
-
     }
 
-    @PUT
-    @Path("{userId}/reminders/{reminderId}")
-    public Response updateReminder(Reminder reminder, @PathParam("userId") final String userId, @PathParam("reminderId") final String reminderId) {
-        Reminder updatedReminder = reminderDao.updateReminder(reminderId, reminder);
-        return Response.ok().entity(updatedReminder).build();
-    }
+//    @PUT
+//    @Path("{userId}/reminders/{reminderId}")
+//    public Response updateReminder(Reminder reminder, @PathParam("userId") final String userId, @PathParam("reminderId") final String reminderId) {
+//        Reminder updatedReminder = reminderDao.updateReminder(reminderId, reminder,userId);
+//        return Response.ok().entity(updatedReminder).build();
+//    }
 
     @DELETE
     @Path("{userId}/reminders/{reminderId}")
     public Response deleteReminder(@PathParam("userId") final String userId, @PathParam("reminderId") final String reminderId) {
-        reminderDao.deleteReminder(reminderId);
+        reminderDao.deleteReminder(reminderId, userId);
+        //TODO : Should event/Notification be added ??
         return Response.ok().build();
     }
 
     @GET
     @Path("{userId}/reminders/{reminderId}")
-    public Response getReminder(@PathParam("userId") final String userId, @PathParam("reminderId") final String reminderId) {
+    public Response getSingleReminder(@PathParam("userId") final String userId, @PathParam("reminderId") final String reminderId) {
         Reminder reminder = reminderDao.getReminder(reminderId);
         return Response.ok().entity(reminder).build();
     }
+
 
     @GET
     @Path("{googleId}/googleId")
@@ -509,8 +515,8 @@ public class UserResource {
 
     @GET
     @Path("{userId}/reminders")
-    public Response getAllReminders(@PathParam("userId") final String userId) {
-        final List<Reminder> reminders = reminderDao.getAllReminders(userId);
+    public Response getReminders(@PathParam("userId") final String userId, @QueryParam("filter") @DefaultValue("all") final String filter) {
+        final List<Reminder> reminders = reminderDao.getReminders(userId, filter);
         ReminderPage reminderPage = new ReminderPage(0, reminders.size(), reminders);
         return Response.ok().entity(reminderPage).build();
     }
@@ -534,7 +540,8 @@ public class UserResource {
 
     @GET
     @Path("{userId}/notifications")
-    public Response getNotifications(@PathParam("userId") final String userId, @QueryParam(FILTER_QPARAM) @DefaultValue(FRESH_NOTIFICATION_TYPE) final String filter) {
+    public Response getNotifications(@PathParam("userId") final String userId,
+                                     @QueryParam(FILTER_QPARAM) @DefaultValue(FRESH_NOTIFICATION_TYPE) final String filter) {
         //AuditEvent auditEvent = auditEventDao.getEvents(userId);
         List<Notification> notifications = notificationDao.getNotifications(userId, filter);
         NotificationPage notificationPage = new NotificationPage(0, notifications.size(), notifications);

@@ -18,7 +18,6 @@ public class FriendRecommendationsPage {
     }
 
     public List<FriendRecommendation> getFriendRecommendations() {
-
         return friendRecommendations;
     }
 

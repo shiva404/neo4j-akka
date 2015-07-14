@@ -24,3 +24,9 @@ WHERE (user)-[:USER_ACCESS]-(group)
 return book,friend,group
 
 
+
+match(user:User {id:{userId}})-[:WISH]-(book:Book)-[:OWNS]-(friend:User)-[:USER_ACCESS]-(group:Group) " +
+            "WHERE (user)-[:USER_ACCESS]-(group) " +
+            "return book,friend,group
+
+

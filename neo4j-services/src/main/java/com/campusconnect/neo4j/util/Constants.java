@@ -21,14 +21,16 @@ public class Constants {
     public static final String NOTIFICATION_RELATION = "NOTIFICATION";
     public static final String CONNECTED_RELATION = "CONNECTED";
     public static final String WISHLIST_RELATION = "WISH";
+    public static final String WISHLIST_WITH_REC = "WISH_REC";
 
     public static final String FRIEND_REQ_SENT = "FRIEND_REQ_SENT";
     public static final String FRIEND_REQ_APPROVAL_PENDING = "FRIEND_REQ_APPROVAL_PENDING";
     public static final String ADDRESS_TYPE_HOME = "HOME";
     public static final String ADDRESS_TYPE_WORK = "WORK";
     public static final String ADDRESS_TYPE_OTHER = "OTHER";
-    public static final String FRIEND_REQUEST_SENT_NOTIFICATION = "FRIEND_REQUEST_SENT";
-    public static final String FRIEND_REQUEST_ACCEPTED_NOTIFICATION = "FRIEND_REQUEST_ACCEPTED";
+    public static final String FRIEND_REQUEST_SENT_NOTIFICATION_TYPE = "FRIEND_REQUEST_SENT";
+    public static final String FRIEND_REQUEST_ACCEPTED_NOTIFICATION_TYPE = "FRIEND_REQUEST_ACCEPTED";
+    public static final String GROUP_DELETED_NOTIFICATION_TYPE = "Group Deleted";
 
     public static final String AVAILABLE = "AVAILABLE";
     public static final String PRIVATE = "PRIVATE";
@@ -86,6 +88,14 @@ public class Constants {
     public static final String BORROWER_ID_QPARAM = "borrowerId";
 
     public static final String REMINDER_CREATED_NOTIFICATION_TYPE = "REMINDER_CREATED";
+	public static final String RECEIVED_REMINDER_TYPE = "Received";
+	public static final String SENT_REMINDER_TYPE = "Sent";
+
+	public static final String GROUP_ADMIN_ROLE = "admin";
+	public static final String GROUP_MEMBER_ROLE = "member";
+	public static final String GROUP_MEMBER_ADDED = "group memner added";
+	public static final String GROUP_ADMIN_NOTIFICATION = "Group admin added";
+	public static final String RETURN_INIT_NOTIFICATION_TYPE = "Book retun initiated";
 
 
 }

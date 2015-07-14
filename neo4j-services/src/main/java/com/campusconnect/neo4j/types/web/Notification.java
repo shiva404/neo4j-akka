@@ -11,12 +11,24 @@ public class Notification {
     private Long timeStamp;
     private String type;
 
+    @Deprecated
+    private String actionString;
+
     public Notification() {
         super();
     }
 
+    @Deprecated
+    public String getActionString() {
+        return actionString;
+    }
 
-	public Notification(Target target, Long timeStamp,String type) {
+    @Deprecated
+    public void setActionString(String actionString) {
+        this.actionString = actionString;
+    }
+
+    public Notification(Target target, Long timeStamp, String type) {
         super();
         this.target = target;
         this.timeStamp = timeStamp;
@@ -24,7 +36,7 @@ public class Notification {
     }
 
 
-	public Target getTarget() {
+    public Target getTarget() {
         return target;
     }
 
@@ -34,8 +46,8 @@ public class Notification {
     }
 
     public String getType() {
-		return type;
-	}
+        return type;
+    }
 
     public void setTarget(Target target) {
         this.target = target;
@@ -46,8 +58,8 @@ public class Notification {
     }
 
     public void setType(String type) {
-		this.type = type;
-	}
+        this.type = type;
+    }
 
 
 }

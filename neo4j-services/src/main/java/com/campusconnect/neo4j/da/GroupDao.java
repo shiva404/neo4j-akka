@@ -47,8 +47,12 @@ public class GroupDao {
 
     private Neo4jTemplate neo4jTemplate;
 
+    String SEARCH_STRING = "(?i)%1$s.*";
+
     @Autowired
     NotificationDao notificationDao;
+
+    
 
     public GroupDao(Neo4jTemplate neo4jTemplate) {
         this.neo4jTemplate = neo4jTemplate;
@@ -96,6 +100,11 @@ public class GroupDao {
 
     public List<Group> getGroups(String userId) {
         return groupRepository.getGroups(userId);
+    }
+
+    public List<Group> searchGroups(String searchString) {
+        List<Group> groups = groupRepository.searchGroups(String.format(SEARCH_STRING, searchString));
+        return groups;
     }
 
     public List<GroupMember> getMembers(String groupId, String loggedInUser) {

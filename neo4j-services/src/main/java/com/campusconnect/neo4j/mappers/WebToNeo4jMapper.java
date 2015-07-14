@@ -45,7 +45,7 @@ public class WebToNeo4jMapper {
     public static Group mapGroupWebToNeo4j(com.campusconnect.neo4j.types.web.Group group) {
         if (group == null)
             return null;
-        return new Group(group.getId(), group.getName(), group.getCreatedDate(), group.getLastModifiedTime(), group.getLastModifiedBy(),group.getPublic());
+        return new Group(group.getId(), group.getName(), group.getCreatedDate(), group.getLastModifiedTime(), group.getLastModifiedBy(),group.getisPublic());
     }
 
     public static Reminder mapReminderWebToNeo4j(com.campusconnect.neo4j.types.web.Reminder reminder) {

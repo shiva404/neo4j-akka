@@ -18,6 +18,9 @@ public interface GroupRepository extends GraphRepository<Group> {
     @Query("match (user:User {id:{0}})-[:USER_ACCESS]-(groups:Group) return groups")
     public List<Group> getGroups(String userId);
 
+    @Query("match (n:Group) WHERE n.name =~ {0} AND n.isPublic='true' return n")
+    public List<Group> searchGroups(String searchString);
+
     @Query("match (books:Book)-[:OWNS]-(users:User)-[:USER_ACCESS]-(group:Group) return books")
     public List<Book> getAvailableBooks(String groupId);
 

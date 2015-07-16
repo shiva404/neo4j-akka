@@ -1,6 +1,7 @@
 package com.campusconnect.neo4j.types.neo4j;
 
 
+import org.neo4j.cypher.internal.compiler.v2_0.functions.Str;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -21,9 +22,9 @@ public class Group {
     private String id;
     private String name;
 
-    private boolean isPublic;
+    private String isPublic;
 
-    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy, boolean isPublic) {
+    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy, String isPublic) {
         this.id = id;
         this.name = name;
         this.createdDate = createdDate;
@@ -51,12 +52,12 @@ public class Group {
         this.name = name;
         this.createdDate = createdDate;
     }
-    public Group(String name, boolean isPublic) {
+    public Group(String name, String isPublic) {
         this.name = name;
         this.isPublic = isPublic;
     }
 
-    public Group(String name, Long createdDate, boolean isPublic) {
+    public Group(String name, Long createdDate, String isPublic) {
 
         this.name = name;
         this.createdDate = createdDate;
@@ -115,9 +116,9 @@ public class Group {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public void setPublic(boolean isPublic) { this.isPublic = isPublic; }
+    public void setisPublic(String isPublic) { this.isPublic = isPublic; }
 
-    public boolean getPublic() { return  isPublic; }
+    public String getisPublic() { return  isPublic; }
 
     @Override
     public String toString() {

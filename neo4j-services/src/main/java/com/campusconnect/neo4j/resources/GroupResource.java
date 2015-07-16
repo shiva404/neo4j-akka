@@ -8,10 +8,7 @@ import com.campusconnect.neo4j.types.common.AccessRoles;
 import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.Group;
 import com.campusconnect.neo4j.types.neo4j.User;
-import com.campusconnect.neo4j.types.web.BooksPage;
-import com.campusconnect.neo4j.types.web.GroupMember;
-import com.campusconnect.neo4j.types.web.GroupMembersPage;
-import com.campusconnect.neo4j.types.web.UserIdsPage;
+import com.campusconnect.neo4j.types.web.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -21,6 +18,7 @@ import java.util.UUID;
 
 import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.mapGroupNeo4jToWeb;
 import static com.campusconnect.neo4j.mappers.WebToNeo4jMapper.mapGroupWebToNeo4j;
+import static com.campusconnect.neo4j.util.Constants.SEARCH_QPARAM;
 
 @Path("/groups")
 @Consumes("application/json")
@@ -68,6 +66,17 @@ public class GroupResource {
     public Response getGroup(@PathParam("groupId") final String groupId) {
         Group group = groupDao.getGroup(groupId);
         return Response.ok().entity(mapGroupNeo4jToWeb(group)).build();
+    }
+
+    @GET
+    @Path("{userId}/search")
+    public Response searchGroups(@PathParam("userId") String userId, @QueryParam(SEARCH_QPARAM) String searchString) {
+        List<Group> groups = groupDao.searchGroups(searchString);
+        List<com.campusconnect.neo4j.types.web.Group> returnGroups = new ArrayList<>(groups.size());
+        for (Group grp : groups) {
+            returnGroups.add(Neo4jToWebMapper.mapGroupNeo4jToWeb(grp));
+        }
+        return Response.ok().entity(new GroupPage(returnGroups,0, returnGroups.size())).build();
     }
 
     @PUT

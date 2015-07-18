@@ -104,8 +104,8 @@ public class BookResource {
         }
         Long now = System.currentTimeMillis();
 
-        //TODO: Should event/notification be added 
-      
+        //TODO: Should event/notification be added
+
         switch (listingType.toUpperCase()) {
 	            case OWNS_RELATION:
 	                if (status == null) {
@@ -134,7 +134,6 @@ public class BookResource {
         
         return Response.ok().build();
     }
-
 
     @POST
     @Path("{bookId}/borrow")

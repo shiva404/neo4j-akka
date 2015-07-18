@@ -8,12 +8,16 @@ import com.campusconnect.neo4j.types.common.IdType;
 import com.campusconnect.neo4j.types.neo4j.AuditEvent;
 import com.campusconnect.neo4j.types.web.Event;
 import com.campusconnect.neo4j.types.web.Subject;
+import com.campusconnect.neo4j.util.Constants;
 import com.campusconnect.neo4j.util.EventDisplayStrings;
 import com.campusconnect.neo4j.util.comparator.TimeStampComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.*;
+
+import static com.campusconnect.neo4j.types.common.AuditEventType.*;
+import static com.campusconnect.neo4j.util.EventDisplayStrings.*;
 
 public class AuditEventDaoImpl implements AuditEventDao {
 
@@ -22,7 +26,6 @@ public class AuditEventDaoImpl implements AuditEventDao {
 
     public AuditEventDaoImpl() {
     }
-
 
     @Override
     public AuditEvent saveEvent(AuditEvent auditEvent) {
@@ -65,14 +68,13 @@ public class AuditEventDaoImpl implements AuditEventDao {
 
     @Override
     public List<Event> getFeedEvents(String userId) throws IOException {
-        List<AuditEvent> followersAuditEvents = auditEventRepository.getAuditEventsForFollowers(userId);
+//        List<AuditEvent> followersAuditEvents = auditEventRepository.getAuditEventsForFollowers(userId);
         List<AuditEvent> friendsAuditEvents = auditEventRepository.getAuditEventsForFriends(userId);
         Map<Long, AuditEvent> mergedEvents = new HashMap<>();
 
-        for (AuditEvent auditEvent : followersAuditEvents) {
-
-            mergedEvents.put(auditEvent.getNodeId(), auditEvent);
-        }
+//        for (AuditEvent auditEvent : followersAuditEvents) {
+//            mergedEvents.put(auditEvent.getNodeId(), auditEvent);
+//        }
 
         for (AuditEvent auditEvent : friendsAuditEvents) {
             mergedEvents.put(auditEvent.getNodeId(), auditEvent);
@@ -85,7 +87,9 @@ public class AuditEventDaoImpl implements AuditEventDao {
                 Event event = EventHelper.deserializeEventString(eventString);
                 if (event.isPublic()) {
                     setEventStrings(event);
-
+                    if(event.getTarget().getIdType().equals(IdType.BOOK_ID.toString())){
+                        //TODO: attach a book
+                    }
                     event.setSubject(new Subject(IdType.USER_ID.toString(), auditEvent.getUserName(), "/users/" + auditEvent.getUserId(), auditEvent.getImageUrl()));
                     events.add(event);
                 }
@@ -97,24 +101,52 @@ public class AuditEventDaoImpl implements AuditEventDao {
     }
 
     private void setEventStrings(Event event) {
-        if (event.getAuditEventType().equals(AuditEventType.FRIEND.toString())) {
-            event.setEventActionString(EventDisplayStrings.FRIEND_EVENT_STRING);
-        } else if (event.getAuditEventType().equals(AuditEventType.FOLLOWING.toString())) {
-            event.setEventActionString(EventDisplayStrings.FOLLOWING_EVENT_STRING);
-        } else if (event.getAuditEventType().equals(AuditEventType.ADDED_ADDRESS.toString())) {
-            event.setEventActionString(EventDisplayStrings.ADDED_ADDRESS_EVENT_STRING);
-        } else if (event.getAuditEventType().equals(AuditEventType.BORROWED.toString())) {
-            event.setEventActionString(EventDisplayStrings.BORROWED_EVENT_STRING);
-        } else if (event.getAuditEventType().equals(AuditEventType.USER_CREATED.toString())) {
-            event.setEventActionString(EventDisplayStrings.CREATED_EVENT_STRING);
-        } else if (event.getAuditEventType().equals(AuditEventType.FOLLOWED.toString())) {
-            event.setEventActionString(EventDisplayStrings.FOLLOWED_EVENT_STRING);
-        } else if (event.getAuditEventType().equals(AuditEventType.UPDATED_ADDRESS.toString())) {
-            event.setEventActionString(EventDisplayStrings.UPDATED_ADDRESS_EVENT_STRING);
-        } else if (event.getAuditEventType().equals(AuditEventType.USER_UPDATED.toString())) {
-            event.setEventActionString(EventDisplayStrings.USER_UPDATED_EVENT_STRING);
-        } else if (event.getAuditEventType().equals(AuditEventType.WISHLIST.toString())) {
-            event.setEventActionString(EventDisplayStrings.WISHLIST_EVENT_STRING);
+        switch (event.getAuditEventType()){
+            case ADDED_ADDRESS:
+                break;
+
+            case BOOK_ADDED_CURRENTLY_READING:
+                break;
+
+            case FRIEND:
+                event.setEventActionString(FRIEND_EVENT_STRING);
+                break;
+            case FOLLOWING:
+                break;
+
+            case BOOK_ADDED_OWNS:
+                event.setEventActionString(OWNS_EVENT_STRING);
+                break;
+            case BOOK_ADDED_READ:
+                event.setEventActionString(READ_EVENT_STRING);
+                break;
+            case BOOK_ADDED_WISHLIST:
+                event.setEventActionString(WISHLIST_EVENT_STRING);
+                break;
+
+            case DELETED_ADDRESS:
+                break;
+
+            case LENT:
+                event.setEventActionString(LENT_EVENT_STRING);
+                break;
+
+            case REMINDER_SENT:
+                break;
+
+            case RETURN_INITIATED:
+                break;
+
+            case UPDATED_ADDRESS:
+                break;
+
+            case USER_CREATED:
+                break;
+
+            case USER_UPDATED:
+                break;
+
+            default:
         }
     }
 

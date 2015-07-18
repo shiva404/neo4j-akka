@@ -9,11 +9,9 @@ import com.campusconnect.neo4j.da.iface.UserDao;
 import com.campusconnect.neo4j.da.mapper.DBMapper;
 import com.campusconnect.neo4j.da.utils.EventHelper;
 import com.campusconnect.neo4j.da.utils.HistoryEventHelper;
-import com.campusconnect.neo4j.da.utils.NotificationHelper;
 import com.campusconnect.neo4j.da.utils.Queries;
 import com.campusconnect.neo4j.da.utils.TargetHelper;
 import com.campusconnect.neo4j.exceptions.Neo4jException;
-import com.campusconnect.neo4j.exceptions.DuplicateDataException;
 import com.campusconnect.neo4j.exceptions.NotFoundException;
 import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.repositories.BookRepository;
@@ -512,16 +510,13 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public Book getBookRelatedUser(String bookId, String userId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        params.put("bookId", bookId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query("match(book:Book {id: {bookId}}) - [relation] - (user:User {id: {userId}}) return relation, book", params);
-        //todo throw not found
-        List<Book> books = getBookFromMapResult(mapResult, userId);
-        if (books.size() > 0) {
-            return books.get(0);
-        } else
-            return null;
+        List<Book> allUserBooks = getAllUserBooks(userId);
+        for(Book book: allUserBooks){
+            if(book.getId().equals(bookId)){
+                return book;
+            }
+        }
+        return getBook(bookId);
     }
 
     @Override
@@ -538,17 +533,15 @@ public class BookDaoImpl implements BookDao {
     @Override
     public Book getBookByGoodreadsIdWithUser(Integer goodreadsId, String userId) {
         //Make sure book already exists in DB:
-        getBookByGoodreadsId(goodreadsId);
-        Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        params.put("goodreadsId", goodreadsId);
-        Result<Map<String, Object>> mapResult = neo4jTemplate.query(GET_BOOK_BY_GRID_USER_QUERY, params);
-        //todo throw not found
-        List<Book> books = getBookFromMapResult(mapResult, userId);
-        if (books.size() > 0) {
-            return books.get(0);
-        } else
-            return null;
+        Book bookByGoodreadsId = getBookByGoodreadsId(goodreadsId);
+        List<Book> allUserBooks = getAllUserBooks(userId);
+        for(Book book: allUserBooks){
+            if(book.getGoodreadsId().equals(goodreadsId)){
+                return book;
+            }
+        }
+
+        return bookByGoodreadsId;
     }
 
     private List<Book> getBookFromMapResult(Result<Map<String, Object>> mapResult, String userId) {
@@ -772,7 +765,7 @@ public class BookDaoImpl implements BookDao {
     		{
     			neo4jTemplate.save(currentlyReadingRelationship);
     			Target target = TargetHelper.createBookTarget(currentlyReadingRelationship.getBook());
-        		Event event = EventHelper.createPublicEvent(AuditEventType.BOOK_ADDED_CURRENTLYREADING.toString(), target);
+        		Event event = EventHelper.createPublicEvent(AuditEventType.BOOK_ADDED_CURRENTLY_READING.toString(), target);
         		auditEventDao.addEvent(currentlyReadingRelationship.getUser().getId(), event);
     		}
     }

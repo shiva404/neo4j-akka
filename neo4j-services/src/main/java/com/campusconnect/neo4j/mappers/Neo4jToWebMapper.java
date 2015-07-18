@@ -41,7 +41,7 @@ public class Neo4jToWebMapper {
         if (book == null)
             return null;
         Book webBook = new Book(book.getId(), book.getGoodreadsId(), book.getAuthorName(), book.getGoodreadsAuthorId(), book.getName(), book.getIsbn(), book.getIsbn13(),
-                book.getPublishedYear(), book.getDescription(), book.getPublisher(), book.getNumberOfPages(), book.getImageUrl());
+                book.getPublishedYear(), book.getDescription(), book.getPublisher(), book.getNumberOfPages(), book.getImageUrl(), book.getNodeId());
 
         webBook.setBookType(book.getBookType());
         if (book.getBookType() != null && book.getBookDetails() != null) {

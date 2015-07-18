@@ -33,7 +33,7 @@ public class WebToNeo4jMapper {
         if (book == null)
             return null;
         return new Book(book.getId(), book.getGoodreadsId(), book.getAuthorName(), book.getGoodreadsAuthorId(), book.getName(), book.getIsbn(), book.getIsbn13(),
-                book.getPublishedYear(), book.getDescription(), book.getPublisher(), book.getNumberOfPages(), book.getImageUrl());
+                book.getPublishedYear(), book.getDescription(), book.getPublisher(), book.getNumberOfPages(), book.getImageUrl(), book.getNodeId());
     }
 
     public static Favourite mapFavouriteWebToNeo4j(com.campusconnect.neo4j.types.web.Favourite favourite) {

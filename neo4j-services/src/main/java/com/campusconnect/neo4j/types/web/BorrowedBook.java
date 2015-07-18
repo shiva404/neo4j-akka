@@ -23,7 +23,7 @@ public class BorrowedBook extends Book implements Serializable {
     public BorrowedBook(Book book) {
         super(book.getId(), book.getGoodreadsId(), book.getAuthorName(), book.getGoodreadsAuthorId(), book.getName(),
                 book.getIsbn(), book.getIsbn13(), book.getPublishedYear(), book.getDescription(), book.getPublisher(),
-                book.getNumberOfPages(), book.getImageUrl());
+                book.getNumberOfPages(), book.getImageUrl(), book.getNodeId());
         setBookType(book.getBookType());
     }
 

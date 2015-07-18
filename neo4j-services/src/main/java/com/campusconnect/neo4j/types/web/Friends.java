@@ -28,5 +28,4 @@ public class Friends {
     public void setMutualFriends(FriendsPage mutualFriends) {
         this.mutualFriends = mutualFriends;
     }
-
 }

@@ -142,16 +142,20 @@ public class BookDaoImpl implements BookDao {
         //todo: merge the result to single id
 //        wishlistRecOnFriends.addAll(wishlistRecOnGroups);
         List<Book> mergeWishList = new ArrayList<>();
-        for (Book wishListFriend : wishlistRecOnFriends){
-            for (Iterator<Book> iterator = wishlistRecOnGroups.iterator(); iterator.hasNext(); ) {
-                Book wishListGroup = iterator.next();
-                if(wishListFriend.getId().equals(wishListGroup.getId())){
-                    WishlistBookDetails wishlistBookDetailsFriendRec = (WishlistBookDetails) wishListFriend.getBookDetails();
-                    WishlistBookDetails wishlistBookDetailsGroupRec = (WishlistBookDetails) wishListGroup.getBookDetails();
-                    wishlistBookDetailsFriendRec.getGroupsWithMembers().addAll(wishlistBookDetailsGroupRec.getGroupsWithMembers());
-                    iterator.remove();
+        if(wishlistRecOnGroups.isEmpty()){
+            mergeWishList.addAll(wishlistRecOnFriends);
+        } else {
+            for (Book wishListFriend : wishlistRecOnFriends){
+                for (Iterator<Book> iterator = wishlistRecOnGroups.iterator(); iterator.hasNext(); ) {
+                    Book wishListGroup = iterator.next();
+                    if(wishListFriend.getId().equals(wishListGroup.getId())){
+                        WishlistBookDetails wishlistBookDetailsFriendRec = (WishlistBookDetails) wishListFriend.getBookDetails();
+                        WishlistBookDetails wishlistBookDetailsGroupRec = (WishlistBookDetails) wishListGroup.getBookDetails();
+                        wishlistBookDetailsFriendRec.getGroupsWithMembers().addAll(wishlistBookDetailsGroupRec.getGroupsWithMembers());
+                        iterator.remove();
+                    }
+                    mergeWishList.add(wishListFriend);
                 }
-                mergeWishList.add(wishListFriend);
             }
         }
         //add all remaining books

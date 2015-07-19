@@ -23,8 +23,6 @@ match(user:User {id:"4eb9557f-618e-418e-aabe-ce16341505d0"})-[:WISH]-(book:Book)
 WHERE (user)-[:USER_ACCESS]-(group)
 return book,friend,group
 
-
-
 match(user:User {id:{userId}})-[:WISH]-(book:Book)-[:OWNS]-(friend:User)-[:USER_ACCESS]-(group:Group) " +
             "WHERE (user)-[:USER_ACCESS]-(group) " +
             "return book,friend,group

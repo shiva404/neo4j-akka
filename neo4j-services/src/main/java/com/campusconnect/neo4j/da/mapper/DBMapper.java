@@ -168,6 +168,9 @@ public class DBMapper {
             case CURRENTLY_READING_RELATION:
                 book.setBookType(CURRENTLY_READING_RELATION);
                 break;
+            default:
+                book.setBookType("NONE");
+                break;
         }
         return book;
     }

@@ -17,6 +17,7 @@ import com.campusconnect.neo4j.mappers.Neo4jToWebMapper;
 import com.campusconnect.neo4j.repositories.BookRepository;
 import com.campusconnect.neo4j.repositories.UserRecRepository;
 import com.campusconnect.neo4j.types.common.AuditEventType;
+import com.campusconnect.neo4j.types.common.BookDetails;
 import com.campusconnect.neo4j.types.common.RelationTypes;
 import com.campusconnect.neo4j.types.common.Target;
 import com.campusconnect.neo4j.types.neo4j.Book;
@@ -45,6 +46,7 @@ import java.util.*;
 import static com.campusconnect.neo4j.da.mapper.DBMapper.*;
 import static com.campusconnect.neo4j.da.utils.Queries.*;
 import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.mapGroupNeo4jToWeb;
+import static com.campusconnect.neo4j.mappers.Neo4jToWebMapper.mapUserNeo4jToWeb;
 import static com.campusconnect.neo4j.types.common.AuditEventType.BORROWED;
 import static com.campusconnect.neo4j.types.common.AuditEventType.BORROW_AGREED;
 import static com.campusconnect.neo4j.types.common.AuditEventType.LENT;
@@ -228,6 +230,13 @@ public class BookDaoImpl implements BookDao {
         return getWishListBookAndUserFromResultMap(mapResult);
     }
 
+    private List<Book> getAllFriendsBooks(String userId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        Result<Map<String, Object>> mapResult = neo4jTemplate.query(Queries.GET_ALL_FRIENDS_BOOKS, params);
+        return getWishListBookAndUserFromResultMap(mapResult);
+    }
+
     private List<Book> getWishlistRecOnGroups(String userId) {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
@@ -296,13 +305,13 @@ public class BookDaoImpl implements BookDao {
             for (Book listedBook : books) {
                 if (listedBook.getId().equals(book.getId())) {
                     WishlistBookDetails wishlistBookDetails = (WishlistBookDetails) listedBook.getBookDetails();
-                    wishlistBookDetails.getUsers().add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+                    wishlistBookDetails.getUsers().add(mapUserNeo4jToWeb(user));
                     appended = true;
                 }
             }
             if (!appended) {
                 WishlistBookDetails wishlistBookDetails = new WishlistBookDetails();
-                wishlistBookDetails.getUsers().add(Neo4jToWebMapper.mapUserNeo4jToWeb(user));
+                wishlistBookDetails.getUsers().add(mapUserNeo4jToWeb(user));
                 book.setBookDetails(wishlistBookDetails);
                 book.setBookType(WISHLIST);
                 books.add(book);
@@ -516,6 +525,7 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
+    //cached
     public Book getBookRelatedUser(String bookId, String userId) {
         List<Book> allUserBooks = getAllUserBooks(userId);
         for(Book book: allUserBooks){
@@ -551,17 +561,110 @@ public class BookDaoImpl implements BookDao {
         return bookByGoodreadsId;
     }
 
-    private List<Book> getBookFromMapResult(Result<Map<String, Object>> mapResult, String userId) {
+    private List<Book> getBookFromMapResult(Result<Map<String, Object>> mapResult, String loggedInUser) {
         List<Book> books = new ArrayList<>();
         for (Map<String, Object> objectMap : mapResult) {
             RestNode bookNode = (RestNode) objectMap.get("book");
             RestRelationship rawWishRelationship = (RestRelationship) objectMap.get("relation");
             Book book = getBookFromRestNode(bookNode);
-            book = setRelationDetailsToBook(rawWishRelationship, book);
+            book = setRelationDetailsToBook(rawWishRelationship, book, loggedInUser);
             books.add(book);
         }
         return books;
     }
+
+
+    private Book setRelationDetailsToBook(RestRelationship rawRelationship, Book book, String loggedInUser) {
+        switch (rawRelationship.getType().name()) {
+            case OWNS_RELATION:
+                book.setBookType(OWNS_RELATION);
+                OwnsRelationship ownsRelationship = getOwnsRelationship(rawRelationship);
+                OwnedBookDetails ownedBookDetailsFromRelation = getOwnedBookDetailsFromRelation(ownsRelationship);
+                //todo: set history events
+                //todo: set those who are looking for
+                book.setBookDetails(ownedBookDetailsFromRelation);
+                break;
+            case BORROWED_RELATION:
+                book.setBookType(BORROWED_RELATION);
+                BorrowRelationship borrowBookRelationship = getBorrowBookRelationship(rawRelationship);
+                BorrowedBookDetails borrowBookDetailsFromRelation = getBorrowBookDetailsFromRelation(borrowBookRelationship);
+                book.setBookDetails(borrowBookDetailsFromRelation);
+                //todo: who already read the book
+                break;
+            case READ_RELATION:
+                book.setBookType(READ_RELATION);
+                break;
+
+            case WISHLIST_RELATION:
+                book.setBookType(WISHLIST_RELATION);
+                break;
+            case CURRENTLY_READING_RELATION:
+                book.setBookType(CURRENTLY_READING_RELATION);
+                break;
+            default:
+                book.setBookType("NONE");
+                break;
+        }
+        return book;
+    }
+
+
+    private Book setRelationDetailsToBook(RestRelationship rawRelationship, Book book) {
+        switch (rawRelationship.getType().name()) {
+            case OWNS_RELATION:
+                book.setBookType(OWNS_RELATION);
+                OwnsRelationship ownsRelationship = getOwnsRelationship(rawRelationship);
+                OwnedBookDetails ownedBookDetailsFromRelation = getOwnedBookDetailsFromRelation(ownsRelationship);
+                //todo: set history events
+                //todo: set those who are looking for
+                book.setBookDetails(ownedBookDetailsFromRelation);
+                break;
+            case BORROWED_RELATION:
+                book.setBookType(BORROWED_RELATION);
+                BorrowRelationship borrowBookRelationship = getBorrowBookRelationship(rawRelationship);
+                BorrowedBookDetails borrowBookDetailsFromRelation = getBorrowBookDetailsFromRelation(borrowBookRelationship);
+                book.setBookDetails(borrowBookDetailsFromRelation);
+                //todo: who already read the book
+                break;
+            case READ_RELATION:
+                book.setBookType(READ_RELATION);
+                break;
+
+            case WISHLIST_RELATION:
+                book.setBookType(WISHLIST_RELATION);
+                break;
+            case CURRENTLY_READING_RELATION:
+                book.setBookType(CURRENTLY_READING_RELATION);
+                break;
+            default:
+                book.setBookType("NONE");
+                break;
+        }
+        return book;
+    }
+
+    private BorrowedBookDetails getBorrowBookDetailsFromRelation(BorrowRelationship borrowBookRelationship) {
+        BorrowedBookDetails borrowedBookDetails = new BorrowedBookDetails();
+        borrowedBookDetails.setAdditionalComments(borrowBookRelationship.getAdditionalComments());
+        borrowedBookDetails.setBorrowDate(borrowBookRelationship.getBorrowDate());
+        borrowedBookDetails.setOwnerUserId(mapUserNeo4jToWeb(userDao.getUser(borrowBookRelationship.getOwnerUserId())));
+        borrowedBookDetails.setContractPeriodInDays(borrowBookRelationship.getContractPeriodInDays());
+        borrowedBookDetails.setStatus(borrowBookRelationship.getStatus());
+        return borrowedBookDetails;
+    }
+
+    private OwnedBookDetails getOwnedBookDetailsFromRelation(OwnsRelationship ownsRelationship) {
+        OwnedBookDetails ownedBookDetails = new OwnedBookDetails();
+        BorrowedBookDetails borrowedBookDetails = new BorrowedBookDetails();
+        borrowedBookDetails.setAdditionalComments(ownsRelationship.getUserComment());
+        borrowedBookDetails.setBorrowDate(ownsRelationship.getLentDate());
+        borrowedBookDetails.setBorrower(mapUserNeo4jToWeb(userDao.getUser(ownsRelationship.getBorrowerId())));
+        borrowedBookDetails.setContractPeriodInDays(ownsRelationship.getContractPeriodInDays());
+        borrowedBookDetails.setStatus(ownsRelationship.getStatus());
+        ownedBookDetails.setBorrowedBookDetails(borrowedBookDetails);
+        return ownedBookDetails;
+    }
+
 
     @Override
     public List<GoodreadsUserRecommendation> getGoodreadsUserRecommendations(String userId) {
@@ -756,11 +859,12 @@ public class BookDaoImpl implements BookDao {
     }
 
     private void setBookHistory(String bookId, String ownerId, HistoryEvent historyEvent) {
-
         OwnsRelationship ownsRelationship = bookRepository.getOwnsRelationship(ownerId, bookId);
-        Set<String> historyEvents = ownsRelationship.getHistoryEvents();
-        historyEvents.add(HistoryEventHelper.serializeEvent(historyEvent));
-        neo4jTemplate.save(ownsRelationship);
+        if(ownsRelationship != null){
+            Set<String> historyEvents = ownsRelationship.getHistoryEvents();
+            historyEvents.add(HistoryEventHelper.serializeEvent(historyEvent));
+            neo4jTemplate.save(ownsRelationship);
+        }
     }
 
     @Override

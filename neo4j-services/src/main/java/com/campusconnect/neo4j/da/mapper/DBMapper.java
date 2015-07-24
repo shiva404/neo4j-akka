@@ -149,65 +149,29 @@ public class DBMapper {
         return null;
     }
 
-    public static Book setRelationDetailsToBook(RestRelationship rawRelationship, Book book) {
-        switch (rawRelationship.getType().name()) {
-            case OWNS_RELATION:
-                book.setBookType(OWNS_RELATION);
-                book.setBookDetails(getOwnsBookDetails(rawRelationship));
-                break;
-            case BORROWED_RELATION:
-                book.setBookType(BORROWED_RELATION);
-                book.setBookDetails(getBorrowBookDetails(rawRelationship));
-                break;
-            case READ_RELATION:
-                book.setBookType(READ_RELATION);
-                break;
-            case WISHLIST_RELATION:
-                book.setBookType(WISHLIST_RELATION);
-                break;
-            case CURRENTLY_READING_RELATION:
-                book.setBookType(CURRENTLY_READING_RELATION);
-                break;
-            default:
-                book.setBookType("NONE");
-                break;
-        }
-        return book;
+
+
+    public static OwnsRelationship getOwnsRelationship(RestRelationship rawRelationship) {
+        OwnsRelationship ownsRelationship = new OwnsRelationship();
+        ownsRelationship.setStatus((String) rawRelationship.getProperty(STATUS, "NONE"));
+        ownsRelationship.setBorrowerId( (String) rawRelationship.getProperty("borrowerId", null));
+        ownsRelationship.setContractPeriodInDays((Integer) rawRelationship.getProperty("contractPeriodInDays", null));
+        ownsRelationship.setLentDate((Long) rawRelationship.getProperty("lentDate", null));
+        ownsRelationship.setUserComment((String) rawRelationship.getProperty("userComment", null));
+        ownsRelationship.getHistoryEvents().addAll(rawRelationship.getProperty("histroyEvent", ))
+        return ownsRelationship;
     }
 
-    private static BookDetails getOwnsBookDetails(RestRelationship ownsRelationship) {
-
-        OwnedBookDetails ownedBookDetails = new OwnedBookDetails();
-
-        String status = (String) ownsRelationship.getProperty(STATUS, "");
-        switch (status) {
-            case AVAILABLE:
-                ownedBookDetails.setStatus(AVAILABLE);
-                break;
-            case BORROW_LOCK:
-                ownedBookDetails.setStatus(BORROW_LOCK);
-                ownedBookDetails.setBorrowerId((String) ownsRelationship.getProperty("borrowerId", null));
-                ownedBookDetails.setContractPeriodInDays((Integer) ownsRelationship.getProperty("contractPeriodInDays", null));
-                break;
-            case LENT:
-                ownedBookDetails.setStatus(BORROW_LOCK);
-                ownedBookDetails.setBorrowerId((String) ownsRelationship.getProperty("borrowerId", null));
-                ownedBookDetails.setContractPeriodInDays((Integer) ownsRelationship.getProperty("contractPeriodInDays", null));
-                ownedBookDetails.setLentDate((Long) ownsRelationship.getProperty("lentDate", null));
-                break;
-        }
-        return ownedBookDetails;
-    }
-
-    private static BorrowedBookDetails getBorrowBookDetails(RestRelationship borrowRelation) {
-        BorrowedBookDetails borrowedBookDetails = new BorrowedBookDetails();
+    public static BorrowRelationship getBorrowBookRelationship(RestRelationship borrowRelation) {
+        BorrowRelationship borrowRelationship = new BorrowRelationship();
 
         String status = (String) borrowRelation.getProperty(STATUS, "");
-        borrowedBookDetails.setOwnerUserId((String) borrowRelation.getProperty("ownerUserId", null));
-        borrowedBookDetails.setContractPeriodInDays((Integer) borrowRelation.getProperty("contractPeriodInDays", null));
-        borrowedBookDetails.setAdditionalComments((String) borrowRelation.getProperty("additionalComments", null));
-        borrowedBookDetails.setStatus(status);
+        borrowRelationship.setOwnerUserId((String) borrowRelation.getProperty("ownerUserId", null));
+        borrowRelationship.setContractPeriodInDays((Integer) borrowRelation.getProperty("contractPeriodInDays", null));
+        borrowRelationship.setAdditionalComments((String) borrowRelation.getProperty("additionalComments", null));
+        borrowRelationship.setStatus(status);
 
-        return borrowedBookDetails;
+        return borrowRelationship;
+
     }
 }

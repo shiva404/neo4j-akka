@@ -24,6 +24,9 @@ public class Queries {
             "WHERE (user)-[:CONNECTED {type:\"FRIEND\"}]-(friend)" +
             "return book, friend";
 
+    public static final String GET_ALL_FRIENDS_BOOKS = "match(user:User {id:{userId}}) - [:CONNECTED]-(friend:User)-[r]-(book:Book) WHERE (user)-[:CONNECTED {type:\"FRIEND\"}]-(friend) return r, book, friend";
+
+
     public static final String GET_WISHLIST_GROUP = "match(user:User {id:{userId}})-[:WISH]-(book:Book)-[:OWNS]-(friend:User)-[:USER_ACCESS]-(group:Group) " +
             "WHERE (user)-[:USER_ACCESS]-(group) " +
             "return book,friend,group";

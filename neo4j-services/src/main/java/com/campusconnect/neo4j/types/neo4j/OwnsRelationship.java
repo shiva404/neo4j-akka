@@ -85,7 +85,7 @@ public class OwnsRelationship extends BookRelationship {
         this.borrowerId = borrowerId;
     }
 
-    public int getContractPeriodInDays() {
+    public Integer getContractPeriodInDays() {
         return contractPeriodInDays;
     }
 

@@ -53,7 +53,7 @@ public interface BookDao {
 
     Book getBookByGoodreadsIdWithUser(Integer goodreadsId, String userId);
 
-    List<Book> getAllUserBooks(String userId);
+    List<Book> getAllUserBooks(String userId, String loggedInUser);
 
     List<Book> searchWithRespectToUser(String userId, String searchString);
 
@@ -81,7 +81,8 @@ public interface BookDao {
     void deleteBorrowRequest(String borrowerId, String bookId, String ownerId, String message);
 
 
-    List<Book> getWishlistBooksWithDetails(String userId);
+    List<Book> getWishlistBooksWithDetails(String userId, String loggedInUser);
+    List<Book> getOwnedBooksWithDetails(String userId, String loggedInUser);
 
     void initiateBookReturn(String bookId, String status, ReturnRequest returnRequest);
 
@@ -90,7 +91,9 @@ public interface BookDao {
 
     void updateBookReturnToSuccess(String bookId, String status, String ownerId, String borrowerId, String comment);
 
-    List<Book> getWishListBooksWithRec(String userId);
+    List<Book> getWishListBooksWithMin1Rec(String userId);
+
+
 
 	void removeOwnedBook(String userId, String bookId);
 

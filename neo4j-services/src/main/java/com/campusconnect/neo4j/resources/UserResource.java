@@ -300,7 +300,7 @@ public class UserResource {
                 BorrowedBooksPage borrowedBooksPage = new BorrowedBooksPage(0, borrowedBooks.size(), borrowedBooks);
                 return Response.ok().entity(borrowedBooksPage).build();
             case WISHLIST_RELATION:
-                List<com.campusconnect.neo4j.types.web.Book> wishListBooks = getWebBooks(bookDao.getWishlistBooksWithDetails(userId));
+                List<com.campusconnect.neo4j.types.web.Book> wishListBooks = getWebBooks(bookDao.getWishlistBooksWithDetails(userId, loggedInUser));
                 BooksPage wishListBooksPage = new BooksPage(wishListBooks.size(), 0, wishListBooks);
                 return Response.ok().entity(wishListBooksPage).build();
             case CURRENTLY_READING_RELATION:
@@ -308,11 +308,12 @@ public class UserResource {
                 CurrentlyReadingBooksPage currentlyReadingBooksPage = new CurrentlyReadingBooksPage(0, currentlyReadingBooks.size(), currentlyReadingBooks);
                 return Response.ok().entity(currentlyReadingBooksPage).build();
             case WISHLIST_WITH_REC:
-                List<com.campusconnect.neo4j.types.web.Book> wishListBooksWithRec = getWebBooks(bookDao.getWishListBooksWithRec(userId));
+                List<com.campusconnect.neo4j.types.web.Book> wishListBooksWithRec = getWebBooks(bookDao.getWishListBooksWithMin1Rec(userId));
                 BooksPage wishListBooksRecPage = new BooksPage(wishListBooksWithRec.size(), 0, wishListBooksWithRec);
                 return Response.ok().entity(wishListBooksRecPage).build();
             case ALL:
-                List<Book> allBooks = bookDao.getAllUserBooks(userId);
+
+                List<Book> allBooks = bookDao.getAllUserBooks(userId, loggedInUser);
                 AllBooks resultBooks = new AllBooks();
                 for (Book book : allBooks) {
                     com.campusconnect.neo4j.types.web.Book webBook = mapBookNeo4jToWeb(book);

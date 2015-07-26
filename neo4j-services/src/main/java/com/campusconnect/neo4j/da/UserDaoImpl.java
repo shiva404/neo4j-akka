@@ -125,6 +125,8 @@ public class UserDaoImpl implements UserDao {
     @Override
     @Cacheable(cacheName = "userIdCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = @Property(name = "includeMethod", value = "false")))
     public User getUser(String userId) {
+        if(userId == null)
+            return null;
         User user = userRepository.findBySchemaPropertyValue("id", userId);
         if (user == null) {
             throw new NotFoundException(ErrorCodes.USER_NOT_FOUND, "User with id:" + userId + " not found");
@@ -185,7 +187,7 @@ public class UserDaoImpl implements UserDao {
         params.put("userId", loggedInUser);
         Result<Map<String, Object>> mapResult = neo4jTemplate.query(GET_RELATED_USERS, params);
 
-        List<User> users = getUsersFromResultMap(mapResult);
+        List<User> users = getUsersAlongWithRelationFromResultMap(mapResult);
         List<User> pendingApprovalFriends = getPendingFriendReq(loggedInUser);
         users = replaceUsersWithExistingFriends(users, pendingApprovalFriends);
         return users;
@@ -262,7 +264,7 @@ public class UserDaoImpl implements UserDao {
         return friendRecommendations;
     }
 
-    private List<User> getUsersFromResultMap(Result<Map<String, Object>> mapResult) {
+    private List<User> getUsersAlongWithRelationFromResultMap(Result<Map<String, Object>> mapResult) {
         List<User> users = new ArrayList<>();
         for (Map<String, Object> objectMap : mapResult) {
             RestNode userNode = (RestNode) objectMap.get("user");

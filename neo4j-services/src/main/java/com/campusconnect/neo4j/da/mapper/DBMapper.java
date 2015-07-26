@@ -158,7 +158,7 @@ public class DBMapper {
         ownsRelationship.setContractPeriodInDays((Integer) rawRelationship.getProperty("contractPeriodInDays", null));
         ownsRelationship.setLentDate((Long) rawRelationship.getProperty("lentDate", null));
         ownsRelationship.setUserComment((String) rawRelationship.getProperty("userComment", null));
-        ownsRelationship.getHistoryEvents().addAll(rawRelationship.getProperty("histroyEvent", ))
+//        ownsRelationship.getHistoryEvents().addAll(rawRelationship.getProperty("histroyEvent", ))
         return ownsRelationship;
     }
 

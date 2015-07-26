@@ -2,6 +2,7 @@ package com.campusconnect.neo4j.types.web;
 
 import com.campusconnect.neo4j.types.common.BookDetails;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class OwnedBookDetails extends BookDetails {
@@ -9,6 +10,16 @@ public class OwnedBookDetails extends BookDetails {
     private BorrowedBookDetails borrowedBookDetails;
     private List<User> lookingForUsers;
     private HistoryEventPage historyEventPage;
+
+    public List<GroupWithMembers> getGroupsWithMembers() {
+        if(groupsWithMembers == null)
+            groupsWithMembers = new LinkedList<>();
+        return groupsWithMembers;
+    }
+
+
+
+    private List<GroupWithMembers> groupsWithMembers;
 
     public String getStatus() {
         return status;
@@ -29,12 +40,11 @@ public class OwnedBookDetails extends BookDetails {
     }
 
     public List<User> getLookingForUsers() {
+        if(lookingForUsers == null)
+            lookingForUsers = new LinkedList<>();
         return lookingForUsers;
     }
 
-    public void setLookingForUsers(List<User> lookingForUsers) {
-        this.lookingForUsers = lookingForUsers;
-    }
 
     public HistoryEventPage getHistoryEventPage() {
         return historyEventPage;
@@ -42,13 +52,6 @@ public class OwnedBookDetails extends BookDetails {
 
     public void setHistoryEventPage(HistoryEventPage historyEventPage) {
         this.historyEventPage = historyEventPage;
-    }
-
-    public OwnedBookDetails(BorrowedBookDetails borrowedBookDetails, List<User> lookingForUsers, HistoryEventPage historyEventPage, String status) {
-        this.borrowedBookDetails = borrowedBookDetails;
-        this.lookingForUsers = lookingForUsers;
-        this.historyEventPage = historyEventPage;
-        this.status = status;
     }
 
     public OwnedBookDetails() {

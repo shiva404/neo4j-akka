@@ -99,10 +99,10 @@ public static void validateUserFields(Fields fields) {
 		 
 		 switch(field.getName()){
 		 case "email":
-			 if(validateEmail())
-			 {
-				 
-			 }
+//			 if(validateEmail())
+//			 {
+//
+//			 }
 			 
 		 }
 	 }

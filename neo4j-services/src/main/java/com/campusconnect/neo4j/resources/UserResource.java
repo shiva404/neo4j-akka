@@ -127,7 +127,8 @@ public class UserResource {
     public Response updateUserFields(@PathParam("userId") final String userId,
                                      Fields fields) throws Exception {
         //TODO: validate passed fields are valid or not
-
+    	Validator.validateUserFields(fields);
+    	
         User user = userDao.getUser(userId);
         setUpdatedFields(user, fields);
         user.setLastModifiedDate(System.currentTimeMillis());
@@ -166,13 +167,13 @@ public class UserResource {
     }
 
     private void setUpdatedFields(User user, Fields fields) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
+    	
         for (Field field : fields.getFields()) {
             BeanUtils.setProperty(user, field.getName(), field.getValue());
         }
+        }
 
-
-    }
+    
 
     @GET
     @Path("{userId}")

@@ -105,13 +105,14 @@ public class BookDaoImpl implements BookDao {
     public void listBookAsOwns(OwnsRelationship ownsRelationship) {
 
     	OwnsRelationship existingOwnsRelationship = bookRepository.getOwnsRelationship(ownsRelationship.getUser().getId(), ownsRelationship.getBook().getId());
-
+    	
     	if(null==existingOwnsRelationship)
     	{
     		neo4jTemplate.save(ownsRelationship);
     		Target target = TargetHelper.createBookTarget(ownsRelationship.getBook());
     		Event event = EventHelper.createPublicEvent(AuditEventType.BOOK_ADDED_OWNS, target);
     		auditEventDao.addEvent(ownsRelationship.getUser().getId(), event);
+    		deleteWishListRelation(existingOwnsRelationship.getUser().getId(),existingOwnsRelationship.getBook().getId());
 
     	}else
     	{
@@ -133,10 +134,22 @@ public class BookDaoImpl implements BookDao {
     		Event event = EventHelper.createPublicEvent(AuditEventType.BOOK_ADDED_READ.toString(), target);
     		auditEventDao.addEvent(readRelation.getUser().getId(), event);
     	}
+    	
+    	deleteCurrentlyReadingRelation(readRelation.getUser().getId(),readRelation.getBook().getId());
+    	deleteWishListRelation(existingReadRelationship.getUser().getId(),existingReadRelationship.getBook().getId());
 
     }
 
-    @Override
+    private void deleteCurrentlyReadingRelation(String userId, String bookId) {
+		
+		CurrentlyReadingRelationShip currentlyReadingRelationShip = bookRepository.getCurrentlyReadingRelationShip(userId, bookId);
+		if(null!= currentlyReadingRelationShip)
+		{
+			neo4jTemplate.delete(currentlyReadingRelationShip);
+		}
+	}
+
+	@Override
     public List<Book> getWishlistBooksWithDetails(String userId) {
         List<Book> wishlistRecOnFriends = getWishlistRecOnFriends(userId);
         List<Book> wishlistRecOnGroups = getWishlistRecOnGroups(userId);
@@ -879,7 +892,18 @@ public class BookDaoImpl implements BookDao {
         		Event event = EventHelper.createPublicEvent(AuditEventType.BOOK_ADDED_CURRENTLY_READING.toString(), target);
         		auditEventDao.addEvent(currentlyReadingRelationship.getUser().getId(), event);
     		}
-    }
+    		
+    		deleteWishListRelation(currentlyReadingRelationship.getUser().getId(),currentlyReadingRelationship.getBook().getId());
+    		
+    		}
+
+	private void deleteWishListRelation(String userId,String bookId) {
+		WishListRelationship wishListRelationship = bookRepository.getWishListRelationship(userId,bookId);
+		if(null!= wishListRelationship)
+		{
+			neo4jTemplate.delete(wishListRelationship);
+		}
+	}
 
     @Override
     public List<CurrentlyReadingBook> getCurrentlyReadingBook(String userId) {
@@ -888,4 +912,38 @@ public class BookDaoImpl implements BookDao {
         Result<Map<String, Object>> mapResult = neo4jTemplate.query(CURRENTLY_READING_BOOKS_QUERY, params);
         return getCurrentlyReadingBookFromResultMap(mapResult);
     }
+
+	@Override
+	public void removeOwnedBook(String userId, String bookId) {
+		
+		OwnsRelationship ownsRelationship = bookRepository.getOwnsRelationship(userId, bookId);
+		if(null!= ownsRelationship)
+		{
+			neo4jTemplate.delete(ownsRelationship);
+		}
+		
+	}
+
+	@Override
+	public void removeWishlistBook(String userId, String bookId) {
+	
+		deleteWishListRelation(userId, bookId);
+	}
+
+	@Override
+	public void removeCurrentlyReadingBook(String userId, String bookId) {
+		deleteCurrentlyReadingRelation(userId,bookId);
+		
+	}
+
+	@Override
+	public void removeReadBook(String userId, String bookId) {
+		ReadRelationship readRelationship = bookRepository.getReadRelationShip(userId, bookId);
+		if(null!= readRelationship)
+		{
+			neo4jTemplate.delete(readRelationship);
+		}
+	}
+	
+	
 }

@@ -15,33 +15,29 @@ import org.springframework.data.neo4j.annotation.NodeEntity;
 @NodeEntity
 public class Group {
 
-    @GraphId
-    private Long nodeId;
-
-    @Indexed(unique = true)
-    private String id;
-    private String name;
-
-    private String isPublic;
-
-    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy, String isPublic) {
-        this.id = id;
-        this.name = name;
-        this.createdDate = createdDate;
-        this.lastModifiedTime = lastModifiedTime;
-        this.lastModifiedBy = lastModifiedBy;
-        this.isPublic = isPublic;
-    }
-
     @CreatedDate
 
     private Long createdDate;
 
-    @LastModifiedDate
-    private Long lastModifiedTime;
+    @Indexed(unique = true)
+    private String id;
+    private String imageUrl;
+
+    private String isPublic;
 
     @LastModifiedBy
     private String lastModifiedBy;
+
+    @LastModifiedDate
+    private Long lastModifiedTime;
+
+    private String name;
+    
+    @GraphId
+    private Long nodeId;
+
+    public Group() {
+    }
 
     public Group(String name) {
         this.name = name;
@@ -52,11 +48,6 @@ public class Group {
         this.name = name;
         this.createdDate = createdDate;
     }
-    public Group(String name, String isPublic) {
-        this.name = name;
-        this.isPublic = isPublic;
-    }
-
     public Group(String name, Long createdDate, String isPublic) {
 
         this.name = name;
@@ -64,7 +55,49 @@ public class Group {
         this.isPublic = isPublic;
     }
 
-    public Group() {
+    public Group(String name, String isPublic) {
+        this.name = name;
+        this.isPublic = isPublic;
+    }
+
+    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy, String isPublic,String imageUrl) {
+        this.id = id;
+        this.name = name;
+        this.createdDate = createdDate;
+        this.lastModifiedTime = lastModifiedTime;
+        this.lastModifiedBy = lastModifiedBy;
+        this.isPublic = isPublic;
+        this.imageUrl = imageUrl;
+    }
+
+    public Long getCreatedDate() {
+        return createdDate;
+    }
+
+	public String getId() {
+        return id;
+    }
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public String getisPublic() { return  isPublic; }
+
+	public String getIsPublic() {
+		return isPublic;
+	}
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public Long getLastModifiedTime() {
+        return lastModifiedTime;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Long getNodeId() {
@@ -72,53 +105,39 @@ public class Group {
         return nodeId;
     }
 
-    public void setNodeId(Long nodeId) {
-        this.nodeId = nodeId;
-    }
-
-    public String getId() {
-        return id;
+    public void setCreatedDate(Long createdDate) {
+        this.createdDate = createdDate;
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
+    public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setisPublic(String isPublic) { this.isPublic = isPublic; }
 
-    public Long getCreatedDate() {
-        return createdDate;
-    }
+    public void setIsPublic(String isPublic) {
+		this.isPublic = isPublic;
+	}
 
-    public void setCreatedDate(Long createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Long getLastModifiedTime() {
-        return lastModifiedTime;
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 
     public void setLastModifiedTime(Long lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
     }
 
-    public String getLastModifiedBy() {
-        return lastModifiedBy;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
+    public void setNodeId(Long nodeId) {
+        this.nodeId = nodeId;
     }
-
-    public void setisPublic(String isPublic) { this.isPublic = isPublic; }
-
-    public String getisPublic() { return  isPublic; }
 
     @Override
     public String toString() {

@@ -104,8 +104,11 @@ public class BookResource {
         }
         Long now = System.currentTimeMillis();
 
-        //TODO: Should event/notification be added 
-      
+<<<<<<< Updated upstream
+        //TODO: Should event/notification be added
+
+=======
+>>>>>>> Stashed changes
         switch (listingType.toUpperCase()) {
 	            case OWNS_RELATION:
 	                if (status == null) {

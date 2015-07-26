@@ -4,6 +4,7 @@ import com.campusconnect.neo4j.types.neo4j.Book;
 import com.campusconnect.neo4j.types.neo4j.*;
 import com.campusconnect.neo4j.types.neo4j.User;
 import com.campusconnect.neo4j.types.web.*;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -90,5 +91,13 @@ public interface BookDao {
     void updateBookReturnToSuccess(String bookId, String status, String ownerId, String borrowerId, String comment);
 
     List<Book> getWishListBooksWithRec(String userId);
+
+	void removeOwnedBook(String userId, String bookId);
+
+	void removeWishlistBook(String userId, String bookId);
+
+	void removeCurrentlyReadingBook(String userId, String bookId);
+
+	void removeReadBook(String userId, String bookId);
 
 }

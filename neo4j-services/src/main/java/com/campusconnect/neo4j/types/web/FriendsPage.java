@@ -13,9 +13,10 @@ public class FriendsPage {
 
     public FriendsPage(int size, int offset, List<User> friends) {
         super();
+        this.size = size;
         this.friends = friends;
         this.offset = offset;
-        this.size = size;
+
     }
 
     public List<User> getFriends() {

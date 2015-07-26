@@ -69,8 +69,9 @@ public class UserRecForWishlist extends UntypedActor {
                 //See what all books need to rec with user
                 List<WishListBook> wishListBooks = task.getWishListBooks();
                 if (wishListBooks != null)
-                    for (com.campusconnect.neo4j.types.web.Book wishListBook : wishListBooks) {
-                        for (Book friendBook : books) {
+                    if(!books.isEmpty() && !wishListBooks.isEmpty())
+                    for (Book friendBook : books) {
+                        for (com.campusconnect.neo4j.types.web.Book wishListBook : wishListBooks) {
                             if (wishListBook.getGoodreadsId() != null && wishListBook.getGoodreadsId().equals(friendBook.getGoodreadsId())) {
                                 if (recExists(wishListBook.getGoodreadsId(), task.getFriend().getId(), task.getGoodreadsUserRecommendations())) {
                                     logger.info("User Recommendation already exists:");

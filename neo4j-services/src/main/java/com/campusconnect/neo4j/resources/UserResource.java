@@ -629,7 +629,7 @@ public class UserResource {
         for (User friend : friends) {
             returnFriends.add(Neo4jToWebMapper.mapUserNeo4jToWeb(friend));
         }
-        FriendsPage friendsPage = new FriendsPage(0, returnFriends.size(), returnFriends);
+        FriendsPage friendsPage = new FriendsPage(returnFriends.size(), 0, returnFriends);
 
         Friends allFriends = new Friends();
         allFriends.setFriends(friendsPage);
@@ -640,7 +640,7 @@ public class UserResource {
             for (User friend : mutualFriends) {
                 returnMutualFriends.add(Neo4jToWebMapper.mapUserNeo4jToWeb(friend));
             }
-            FriendsPage mutualFriendsPage = new FriendsPage(0, returnMutualFriends.size(), returnMutualFriends);
+            FriendsPage mutualFriendsPage = new FriendsPage(returnMutualFriends.size(), 0, returnMutualFriends);
             allFriends.setMutualFriends(mutualFriendsPage);
         }
         return Response.ok().entity(allFriends).build();

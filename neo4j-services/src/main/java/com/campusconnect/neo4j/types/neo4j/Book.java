@@ -54,7 +54,7 @@ public class Book implements Serializable {
     }
 
     public Book(String id, Integer goodreadsId, String authorName, String goodreadsAuthorId, String name, String isbn, String isbn13,
-                int publishedYear, String description, String publisher, Integer numberOfPages, String imageUrl) {
+                int publishedYear, String description, String publisher, Integer numberOfPages, String imageUrl, Long nodeId) {
         this.id = id;
         this.goodreadsId = goodreadsId;
         this.authorName = authorName;
@@ -67,6 +67,7 @@ public class Book implements Serializable {
         this.publisher = publisher;
         this.numberOfPages = numberOfPages;
         this.imageUrl = imageUrl;
+        this.nodeId = nodeId;
     }
 
     public Book() {

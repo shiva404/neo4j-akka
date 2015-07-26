@@ -61,7 +61,7 @@ public class AddressDaoImpl implements AddressDao {
             Long currentTime = System.currentTimeMillis();
 
             Target target = TargetHelper.createUserTarget(userDao.getUser(userId));
-            Event updatedAddressUserEvent = EventHelper.createPrivateEvent(AuditEventType.UPDATED_ADDRESS.toString(), target);
+            Event updatedAddressUserEvent = EventHelper.createPrivateEvent(AuditEventType.UPDATED_ADDRESS, target);
             auditEventDao.addEvent(userId, updatedAddressUserEvent);
 
         } catch (Exception e) {
@@ -77,7 +77,7 @@ public class AddressDaoImpl implements AddressDao {
 
         addressRepository.delete(Long.parseLong(addressId));
         Target target = TargetHelper.createUserTarget(userDao.getUser(userId));
-        Event event = EventHelper.createPrivateEvent(AuditEventType.DELETED_ADDRESS.toString(), target);
+        Event event = EventHelper.createPrivateEvent(AuditEventType.DELETED_ADDRESS, target);
         auditEventDao.addEvent(userId, event);
     }
 

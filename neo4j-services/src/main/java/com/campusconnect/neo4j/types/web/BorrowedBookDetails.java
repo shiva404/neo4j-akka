@@ -2,20 +2,17 @@ package com.campusconnect.neo4j.types.web;
 
 import com.campusconnect.neo4j.types.common.BookDetails;
 
-/**
- * Created with IntelliJ IDEA.
- * User: sn1
- * Date: 6/6/15
- * Time: 4:16 PM
- * To change this template use File | Settings | File Templates.
- */
 public class BorrowedBookDetails extends BookDetails {
+    private User borrower;
+    private User ownerUserId;
+
     private Long dueDate;
-    private String ownerUserId;
     private String additionalComments;
     private Long borrowDate;
     private Integer contractPeriodInDays;
     private String status;
+
+
 
     public Long getDueDate() {
         return dueDate;
@@ -25,11 +22,11 @@ public class BorrowedBookDetails extends BookDetails {
         this.dueDate = dueDate;
     }
 
-    public String getOwnerUserId() {
+    public User getOwnerUserId() {
         return ownerUserId;
     }
 
-    public void setOwnerUserId(String ownerUserId) {
+    public void setOwnerUserId(User ownerUserId) {
         this.ownerUserId = ownerUserId;
     }
 
@@ -69,13 +66,22 @@ public class BorrowedBookDetails extends BookDetails {
 
     }
 
-    public BorrowedBookDetails(Long dueDate, String ownerUserId, String additionalComments, Long borrowDate, Integer contractPeriodInDays, String status) {
+    public User getBorrower() {
+        return borrower;
+    }
 
+    public void setBorrower(User borrower) {
+        this.borrower = borrower;
+    }
+
+    public BorrowedBookDetails(Long dueDate, User ownerUserId, User borrower, String additionalComments,
+                               Long borrowDate, Integer contractPeriodInDays, String status) {
         this.dueDate = dueDate;
         this.ownerUserId = ownerUserId;
         this.additionalComments = additionalComments;
         this.borrowDate = borrowDate;
         this.contractPeriodInDays = contractPeriodInDays;
         this.status = status;
+        this.borrower = borrower;
     }
 }

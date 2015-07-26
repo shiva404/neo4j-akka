@@ -6,6 +6,8 @@ import com.campusconnect.neo4j.exceptions.Neo4jException;
 import com.campusconnect.neo4j.types.neo4j.BorrowRelationship;
 import com.campusconnect.neo4j.types.neo4j.OwnsRelationship;
 import com.campusconnect.neo4j.types.neo4j.UserGroupRelationship;
+import com.campusconnect.neo4j.types.web.Field;
+import com.campusconnect.neo4j.types.web.Fields;
 import com.campusconnect.neo4j.types.web.User;
 
 import static com.campusconnect.neo4j.util.ErrorCodes.INVALID_ARGUMENTS;
@@ -72,5 +74,38 @@ public static void checkBookReturnPreConditions(
 	{
 		throw new Neo4jException(ErrorCodes.INCONSISTANT_DATA, "Data is not consistant please contact admin");
 	}
+}
+
+public static void validateUserFields(Fields fields) {
+	
+		//  this.email = email;
+		//  this.favorites = favorites;
+		//  
+		//  this.goodreadsAccessToken = goodreadsAccessToken;
+		//  this.goodreadsAccessTokenSecret = goodreadsAccessTokenSecret;
+		//  this.goodreadsAuthStatus = goodreadsAuthStatus;
+		//
+		//
+		//
+		//  this.name = name;
+		// 
+		//  this.phone = phone;
+		//  this.gender = gender;
+		//  this.profileImageUrl = profileImageUrl;
+		//  this.workDesignation = workDesignation;
+		//  this.workLocation = workLocation;
+	
+	 for (Field field : fields.getFields()) {
+		 
+		 switch(field.getName()){
+		 case "email":
+			 if(validateEmail())
+			 {
+				 
+			 }
+			 
+		 }
+	 }
+	
 }
 }

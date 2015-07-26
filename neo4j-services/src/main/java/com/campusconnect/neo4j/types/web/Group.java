@@ -2,25 +2,21 @@ package com.campusconnect.neo4j.types.web;
 
 public class Group {
 
-    private String id;
-    private String name;
-
-    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy, String isPublic) {
-        this.id = id;
-        this.name = name;
-        this.createdDate = createdDate;
-        this.lastModifiedTime = lastModifiedTime;
-        this.lastModifiedBy = lastModifiedBy;
-        this.isPublic = isPublic;
-    }
-
     private Long createdDate;
+    private String id;
 
-    private Long lastModifiedTime;
-
-    private String lastModifiedBy;
+    private String imageUrl;
 
     private String isPublic;
+
+	private String lastModifiedBy;
+
+	private Long lastModifiedTime;
+
+	private String name;
+
+	public Group() {
+    }
 
     public Group(String name) {
         this.name = name;
@@ -31,12 +27,7 @@ public class Group {
         this.name = name;
         this.createdDate = createdDate;
     }
-
-    public Group(String name, String isPublic) {
-        this.name = name;
-        this.isPublic = isPublic;
-    }
-
+    
     public Group(String name, Long createdDate, String isPublic) {
 
         this.name = name;
@@ -44,55 +35,83 @@ public class Group {
         this.isPublic = isPublic;
     }
 
-    public Group() {
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+    public Group(String name, String isPublic) {
         this.name = name;
+        this.isPublic = isPublic;
+    }
+
+    public Group(String id, String name, Long createdDate, Long lastModifiedTime, String lastModifiedBy, String isPublic,String imageUrl) {
+        this.id = id;
+        this.name = name;
+        this.createdDate = createdDate;
+        this.lastModifiedTime = lastModifiedTime;
+        this.lastModifiedBy = lastModifiedBy;
+        this.isPublic = isPublic;
+        this.imageUrl = imageUrl;
     }
 
     public Long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Long createdDate) {
-        this.createdDate = createdDate;
+    public String getId() {
+        return id;
+    }
+
+    public String getImageUrl() {
+		return imageUrl;
+	}
+
+    public String getisPublic() {
+        return  isPublic;
+    }
+
+    public String getIsPublic() {
+		return isPublic;
+	}
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
     }
 
     public Long getLastModifiedTime() {
         return lastModifiedTime;
     }
 
-    public void setLastModifiedTime(Long lastModifiedTime) {
-        this.lastModifiedTime = lastModifiedTime;
+    public String getName() {
+        return name;
     }
 
-    public String getLastModifiedBy() {
-        return lastModifiedBy;
+    public void setCreatedDate(Long createdDate) {
+        this.createdDate = createdDate;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
+    public void setId(String id) {
+        this.id = id;
     }
+
+    public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 
     public void setisPublic(String isPublic) {
         this.isPublic = isPublic;
     }
 
-    public String getisPublic() {
-        return  isPublic;
+    public void setIsPublic(String isPublic) {
+		this.isPublic = isPublic;
+	}
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public void setLastModifiedTime(Long lastModifiedTime) {
+        this.lastModifiedTime = lastModifiedTime;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }
